@@ -1,0 +1,40 @@
+<li class="nav-item" *ngIf="!isAuthenticated">
+  <a 
+    class="nav-link" 
+    (click)="login()"
+    title="Login"
+    href="javascript:void(0)"><i class="tim-icons icon-single-02"></i></a>
+</li>
+
+<li class=" nav-item" *ngIf="isAuthenticated" ngbDropdown>
+  <a
+    class=" nav-link"
+    data-toggle="dropdown"
+    href="javascript:void(0)"
+    ngbDropdownToggle>
+    <div class=" photo">
+      <img alt="Profile Photo" src="assets/img/anime3.png" />
+    </div>
+    <b class=" caret d-none d-lg-block d-xl-block"> </b>
+    <p class=" d-lg-none">Log out</p>
+  </a>
+
+  <ul class=" dropdown-navbar" ngbDropdownMenu>
+    <li class=" nav-link">
+      <a class=" nav-item" href="javascript:void(0)" ngbDropdownItem>
+        Profile
+      </a>
+    </li>
+    <li class=" nav-link">
+      <a class=" nav-item" href="javascript:void(0)" ngbDropdownItem>
+        Settings
+      </a>
+    </li>
+    <li class=" dropdown-divider"></li>
+    <li class=" nav-link">
+      <a class=" nav-item" href="javascript:void(0)" (click)="logout()" ngbDropdownItem>
+        Log out
+      </a>
+    </li>
+  </ul>
+</li>

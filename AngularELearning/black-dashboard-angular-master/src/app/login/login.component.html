@@ -1,0 +1,65 @@
+
+<div class=" content" style="margin-top: 10%;">
+  <div class=" row">
+    <div class="col-md-4"></div>
+    <div class="col-md-4">
+      <div class=" card card-user">
+        <div class=" card-body">
+          <p class=" card-text text-center">Login</p>
+          <div class=" author">
+              <div class=" block block-one"></div>
+              <div class=" block block-two"></div>
+              <div class=" block block-three"></div>
+              <div class=" block block-four"></div>
+              <a href="javascript:void(0)">
+                <img alt="..." class=" avatar" src="assets/img/anime3.png" />
+              </a>
+            </div>
+          <div class=" card-description">
+            <form #sorbsoftForm (submit)="authenticate(sorbsoftForm)">
+              <div class="justify-content-md-center row">
+
+                <div class="col-md-6">
+                  <div class=" form-group">
+                    <label>Username </label>
+                    <input
+                      class=" form-control"
+                      name="username"
+                      id="username"
+                      placeholder="Username"
+                      #username="ngModel"
+                      type="email"
+                      [(ngModel)]="vm.username"
+                    />
+                  </div>
+                </div>
+              </div>
+              <div class="justify-content-md-center row">
+                  <div class=" col-md-offset-3 col-md-6">
+                      <div class=" form-group">
+                          <label>Password </label>
+                          <input
+                            class=" form-control"
+                            name="password"
+                            id="password"
+                            placeholder="password"
+                            #password="ngModel"
+                            type="password"
+                            [(ngModel)]="vm.password"
+                          />
+                      </div>
+                  </div>
+              </div>
+              <div class=" card-footer">
+                <div class=" button-container">
+                    <button class=" btn btn-fill btn-danger" type="submit">Login</button>
+                </div>
+              </div>
+          </form>
+          <h4 *ngIf="error">{{error}}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+  

@@ -1,0 +1,14 @@
+
+/* 
+.table-fixed{
+    width: 100%;
+    tbody{
+        height: 54%;
+        overflow-y:auto;
+        overflow-x:auto;
+        width: 100%;
+    }
+    thead,tbody,tr,td,th{
+      display:block;
+    }
+} */
