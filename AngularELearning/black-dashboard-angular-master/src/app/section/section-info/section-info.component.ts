@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Section } from '../shared/section.model';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,21 +9,22 @@ import { SectionService } from '../shared/section.service';
   templateUrl: 'section-info.component.html',
   styleUrls: ['section-info.component.css']
 })
-export class SectionInfoComponent {
+export class SectionInfoComponent implements OnInit, OnDestroy {
    public saving = false;
    public subscription: Subscription;
    public sectionList: Section[];
    public vm: Section;
 
-   constructor(private route: ActivatedRoute,
+   constructor(
+     private route: ActivatedRoute,
      private router: Router,
      private sectionService: SectionService) {
     }
-  ngOnInit(){
+  ngOnInit() {
    this.loadVm();
   }
 
-  public loadVm():void {
+  public loadVm(): void {
     this.subscription = this.sectionService.getAll()
     .subscribe(
       data => {
@@ -31,7 +32,7 @@ export class SectionInfoComponent {
         console.log(data);
       },
       error => {
-        this.saving = false;  
+        this.saving = false;
         alert('Failed to load sections');
       });
   }
@@ -43,7 +44,7 @@ export class SectionInfoComponent {
         this.vm = data;
       },
       error => {
-        this.saving = false;  
+        this.saving = false;
         alert('Failed to load section');
       });
   }
@@ -55,15 +56,15 @@ export class SectionInfoComponent {
         this.vm = data;
       },
       error => {
-        this.saving = false;  
+        this.saving = false;
         alert('Failed to load section');
       });
   }
- 
+
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
- 
+
   public save(): void {
     if (!this.isValid()) {
       return;
@@ -71,11 +72,11 @@ export class SectionInfoComponent {
     this.saving = true;
     this.sectionService.saveOrEditSection(this.vm)
     .subscribe(message => {
-      this.saving = false;  
+      this.saving = false;
       alert(message);
       },
       error => {
-        this.saving = false;  
+        this.saving = false;
         alert(error);
       }
     );
@@ -89,12 +90,12 @@ export class SectionInfoComponent {
   public back(data: boolean): void {
     if (!data) {
       this.loadVm();
-    } 
-    this.vm = null
+    }
+    this.vm = null;
   }
 
   public isValid(): boolean {
-    if (this.vm.name == '') {
+    if (this.vm.name === '') {
       alert('You should specify the section name.');
       return false;
     }
@@ -102,12 +103,12 @@ export class SectionInfoComponent {
   }
 
   public vmChanged(data: any): void {
-    this.loadVm(); 
+    this.loadVm();
   }
 
-  public delete (sectionId: number): void {
+  public delete(sectionId: number): void {
     const section = this.sectionList.find(o => o.id === sectionId);
-    if (!section){
+    if (!section) {
       return;
     }
 
@@ -124,5 +125,4 @@ export class SectionInfoComponent {
         });
     }
   }
-  
 }

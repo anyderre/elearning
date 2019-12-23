@@ -8,18 +8,25 @@
           <h6 class=" title d-inline">Categories</h6>
         </div>
         <div class=" card-body ">
-          <p class=" text-muted" *ngIf="!categoryList || (categoryList && categoryList.length <= 0)">
+          <span class=" text-muted" *ngIf="!categoryList || (categoryList && categoryList.length <= 0)">
             Nothing to show  
-            <button class=" btn btn-icon btn-round" title="Add New Category" (click)="getVm()" href="javascript:void(0)">
-              <i class=" tim-icons icon-simple-add"></i>
-            </button>
-          </p>
+            <div class=" button-container">
+              <button class=" btn btn-icon btn-round" 
+                title="Add New Category" 
+                type="button"
+                (click)="getVm()" 
+                href="javascript:void(0)">
+                <i class=" tim-icons icon-simple-add"></i>
+              </button>
+            </div>
+          </span>
           <div class="table-responsive  table-full-width "  *ngIf="categoryList && categoryList.length > 0">
             <table class=" table">
               <colgroup>
                 <col style="width: 5%;">
                 <col style="width: 20%;">
-                <col style="width: 60%;">
+                <col style="width: 40%;">
+                <col style="width: 20%;">
                 <col style="width: 15%;">
               </colgroup>
               <thead class=" text-primary">
@@ -27,15 +34,21 @@
                   <th></th>
                   <th>Name</th>
                   <th>Description</th>
+                  <th>Parent Category</th>
                   <th>  
-                    <button
-                    *ngIf="categoryList && categoryList.length > 0"
-                    class=" btn btn-icon float-right btn-round mr-3"
-                    title="Add a Category"
-                    (click)="getVm()"
-                    type="button">
-                    <i class=" tim-icons icon-simple-add"> </i>
-                  </button></th>
+                    <div class=" button-container">
+                      <button
+                        *ngIf="categoryList && categoryList.length > 0"
+                        class=" btn btn-icon float-right btn-round mr-3"
+                        title="Add a Category"
+                        type="button"
+                        (click)="getVm()"
+                        href="javascript:void(0)"
+                        type="button">
+                        <i class=" tim-icons icon-simple-add"> </i>
+                      </button>
+                    </div>
+                </th>
                 </tr>
               </thead>
               <tbody>
@@ -62,6 +75,11 @@
                   <td>
                     <p class=" text-muted text-justify" style="white-space: normal">
                       {{item.description}}
+                    </p>
+                  </td>
+                  <td>
+                    <p class=" text-muted text-justify" style="white-space: normal">
+                      {{item.parentCategory?.name}}
                     </p>
                   </td>
                   <td class=" td-actions text-right">

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Category } from '../shared/category.model';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -9,28 +9,28 @@ import { CategoryService } from '../shared/category.service';
   templateUrl: 'category-info.component.html',
   styleUrls: ['category-info.component.css']
 })
-export class CategoryInfoComponent {
+export class CategoryInfoComponent implements OnInit, OnDestroy {
    public saving = false;
    public subscription: Subscription;
    public categoryList: Category[];
    public vm: Category;
 
-   constructor(private categoryService: CategoryService) {
-    }
-  ngOnInit(){
+  constructor(private categoryService: CategoryService) {
+  }
+
+  ngOnInit() {
    this.loadVm();
   }
 
-  public loadVm():void {
+  public loadVm(): void {
     this.subscription = this.categoryService.getAll()
     .subscribe(
       data => {
         this.categoryList = data;
-        console.log(data);
       },
-      error => {
-        this.saving = false;  
-        alert('Failed to load categorys');
+        () => {
+        this.saving = false;
+        alert('Failed to load categories');
       });
   }
 
@@ -40,8 +40,8 @@ export class CategoryInfoComponent {
       data => {
         this.vm = data;
       },
-      error => {
-        this.saving = false;  
+      () => {
+        this.saving = false;
         alert('Failed to load category');
       });
   }
@@ -52,16 +52,16 @@ export class CategoryInfoComponent {
       data => {
         this.vm = data;
       },
-      error => {
-        this.saving = false;  
+      () => {
+        this.saving = false;
         alert('Failed to load category');
       });
   }
- 
+
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
- 
+
   public save(): void {
     if (!this.isValid()) {
       return;
@@ -69,11 +69,11 @@ export class CategoryInfoComponent {
     this.saving = true;
     this.categoryService.saveOrEditCategory(this.vm)
     .subscribe(message => {
-      this.saving = false;  
+      this.saving = false;
       alert(message);
       },
       error => {
-        this.saving = false;  
+        this.saving = false;
         alert(error);
       }
     );
@@ -87,12 +87,12 @@ export class CategoryInfoComponent {
   public back(data: boolean): void {
     if (!data) {
       this.loadVm();
-    } 
-    this.vm = null
+    }
+    this.vm = null;
   }
 
   public isValid(): boolean {
-    if (this.vm.name == '') {
+    if (this.vm.name === '') {
       alert('You should specify the category name.');
       return false;
     }
@@ -100,12 +100,12 @@ export class CategoryInfoComponent {
   }
 
   public vmChanged(data: any): void {
-    this.loadVm(); 
+    this.loadVm();
   }
 
-  public delete (categoryId: number): void {
+  public delete(categoryId: number): void {
     const category = this.categoryList.find(o => o.id === categoryId);
-    if (!category){
+    if (!category) {
       return;
     }
 
@@ -122,5 +122,4 @@ export class CategoryInfoComponent {
         });
     }
   }
-  
 }

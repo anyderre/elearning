@@ -1,21 +1,35 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation } from '@angular/core';
 import { Category } from '../shared/category.model';
 import { CategoryService } from '../shared/category.service';
-import { Subscription } from 'rxjs';
 import { FormGroup } from '@angular/forms';
+import { CategorySelectService } from '../shared/category-select.service';
 
 @Component({
   selector: 'app-courses-category-form',
-  templateUrl: 'category-form.component.html'
+  templateUrl: 'category-form.component.html',
+  styleUrls: ['category-form.component.css'],
+  encapsulation: ViewEncapsulation.None
 })
-export class CategoryFormComponent {
+export class CategoryFormComponent implements OnInit {
   @Output() goBack = new EventEmitter();
   @Input() vm: Category;
+  public loading = false;
+  public selectedCategory = null;
+  public parentCategoryId: number;
 
   public saving = false;
   public categoryList: Category[];
+  public filter = {
+    parentCategory: 0,
+  };
 
-  constructor(private categoryService: CategoryService) {}
+  constructor(
+    private categoryService: CategoryService,
+    public categorySelectService: CategorySelectService) {}
+
+  ngOnInit() {
+    this.loadCategories();
+  }
 
   public save(form: FormGroup): void {
     if (form.invalid) {
@@ -26,18 +40,43 @@ export class CategoryFormComponent {
     if (!this.isValid()) {
       return;
     }
+    this.updateVm();
     this.saving = true;
     this.categoryService.saveOrEditCategory(this.vm)
     .subscribe(() => {
-      this.saving = false;  
-        this.back(false);
-        alert('Registration correct');
+      this.saving = false;
+      this.back(false);
+      alert('Registration correct');
       },
       () => {
-        this.saving = false;  
+        this.saving = false;
         alert('Registration failed');
       }
     );
+  }
+
+  private updateVm(): void {
+    if (this.parentCategoryId) {
+      this.vm.parentCategory = new Category(this.parentCategoryId, '', '', null);
+    }
+  }
+
+  public loadCategories(): void {
+    this.loading = true;
+    let obj = {};
+    if (this.vm) {
+      obj = {parentCategoryId: `${this.vm.id}`};
+    }
+    this.categorySelectService.getAllFiltered(obj)
+    .subscribe(
+      data => {
+        this.categoryList = data;
+        this.loading = false;
+      },
+      () => {
+        this.loading = false;
+        alert('Failed to load categories');
+      });
   }
 
   public back(isBack: boolean): void {
@@ -52,7 +91,7 @@ export class CategoryFormComponent {
   }
 
   public isValid(): boolean {
-    if (this.vm.name == '') {
+    if (this.vm.name === '') {
       alert('You should specify the category name.');
       return false;
     }

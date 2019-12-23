@@ -2,8 +2,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, throwError } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { map, catchError} from 'rxjs/operators'
-import * as moment from "moment";
+import { map, catchError} from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import * as jwt_decode from 'jwt-decode';
 
@@ -16,17 +15,17 @@ export class AuthService  {
   }
 
   public login(username: string, password: string): Observable<any> {
-    let url = `${this.apiUrl}/authenticate` 
+    const url = `${this.apiUrl}/authenticate`;
     return this.http.post<{token: string}>(url, JSON.stringify({username , password}))
       .pipe(
         map(result => {
           localStorage.setItem('access_token', result.token);
         }),
         catchError(this.handleError)
-      )
+      );
   }
 
-  public handleError(error) {
+  public handleError(error: any) {
     let errorMessage = '';
     if (error.error instanceof ErrorEvent) {
         // client-side error
@@ -37,41 +36,50 @@ export class AuthService  {
     }
     console.log(errorMessage);
     return throwError(errorMessage);
-}
+  }
 
-public getTokenExpirationDate(token: string): Date {
-  const decoded = jwt_decode(token);
+  public getTokenExpirationDate(token: string): Date {
+    const decoded = jwt_decode(token);
 
-  if (decoded.exp === undefined) return null;
+    if (decoded.exp === undefined) {
+      return null;
+    }
 
-  const date = new Date(0); 
-  date.setUTCSeconds(decoded.exp);
-  return date;
-}
+    const date = new Date(0);
+    date.setUTCSeconds(decoded.exp);
+    return date;
+  }
 
-public isTokenExpired(token?: string): boolean {
-  if(!token) token = this.getToken();
-  if(!token) return true;
+  public isTokenExpired(token?: string): boolean {
+    if (!token) {
+      token = this.getToken();
+    }
+    if (!token) {
+      return true;
+    }
 
-  const date = this.getTokenExpirationDate(token);
-  if(date === undefined) return false;
-  return !(date.valueOf() > new Date().valueOf());
-}
-  
-public logout() {
-  localStorage.removeItem("access_token");
-}
+    const date = this.getTokenExpirationDate(token);
+    if (date === undefined) {
+      return false;
+    }
+    return !(date.valueOf() > new Date().valueOf());
+  }
 
-public getToken (): string {
-  return localStorage.getItem('access_token');
-}
+  public logout() {
+    localStorage.removeItem('access_token');
+    this.router.navigate(['/dashboard']);
+  }
 
-public isLoggedIn(): boolean {
-  return (localStorage.getItem('access_token') !== null);
-}
+  public getToken(): string {
+    return localStorage.getItem('access_token');
+  }
 
-public isLoggedOut(): boolean {
-    return !this.isLoggedIn();
-}
+  public isLoggedIn(): boolean {
+    return (localStorage.getItem('access_token') !== null);
+  }
+
+  public isLoggedOut(): boolean {
+      return !this.isLoggedIn();
+  }
 
 }

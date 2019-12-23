@@ -14,70 +14,62 @@ export class CategoryService {
     constructor(private http: HttpClient) {}
 
   public saveOrEditCategory(vm: Category): Observable<any> {
-    let url = `${this.apiUrl}/category/save` 
+    const url = `${this.apiUrl}/category/save`;
     return this.http.post(url, JSON.stringify(vm), {responseType: 'text'})
       .pipe(
         map(response => response),
         catchError(this.handleError)
-      )
+      );
   }
   public getCategoryViewModel(): Observable<any> {
-    let url = `${this.apiUrl}/category` 
+    const url = `${this.apiUrl}/category`;
     return this.http.get(url)
       .pipe(
         map(result => {
           return this.mapResult(result);
         }),
         catchError(this.handleError)
-      )
+      );
   }
 
   public getCategoryById(categoryId: number): Observable<any> {
-    let url = `${this.apiUrl}/category/${categoryId}`; 
+    const url = `${this.apiUrl}/category/${categoryId}`;
     return this.http.get(url)
       .pipe(
         map(result => {
           return this.mapResult(result);
         }),
         catchError(this.handleError)
-      )
+      );
   }
 
   public getAll(): Observable<any> {
-    let url = `${this.apiUrl}/category/all`
+    const url = `${this.apiUrl}/category/all`;
     return this.http.get(url)
       .pipe(
         map(result => result),
         catchError(this.handleError)
-      )
+      );
   }
 
-  public getAllFiltered(filter: any): Observable<any> {
-    let url = `${this.apiUrl}/category/all`
-    return this.http.get(url)
-      .pipe(
-        map(result => result),
-        catchError(this.handleError)
-      )
-  }
-  
   public deleteCategory(categoryId: number): Observable<any> {
-    let url = `${this.apiUrl}/category/delete/${categoryId}` 
+    const url = `${this.apiUrl}/category/delete/${categoryId}`;
     return this.http.delete(url, {responseType: 'text'})
       .pipe(
         map(result => {
           return result;
         }),
         catchError(this.handleError)
-      )
+      );
   }
 
     public mapResult(response: any): Category {
-        return new Category(
-            response.id,
-            response.name,
-            response.description
-        )
+      return new Category(
+          response.id,
+          response.name,
+          response.description,
+          response.parentCategory,
+      );
     }
 
     public handleError(error: any) {
@@ -89,7 +81,7 @@ export class CategoryService {
           // server-side error
           errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
       }
-      debugger
+
       console.log(errorMessage);
       return throwError(errorMessage);
     }

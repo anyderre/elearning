@@ -22,23 +22,44 @@
           </div>
         </div>
       </div>
+      <div class="justify-content-md-center row" *ngIf="categoryList">
+        <div class="col-md-8">
+          <div class=" form-group">
+            <label>Parent Category</label>
+            <ngx-select 
+              [items]="categoryList" 
+              optionValueField="id"
+              optionTextField="name"
+              name ="xparentCategory"
+              id ="xparentCategory"
+              allowClear="true"
+              [placeholder]="'Search for a category'"
+              [(ngModel)]="parentCategoryId"
+              autoClearSearch="true"
+              #parent="ngModel">
+            </ngx-select>
+          
+          </div>
+        </div>
+      </div>
+
         <div class="justify-content-md-center row">
           <div class="col-md-8">
             <div class=" form-group">
               <label for="description">Description</label>
-                <textarea
-                  class=" form-control"
-                  cols="80"
-                  id="description"
-                  name="description"
-                  placeholder="Here can be your description"
-                  rows="4"
-                  placeholder="Enter the category description"
-                  autocomplete="off"
-                  #description="ngModel"
-                  maxlength="250"
-                  [(ngModel)]="vm.description">
-                </textarea>  
+              <textarea
+                class=" form-control"
+                cols="80"
+                id="description"
+                name="description"
+                placeholder="Here can be your description"
+                rows="1"
+                placeholder="Enter the category description"
+                autocomplete="off"
+                #description="ngModel"
+                maxlength="250"
+                [(ngModel)]="vm.description">
+              </textarea>  
             </div>
           </div>
         </div>
