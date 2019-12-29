@@ -20,7 +20,7 @@ export class CategoryFormComponent implements OnInit {
   public saving = false;
   public categoryList: Category[];
   public filter = {
-    parentCategory: 0,
+    categoryId: 0,
   };
 
   constructor(
@@ -65,7 +65,7 @@ export class CategoryFormComponent implements OnInit {
     this.loading = true;
     let obj = {};
     if (this.vm) {
-      obj = {parentCategoryId: `${this.vm.id}`};
+      obj = {categoryId: `${this.vm.id}`};
     }
     this.categorySelectService.getAllFiltered(obj)
     .subscribe(

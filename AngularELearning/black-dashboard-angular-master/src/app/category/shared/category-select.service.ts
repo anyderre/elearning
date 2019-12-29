@@ -13,10 +13,11 @@ export class CategorySelectService {
   constructor(private http: HttpClient) {}
 
   public getAllFiltered(filter: any = null): Observable<any> {
-    // const url = `${this.apiUrl}/category/all/filtered`;
-    const url = `${this.apiUrl}/category/all`;
+    const url = `${this.apiUrl}/category/all/filtered`;
+    // const url = `${this.apiUrl}/category/all`;
+    const obj = {categoryId: `${filter.categoryId}`};
 // debugger
-    return this.http.get(url, filter ? filter : null)
+    return this.http.get(url, {params: obj})
       .pipe(
         map(result => result),
         catchError(this.handleError)
