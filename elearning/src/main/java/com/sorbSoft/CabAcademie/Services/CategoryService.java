@@ -79,11 +79,13 @@ public class CategoryService {
         if (category == null) {
             return "The category you want to delete doesn't exist";
         }
-        List<Category> categories = categoryRepository.findAllByParentCategory(category.getParentCategory().getId());
-        categories.forEach(cat -> {
-            cat.setParentCategory(null);
-            categoryRepository.save(cat);
-        });
+        if (category.getParentCategory()!= null){
+            List<Category> categories = categoryRepository.findAllByParentCategory(category.getParentCategory().getId());
+            categories.forEach(cat -> {
+                cat.setParentCategory(null);
+                categoryRepository.save(cat);
+            });
+        }
         category.setDeleted(true);
         categoryRepository.save(category);
         return "Section successfully deleted";

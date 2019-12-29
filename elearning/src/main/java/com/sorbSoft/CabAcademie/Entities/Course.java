@@ -29,6 +29,9 @@ public class Course implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_id")
     private Category category;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "section_id")
+    private Section section;
     private boolean premium;
     //duree du cours
     private int duration;

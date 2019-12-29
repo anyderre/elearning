@@ -15,5 +15,6 @@ public class Syllabus implements Serializable {
     @Id()
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String about;
+    private String title;
+    private String description;
 }

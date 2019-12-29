@@ -25,7 +25,8 @@ public class SyllabusService {
 
     public Syllabus updateSyllabus(Syllabus syllabus){
         Syllabus currentSyllabus= syllabusRepository.findOne(syllabus.getId());
-        currentSyllabus.setAbout(syllabus.getAbout());
+        currentSyllabus.setTitle(syllabus.getTitle());
+        currentSyllabus.setDescription(syllabus.getDescription());
 
         return syllabusRepository.save(currentSyllabus);
     }

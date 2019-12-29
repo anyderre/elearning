@@ -11,10 +11,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Dany on 20/05/2018.
@@ -57,6 +59,16 @@ public class CategoryController {
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/all/filtered")
+    public ResponseEntity<List<Category>> getAllCategoriesFiltered(@RequestParam(value = "categoryId", required = false) Long categoryId){
+        List<Category> categories = categoryService.fetchAllCategories().stream().filter(o -> !o.getId().equals(categoryId)).collect(Collectors.toList());
+        categories = categories.stream().filter(o -> o.getParentCategory() == null || !o.getParentCategory().getId().equals(categoryId)).collect(Collectors.toList());
+
+        if(categories.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
+    }
+
     @GetMapping(value="/topics/{id}")
     public ResponseEntity<List<Topic>> getAllTopicsByCategory(@PathVariable Long id){
         List<Topic> topics= topicService.fetchAllTopicByCategory(id);
@@ -70,7 +82,6 @@ public class CategoryController {
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
-
 
     @PostMapping(value = "/save")
     public  ResponseEntity<String> saveCategory(@Valid @RequestBody Category category){
