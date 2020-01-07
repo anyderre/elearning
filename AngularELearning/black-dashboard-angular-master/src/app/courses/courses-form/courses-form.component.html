@@ -1,0 +1,164 @@
+
+<div class=" content " *ngIf="vm">
+  <form #sorbsoftSectionForm>
+    <div class="row justify-content-md-center">
+      <div class="col-md-6 col-md-offset-6">
+        <div class=" card">
+          <div class="card-header text-center">
+            <h4>{{vm.id ? 'Edit' : 'Add'}} Courses</h4>
+          </div>
+          <div class=" card-body">
+            <div class="justify-content-md-center row">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label for="title">Title</label>
+                  <input class=" form-control" name="title" id="title" placeholder="Enter the courses title"
+                    #title="ngModel" type="text" required autocomplete="off" [(ngModel)]="vm.title" maxlength="50" />
+                </div>
+              </div>
+            </div>
+            <div class="justify-content-md-center row">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <div class=" form-check">
+                    <label class=" form-check-label">
+                      <input class="form-check-input" 
+                      type="checkbox" 
+                      name="isPremium" 
+                      id="isPremium" 
+                      #isPremium="ngModel"
+                      [(ngModel)]="vm.isPremium"/>
+                      <span class=" form-check-sign">
+                        <span class="check"> </span>
+                        <label> Is Premium </label> 
+                      </span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+  
+            <div class="justify-content-md-center row" *ngIf="vm.isPremium">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label for="description">Price</label>
+                  <input class=" form-control" id="price" name="price" #price="ngModel" min="0" [(ngModel)]="vm.price">
+                </div>
+              </div>
+            </div>
+  
+            <div class="justify-content-md-center row">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label for="description">Start Date</label>
+                  <input class="form-control" id="startDate" name="startDate" #startDate="ngModel" type="date"
+                    [(ngModel)]="vm.startDate">
+                </div>
+              </div>
+            </div>
+            <div class="justify-content-md-center row">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label for="description">End Date</label>
+                  <input class="form-control" id="endDate" name="endDate" type="date" autocomplete="off"
+                    #endDate="ngModel" [(ngModel)]="vm.endDate">
+                </div>
+              </div>
+            </div>
+  
+            <div class="justify-content-md-center row" *ngIf="sections">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label>Section</label>
+                  <ngx-select 
+                    [items]="sections" 
+                    optionValueField="id" 
+                    optionTextField="name" 
+                    name="xSection"
+                    id="xSection" 
+                    allowClear="true" 
+                    [placeholder]="'Search for a section'" 
+                    [(ngModel)]="sectionId"
+                    autoClearSearch="true" #xSection="ngModel">
+                  </ngx-select>
+  
+                </div>
+              </div>
+            </div>
+  
+            <div class="justify-content-md-center row" *ngIf="categories">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label>Section</label>
+                  <ngx-select 
+                    [items]="categories" 
+                    optionValueField="id" 
+                    optionTextField="name" 
+                    name="xCategory"
+                    id="xCategory" 
+                    allowClear="true" 
+                    [placeholder]="'Search for a category'" 
+                    [(ngModel)]="categoryId"
+                    autoClearSearch="true" 
+                    #xCategory="ngModel">
+                  </ngx-select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-md-center" *ngIf="vm.syllabus">
+      <div class="col-md-6 col-md-offset-6">
+        <div class=" card">
+          <div class="card-header text-center">
+            <h4>Syllabus</h4>
+          </div>
+          <div class=" card-body">
+            <div class="justify-content-md-center row">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label for="title">Title</label>
+                  <input class=" form-control" name="title" id="title" placeholder="Enter the courses title"
+                    #title="ngModel" type="text" required autocomplete="off" [(ngModel)]="vm.syllabus.title"
+                    maxlength="50" />
+                </div>
+              </div>
+            </div>
+            <div class="justify-content-md-center row">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label for="description">Description</label>
+                  <textarea class=" form-control" cols="80" id="description" name="description"
+                    placeholder="Here can be your description" rows="1" placeholder="Enter the category description"
+                    autocomplete="off" #description="ngModel" maxlength="250" [(ngModel)]="vm.syllabus.description">
+                  </textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row justify-content-md-center">
+      <div class="col-md-6 col-md-offset-6">
+        <div class=" card">
+          <div class=" card-footer">
+            <div class=" button-container">
+              <button class=" btn btn-icon btn-round" type="button" title="Go back" (click)="back(true)"
+                href="javascript:void(0)">
+                <i class=" tim-icons icon-minimal-left"></i>
+              </button>
+              <span class="float-right">
+                <button class=" btn btn-fill btn-danger" type="reset" (click)="cancel()">Cancel</button>
+                <button class=" btn btn-fill btn-success" type="submit" (click)="save(sorbsoftSectionForm)">Save</button>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  </form>
+</div>

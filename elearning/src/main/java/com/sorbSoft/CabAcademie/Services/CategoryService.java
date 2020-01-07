@@ -21,7 +21,6 @@ public class CategoryService {
     private CategoryRepository categoryRepository;
 
     @Autowired
-    private TopicService topicService;
     public List<Category> fetchAllCategories(){
         return categoryRepository.findAll();
     }
@@ -71,6 +70,7 @@ public class CategoryService {
             }
         }
     }
+
     public String deleteCategory(Long id){
         if (id <= 0L) {
             return "You should indicate the id of the category";

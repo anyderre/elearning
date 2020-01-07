@@ -32,9 +32,7 @@ public class Course implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(name = "section_id")
     private Section section;
-    private boolean premium;
-    //duree du cours
-    private int duration;
+    private boolean isPremium;
     private Date startDate;
-
+    private Date endDate;
 }

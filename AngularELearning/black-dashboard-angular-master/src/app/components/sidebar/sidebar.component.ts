@@ -17,6 +17,13 @@ export const ROUTES: RouteInfo[] = [
     class: '',
   },
   {
+    path: '/category',
+    title: 'Category',
+    rtlTitle: 'لوحة القيادة',
+    icon: 'icon-components',
+    class: '',
+  },
+  {
     path: '/courses',
     title: 'Courses',
     rtlTitle: 'لوحة القيادة',
@@ -31,10 +38,10 @@ export const ROUTES: RouteInfo[] = [
     class: '',
   },
   {
-    path: '/category',
-    title: 'Category',
+    path: '/syllabus',
+    title: 'Syllabus',
     rtlTitle: 'لوحة القيادة',
-    icon: 'icon-components',
+    icon: 'icon-chart-pie-36',
     class: '',
   },
   {

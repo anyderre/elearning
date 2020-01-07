@@ -26,7 +26,7 @@ public class SectionController {
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<Section> getSection(@PathVariable Long id){
-        if(id<0)
+        if(id < 0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Section section= sectionService.fetchSection(id);

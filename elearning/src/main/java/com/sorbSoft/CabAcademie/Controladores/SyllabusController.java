@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Controladores;
 
 import com.sorbSoft.CabAcademie.Entities.Syllabus;
 import com.sorbSoft.CabAcademie.Services.SyllabusService;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class SyllabusController {
         return new ResponseEntity<>(currentSyllabus, HttpStatus.OK);
     }
 
-    @GetMapping()
+    @GetMapping("/all")
     public ResponseEntity<List<Syllabus>> getAllSyllabus(){
         List<Syllabus> syllabusList= syllabusService.fetchAllSyllabus();
         if(syllabusList.isEmpty())
@@ -40,36 +41,27 @@ public class SyllabusController {
         return new ResponseEntity<>(syllabusList, HttpStatus.OK);
     }
 
-    @PostMapping()
-    public  ResponseEntity<Syllabus> saveSyllabus(@Valid @RequestBody Syllabus syllabus){
-        Syllabus currentSyllabus= syllabusService.saveSyllabus(syllabus);
-        if(currentSyllabus==null)
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @GetMapping("")
+    public ResponseEntity<Syllabus> getAllSyllabusViewModel(){
+        return new ResponseEntity<>(syllabusService.getSyllabusViewModel(), HttpStatus.OK);
+    }
+
+    @PostMapping("/save")
+    public  ResponseEntity<String> saveSyllabus(@Valid @RequestBody Syllabus syllabus){
+        Pair<String, Syllabus> result = syllabusService.saveSyllabus(syllabus);
+        if(result.getValue() == null)
+            return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<Syllabus> updateSyllabus(@PathVariable Long id, @RequestBody Syllabus syllabus){
-        if(id<0)
-            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(syllabusService.fetchSyllabus(id)==null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        Syllabus currentSyllabus= syllabusService.updateSyllabus(syllabus);
-        if (currentSyllabus==null)
-            return  new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
-
-        return new ResponseEntity<>(currentSyllabus, HttpStatus.OK);
-    }
-
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "/delete/{id}")
     public ResponseEntity<String> deleteSyllabus(@PathVariable Long id ){
-        if(id<0)
-            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(syllabusService.fetchSyllabus(id)==null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        syllabusService.deleteSyllabus(id);
-        return new ResponseEntity<>("Syllabus with "+ id+" Deleted!", HttpStatus.OK);
+        if(id<0)
+            return ResponseEntity.badRequest().build();
+        if(syllabusService.fetchSyllabus(id)==null)
+            return ResponseEntity.notFound().build();
+
+        return ResponseEntity.ok(syllabusService.deleteSyllabus(id));
     }
 }

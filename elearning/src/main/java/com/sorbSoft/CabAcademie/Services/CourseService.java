@@ -1,8 +1,7 @@
 package com.sorbSoft.CabAcademie.Services;
 
 
-import com.sorbSoft.CabAcademie.Entities.Course;
-import com.sorbSoft.CabAcademie.Entities.Syllabus;
+import com.sorbSoft.CabAcademie.Entities.*;
 import com.sorbSoft.CabAcademie.Repository.CourseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -11,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -47,7 +47,7 @@ public class CourseService {
     public Course updateCourse (Course course){
         Course currentCourse= courseRepository.findOne(course.getId());
         currentCourse.setCategory(course.getCategory());
-        currentCourse.setDuration(course.getDuration());
+        currentCourse.setEndDate(course.getEndDate());
         currentCourse.setPremium(course.isPremium());
         currentCourse.setPrice(course.getPrice());
         currentCourse.setStartDate(course.getStartDate());
@@ -56,10 +56,106 @@ public class CourseService {
         currentCourse.setUser(course.getUser());
         return courseRepository.save(currentCourse);
     }
+
+    public Course getCourseViewModel(){
+        return new Course() {
+            @Override
+            public Long getId() {
+                return 0L;
+            }
+
+            @Override
+            public String getTitle() {
+                return "";
+            }
+
+            @Override
+            public User getUser() {
+                return null;
+            }
+
+            @Override
+            public double getPrice() {
+                return 0D;
+            }
+
+            @Override
+            public Syllabus getSyllabus() {
+                return new Syllabus(){
+                    @Override
+                    public String getTitle() {
+                        return "";
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "";
+                    }
+                };
+            }
+
+            @Override
+            public Category getCategory() {
+                return new Category(){
+                    @Override
+                    public String getName() {
+                        return "";
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "";
+                    }
+
+                };
+            }
+
+            @Override
+            public Section getSection() {
+                return new Section(){
+                    @Override
+                    public String getName() {
+                        return "";
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "";
+                    }
+                };
+            }
+
+            @Override
+            public boolean isPremium() {
+                return true;
+            }
+
+            @Override
+            public Date getStartDate() {
+                return new Date();
+            }
+
+            @Override
+            public Date getEndDate() {
+                return new Date();
+            }
+        };
+    }
+
+//    private String title;
+//    private User user;
+//    private double price;
+//    private Syllabus syllabus;
+//    private Category category;
+//    private Section section;
+//    private boolean isPremium;
+//    private Date startDate;
+//    private Date endDate;
+
     public Course saveCourse (Course course)
     {
-        Syllabus syllabus = syllabusService.saveSyllabus(course.getSyllabus());
-        course.setSyllabus(syllabus);
+//        Syllabus syllabus = syllabusService.saveSyllabus(course.getSyllabus());
+//        course.setSyllabus(syllabus);
         return courseRepository.save(course);
     }
     public void deleteCourse(Long id){
