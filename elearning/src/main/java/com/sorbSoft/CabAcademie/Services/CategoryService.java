@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Dany on 15/05/2018.
@@ -92,5 +94,46 @@ public class CategoryService {
     }
     //other delete methods
     //other fetching methods
+
+
+    public List<Category> getAllFiltered(Long categoryId){
+        List<Category> categories = fetchAllCategories();
+        if (categoryId == null)
+            return categories;
+        List<Category> categoriesFiltered = categories.isEmpty() ? null :  categories.stream().filter(o -> !o.getId().equals(categoryId)).collect(Collectors.toList());
+        if (categoriesFiltered == null) {
+            return new ArrayList<>();
+        }
+        return categoriesFiltered.stream().filter(o -> o.getParentCategory() == null || !o.getParentCategory().getId().equals(categoryId)).collect(Collectors.toList());
+    }
+
+    public Category getCategoryViewModel() {
+        return new Category() {
+            @Override
+            public Long getId() {
+                return 0L;
+            }
+
+            @Override
+            public boolean isDeleted() {
+                return false;
+            }
+
+            @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
+            public String getDescription() {
+                return "";
+            }
+
+            @Override
+            public Category getParentCategory() {
+                return null;
+            }
+        };
+    }
 
 }

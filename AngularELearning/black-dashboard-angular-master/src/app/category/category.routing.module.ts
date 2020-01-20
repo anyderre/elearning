@@ -10,7 +10,6 @@ export const CategoryRoutes: Routes = [
     component: CategoryInfoComponent,
     canActivate: [ AuthGuard ],
     children: [
-
     ]
   },
 ];

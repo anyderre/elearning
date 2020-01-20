@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Services;
 
 import com.sorbSoft.CabAcademie.Entities.*;
 import com.sorbSoft.CabAcademie.Repository.CourseRepository;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -43,18 +45,39 @@ public class CourseService {
         return courseRepository.findOne(id);
     }
 
-
-    public Course updateCourse (Course course){
+    public Pair<String, Course> updateCourse(Course course){
+        Course savedCourse = courseRepository.findCourseByTitleAndIdIsNot(course.getTitle(), course.getId());
+        if (savedCourse != null) {
+            return new Pair<>("The course name already exist for another definition", null);
+        }
         Course currentCourse= courseRepository.findOne(course.getId());
-        currentCourse.setCategory(course.getCategory());
         currentCourse.setEndDate(course.getEndDate());
+        currentCourse.setCategory(course.getCategory());
         currentCourse.setPremium(course.isPremium());
         currentCourse.setPrice(course.getPrice());
         currentCourse.setStartDate(course.getStartDate());
-        currentCourse.setSyllabus(course.getSyllabus());
-        currentCourse.setTitle(course.getTitle());
         currentCourse.setUser(course.getUser());
-        return courseRepository.save(currentCourse);
+        currentCourse.setDeleted(false);
+        currentCourse.setSyllabus(course.getSyllabus());
+        
+        Course result = courseRepository.save(currentCourse);
+        if (result == null) {
+            return new Pair<>("Couldn't update the course", null);
+        } else {
+            return new Pair<>("Course updated successfully", result);
+        }
+    }
+
+    public String deleteCourse(Long id){
+        if (id <= 0L) {
+            return "You should indicate the id of the course";
+        }
+        Course course = fetchCourse(id);
+        if (course == null) {
+            return "The course you want to delete doesn't exist";
+        }
+        course.setDeleted(true);
+        return "Course successfully deleted";
     }
 
     public Course getCourseViewModel(){
@@ -80,18 +103,8 @@ public class CourseService {
             }
 
             @Override
-            public Syllabus getSyllabus() {
-                return new Syllabus(){
-                    @Override
-                    public String getTitle() {
-                        return "";
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return "";
-                    }
-                };
+            public List<Syllabus> getSyllabus() {
+                return new ArrayList<>();
             }
 
             @Override
@@ -111,21 +124,6 @@ public class CourseService {
             }
 
             @Override
-            public Section getSection() {
-                return new Section(){
-                    @Override
-                    public String getName() {
-                        return "";
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return "";
-                    }
-                };
-            }
-
-            @Override
             public boolean isPremium() {
                 return true;
             }
@@ -141,26 +139,22 @@ public class CourseService {
             }
         };
     }
+    
+    public Pair<String, Course> saveCourse(Course course){
+        if (course.getId() > 0L) {
+            return updateCourse(course);
+        } else {
+            Course savedCourse = courseRepository.findCourseByTitle(course.getTitle());
 
-//    private String title;
-//    private User user;
-//    private double price;
-//    private Syllabus syllabus;
-//    private Category category;
-//    private Section section;
-//    private boolean isPremium;
-//    private Date startDate;
-//    private Date endDate;
-
-    public Course saveCourse (Course course)
-    {
-//        Syllabus syllabus = syllabusService.saveSyllabus(course.getSyllabus());
-//        course.setSyllabus(syllabus);
-        return courseRepository.save(course);
+            if ( savedCourse != null){
+                return new Pair<>("The course you are trying to save already exist", null);
+            }
+            Course result = courseRepository.save(course);
+            if (result == null){
+                return new Pair<>("Couldn't save the course", null);
+            } else {
+                return  new Pair<>("Course saved successfully", result);
+            }
+        }
     }
-    public void deleteCourse(Long id){
-        courseRepository.delete(id);
-    }
-    //other delete methods
-    //other fetching methods
 }

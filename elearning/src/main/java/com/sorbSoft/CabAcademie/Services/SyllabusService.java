@@ -47,8 +47,7 @@ public class SyllabusService {
             return new Pair<>("Syllabus updated successfully", result);
         }
     }
-    
-    
+
     public Syllabus getSyllabusViewModel(){
         return new Syllabus(){
             @Override

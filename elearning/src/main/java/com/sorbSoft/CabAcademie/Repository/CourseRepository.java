@@ -14,5 +14,7 @@ import java.util.List;
 public interface CourseRepository extends JpaRepository<Course, Long> {
 
     Page<Course> findAll(Pageable pagin);
+    Course findCourseByTitle(String name);
+    Course findCourseByTitleAndIdIsNot(String title, Long id);
     Page<Course> findByTitleContainsAllIgnoreCase(String searchText, Pageable pagin);
 }

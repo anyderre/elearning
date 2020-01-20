@@ -11,7 +11,7 @@ export class Courses {
         public isPremium: boolean,
         public startDate: boolean,
         public endDate: boolean,
-        public syllabus: Syllabus | null,
+        public syllabus: Syllabus[] | null,
         public category: Category | null,
         public section: Section | null,
         public user: any | null, // to be change to user

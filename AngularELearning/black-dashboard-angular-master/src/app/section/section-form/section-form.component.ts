@@ -1,7 +1,6 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { Section } from '../shared/section.model';
 import { SectionService } from '../shared/section.service';
-import { Subscription } from 'rxjs';
 import { FormGroup } from '@angular/forms';
 
 @Component({
@@ -29,12 +28,12 @@ export class SectionFormComponent {
     this.saving = true;
     this.sectionService.saveOrEditSection(this.vm)
     .subscribe(() => {
-      this.saving = false;  
-        this.back(false);
-        alert('Registration correct');
+      this.saving = false;
+      this.back(false);
+      alert('Registration correct');
       },
       () => {
-        this.saving = false;  
+        this.saving = false;
         alert('Registration failed');
       }
     );
@@ -52,7 +51,7 @@ export class SectionFormComponent {
   }
 
   public isValid(): boolean {
-    if (this.vm.name == '') {
+    if (this.vm.name === '') {
       alert('You should specify the section name.');
       return false;
     }

@@ -14,7 +14,7 @@ export class CoursesService {
     constructor(private http: HttpClient) {}
 
   public saveOrEditCourses(vm: Courses): Observable<any> {
-    const url = `${this.apiUrl}/courses/save`;
+    const url = `${this.apiUrl}/course/save`;
     return this.http.post(url, JSON.stringify(vm), {responseType: 'text'})
       .pipe(
         map(response => response),
@@ -33,7 +33,7 @@ export class CoursesService {
   }
 
   public getCoursesById(coursesId: number): Observable<any> {
-    const url = `${this.apiUrl}/courses/${coursesId}`;
+    const url = `${this.apiUrl}/course/${coursesId}`;
     return this.http.get(url)
       .pipe(
         map(result => {
@@ -44,7 +44,7 @@ export class CoursesService {
   }
 
   public getAll(): Observable<any> {
-    const url = `${this.apiUrl}/courses/all`;
+    const url = `${this.apiUrl}/course/all`;
     return this.http.get(url)
       .pipe(
         map(result => result),
@@ -53,7 +53,7 @@ export class CoursesService {
   }
 
   public deleteCourses(coursesId: number): Observable<any> {
-    const url = `${this.apiUrl}/courses/delete/${coursesId}`;
+    const url = `${this.apiUrl}/course/delete/${coursesId}`;
     return this.http.delete(url, {responseType: 'text'})
       .pipe(
         map(result => {

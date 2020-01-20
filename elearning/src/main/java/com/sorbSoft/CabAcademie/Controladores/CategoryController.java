@@ -36,7 +36,7 @@ public class CategoryController {
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Category category= categoryService.fetchCategory(id);
-        if(category==null)
+        if(category == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(category, HttpStatus.OK);
@@ -44,11 +44,7 @@ public class CategoryController {
 
     @GetMapping(value = "")
     public ResponseEntity<Category> getCategoryViewModel(){
-        Category category = new Category();
-        category.setName("");
-        category.setDescription("");
-        category.setId(0L);
-        return new ResponseEntity<>(category, HttpStatus.OK);
+        return new ResponseEntity<>(categoryService.getCategoryViewModel(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/all")
@@ -60,11 +56,9 @@ public class CategoryController {
     }
 
     @GetMapping(value = "/all/filtered")
-    public ResponseEntity<List<Category>> getAllCategoriesFiltered(@RequestParam(value = "categoryId", required = false) Long categoryId){
-        List<Category> categories = categoryService.fetchAllCategories().stream().filter(o -> !o.getId().equals(categoryId)).collect(Collectors.toList());
-        categories = categories.stream().filter(o -> o.getParentCategory() == null || !o.getParentCategory().getId().equals(categoryId)).collect(Collectors.toList());
-
-        if(categories.isEmpty())
+    public ResponseEntity<List<Category>> getAllCategoriesFiltered(@RequestParam(value = "categoryId",  required = false) Long categoryId){
+        List <Category> categories = categoryService.getAllFiltered(categoryId);
+        if(categories == null)
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }

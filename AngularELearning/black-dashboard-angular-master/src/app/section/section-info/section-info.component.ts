@@ -15,11 +15,8 @@ export class SectionInfoComponent implements OnInit, OnDestroy {
    public sectionList: Section[];
    public vm: Section;
 
-   constructor(
-     private route: ActivatedRoute,
-     private router: Router,
-     private sectionService: SectionService) {
-    }
+   constructor(private sectionService: SectionService) { }
+
   ngOnInit() {
    this.loadVm();
   }

@@ -4,6 +4,8 @@ import { CoursesRoutingModule } from './courses.routing.module';
 import { CoursesDashboardComponent } from './courses-dashboard/courses-dashboard.component';
 import { SharedModule } from '../shared/shared.module';
 import { CoursesFormComponent } from './courses-form/courses-form.component';
+import { SyllabusFormComponent } from './syllabus-form/syllabus-form.component';
+import { CourseInfoComponent } from './course-info/course-info.component';
 
 @NgModule({
   imports: [
@@ -14,6 +16,8 @@ import { CoursesFormComponent } from './courses-form/courses-form.component';
   declarations: [
     CoursesDashboardComponent,
     CoursesFormComponent,
+    SyllabusFormComponent,
+    CourseInfoComponent,
   ],
 })
 export class CoursesModule {

@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Dany on 18/05/2018.
@@ -71,5 +73,38 @@ public class SectionService {
         }
         section.setDeleted(true);
         return "Section successfully deleted";
+    }
+
+    public List<Section> getAllFiltered(Long sectionId){
+        List<Section> sections = fetchAllSection();
+        if (sectionId == null)
+            return sections;
+        if (sectionId <= 0L)
+            return new ArrayList<>();
+        return sections.isEmpty() ? new ArrayList<>() :  sections.stream().filter(o -> !o.getId().equals(sectionId)).collect(Collectors.toList());
+    }
+
+    public Section getSectionViewModel() {
+        return new Section() {
+            @Override
+            public Long getId() {
+                return 0L;
+            }
+
+            @Override
+            public boolean isDeleted() {
+                return false;
+            }
+
+            @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
+            public String getDescription() {
+                return "";
+            }
+        };
     }
 }

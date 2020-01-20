@@ -13,6 +13,9 @@ export class CoursesDashboardComponent implements OnInit {
   ngOnInit() {}
 
   public add(): void {
-    this.router.navigate(['/courses/form']);
+    this.router.navigate(['/courses/0/form']);
+  }
+  public read(): void {
+    this.router.navigate(['/courses/read']);
   }
 }

@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Controladores;
 
 import com.sorbSoft.CabAcademie.Entities.Course;
 import com.sorbSoft.CabAcademie.Services.CourseService;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -36,12 +37,11 @@ public class CourseController {
     }
 
     @GetMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Course> getSectionViewModel(){
+    public ResponseEntity<Course> getCourseViewModel(){
         return new ResponseEntity<>(courseService.getCourseViewModel(), HttpStatus.OK);
     }
 
-
-    @GetMapping()
+    @GetMapping(value = "/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Course>> getAllCourses(){
         List<Course> courses = courseService.fetchAllCourses();
         if(courses.isEmpty())
@@ -60,28 +60,14 @@ public class CourseController {
         Page<Course> courses = courseService.fetchAllCoursesByPageAndSerchText(page,itemsPerPage,searchText);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
-
-    @PostMapping()
-    public  ResponseEntity<Course> saveCourse(@Valid @RequestBody Course course){
-        Course currentCourse = courseService.saveCourse(course);
-        if(currentCourse==null)
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        return  new ResponseEntity<>(HttpStatus.CREATED);
+    @PostMapping("/save")
+    public  ResponseEntity<String> saveCourse(@Valid @RequestBody Course section){
+        Pair<String, Course> result = courseService.saveCourse(section);
+        if(result.getValue() == null)
+            return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(result.getKey(), HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<Course> updateCourse(@PathVariable Long id, @RequestBody Course course){
-        if(id<0)
-            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(courseService.fetchCourse(id)==null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        Course currentCourse = courseService.updateCourse(course);
-        if (currentCourse==null)
-            return  new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
-
-        return new ResponseEntity<>(currentCourse, HttpStatus.OK);
-    }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteCourse(@PathVariable Long id ){

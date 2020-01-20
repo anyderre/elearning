@@ -38,11 +38,15 @@ public class SectionController {
 
     @GetMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Section> getSectionViewModel(){
-        Section section= new Section();
-        section.setName("");
-        section.setDescription("");
-        section.setId(0L);
-        return new ResponseEntity<>(section, HttpStatus.OK);
+        return new ResponseEntity<>(sectionService.getSectionViewModel(), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/all/filtered")
+    public ResponseEntity<List<Section>> getAllFiltered(@RequestParam(value = "sectionId", required = false) Long sectionId){
+        List <Section> categories = sectionService.getAllFiltered(sectionId);
+        if(categories == null)
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
     @GetMapping(value = "/all" , consumes = MediaType.APPLICATION_JSON_VALUE)

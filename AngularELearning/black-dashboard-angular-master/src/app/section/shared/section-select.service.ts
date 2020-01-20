@@ -7,14 +7,14 @@ import { map, catchError } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
-export class CategorySelectService {
+export class SectionSelectService {
   private apiUrl = environment.baseUrl;
 
   constructor(private http: HttpClient) {}
 
   public getAllFiltered(filter: any = null): Observable<any> {
-    const url = `${this.apiUrl}/category/all/filtered`;
-    return this.http.get(url, {params: filter})
+    const url = `${this.apiUrl}/section/all/filtered`;
+    return this.http.get(url)
       .pipe(
         map(result => result),
         catchError(this.handleError)
