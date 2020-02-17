@@ -24,10 +24,10 @@
                     <label class=" form-check-label">
                       <input class="form-check-input" 
                       type="checkbox" 
-                      name="isPremium" 
-                      id="isPremium" 
-                      #isPremium="ngModel"
-                      [(ngModel)]="vm.isPremium"/>
+                      name="premium" 
+                      id="premium" 
+                      #premium="ngModel"
+                      [(ngModel)]="vm.premium"/>
                       <span class=" form-check-sign">
                         <span class="check"> </span>
                         <label> Is Premium </label> 
@@ -38,7 +38,7 @@
               </div>
             </div>
   
-            <div class="justify-content-md-center row" *ngIf="vm.isPremium">
+            <div class="justify-content-md-center row" *ngIf="vm.premium">
               <div class="col-md-8">
                 <div class=" form-group">
                   <label for="description">Price</label>
@@ -51,7 +51,12 @@
               <div class="col-md-8">
                 <div class=" form-group">
                   <label for="description">Start Date</label>
-                  <input class="form-control" id="startDate" name="startDate" #startDate="ngModel" type="date"
+                  <input 
+                    class="form-control" 
+                    id="startDate" 
+                    name="startDate" 
+                    #startDate="ngModel" 
+                    type="date"
                     [(ngModel)]="vm.startDate">
                 </div>
               </div>
@@ -60,8 +65,12 @@
               <div class="col-md-8">
                 <div class=" form-group">
                   <label for="description">End Date</label>
-                  <input class="form-control" id="endDate" name="endDate" type="date" autocomplete="off"
-                    #endDate="ngModel" [(ngModel)]="vm.endDate">
+                  <input class="form-control" 
+                    id="endDate" 
+                    name="endDate" 
+                    type="date" 
+                    #endDate="ngModel" 
+                    [(ngModel)]="vm.endDate">
                 </div>
               </div>
             </div>

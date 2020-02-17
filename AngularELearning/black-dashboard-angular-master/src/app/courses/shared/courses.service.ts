@@ -15,12 +15,13 @@ export class CoursesService {
 
   public saveOrEditCourses(vm: Courses): Observable<any> {
     const url = `${this.apiUrl}/course/save`;
-    return this.http.post(url, JSON.stringify(vm), {responseType: 'text'})
+    return this.http.post(url, JSON.stringify(vm), {responseType: 'json'})
       .pipe(
         map(response => response),
         catchError(this.handleError)
       );
   }
+
   public getCoursesViewModel(): Observable<any> {
     const url = `${this.apiUrl}/course`;
     return this.http.get(url)
@@ -63,35 +64,35 @@ export class CoursesService {
       );
   }
 
-    public mapResult(response: any): Courses {
-      return new Courses(
-          response.id,
-          response.title,
-          response.price,
-          response.description,
-          response.isPremium,
-          response.startDate,
-          response.endDate,
-          response.syllabus,
-          response.category,
-          response.section,
-          response.user,
-      );
+  public mapResult(response: any): Courses {
+    return new Courses(
+        response.id,
+        response.title,
+        response.price,
+        response.description,
+        response.premium,
+        response.startDate,
+        response.endDate,
+        response.syllabus,
+        response.category,
+        response.section,
+        response.user,
+    );
+  }
+
+  public handleError(error: any) {
+    let errorMessage = '';
+    if (error.error instanceof ErrorEvent) {
+        // client-side error
+        errorMessage = `Error: ${error.error.message}`;
+    } else {
+        // server-side error
+        errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
     }
 
-    public handleError(error: any) {
-      let errorMessage = '';
-      if (error.error instanceof ErrorEvent) {
-          // client-side error
-          errorMessage = `Error: ${error.error.message}`;
-      } else {
-          // server-side error
-          errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
-      }
-
-      console.log(errorMessage);
-      return throwError(errorMessage);
-    }
+    console.log(errorMessage);
+    return throwError(errorMessage);
+  }
 }
 
 

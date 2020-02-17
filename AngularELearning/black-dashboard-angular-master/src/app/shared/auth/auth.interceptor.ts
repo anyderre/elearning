@@ -19,7 +19,7 @@ export class AuthInterceptor implements HttpInterceptor {
       if (request.urlWithParams.indexOf('/authenticate') > -1) {
         request = request.clone({
           setHeaders: {
-            'Content-Type': 'application/json' 
+            'Content-Type': 'application/json'
           }
         });
       } else {
@@ -27,7 +27,7 @@ export class AuthInterceptor implements HttpInterceptor {
         request = request.clone({
           setHeaders: {
             Authorization: 'Bearer ' + accessToken,
-            'Content-Type': 'application/json' 
+            'Content-Type': 'application/json'
           }
         });
       }

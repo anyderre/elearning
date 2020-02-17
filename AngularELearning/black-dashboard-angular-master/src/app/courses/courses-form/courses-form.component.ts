@@ -102,7 +102,7 @@ export class CoursesFormComponent implements OnInit {
     if (this.categoryId) {
       this.vm.category = new Category(this.categoryId, '', '', null);
     }
-    if (!this.vm.isPremium) {
+    if (!this.vm.premium) {
       this.vm.price = 0;
     }
   }
@@ -125,11 +125,19 @@ export class CoursesFormComponent implements OnInit {
       data => {
         this.vm = data;
         this.cleanVm = this.vm;
+        this.fill();
+        console.log(this.vm);
       },
       () => {
         this.saving = false;
         alert('Failed to load course');
       });
+  }
+
+  private fill(): void {
+    this.sectionId = this.vm.section ? this.vm.section.id : 0;
+    this.categoryId = this.vm.section ? this.vm.category.id : 0;
+    // this.vm.startDate = this.vm.startDate ? new Date(this.vm.startDate) : null;
   }
 
   public cancel(): void {
@@ -147,7 +155,7 @@ export class CoursesFormComponent implements OnInit {
       alert('You should specify the course title.');
       return false;
     }
-    if (this.vm.isPremium) {
+    if (this.vm.premium) {
       if (+this.vm.price <= 0) {
         alert('You should specify the course price.');
         return false;

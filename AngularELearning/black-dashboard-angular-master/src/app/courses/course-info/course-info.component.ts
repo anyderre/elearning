@@ -38,4 +38,9 @@ export class CourseInfoComponent implements OnDestroy, OnInit {
     this.subscription.unsubscribe();
   }
 
+  public edit(index: number): void {
+    const id = this.courses[index].id;
+    this.router.navigate([`/courses/${id}/form`]);
+  }
+
 }

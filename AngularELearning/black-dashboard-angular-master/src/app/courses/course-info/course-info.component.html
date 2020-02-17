@@ -78,8 +78,8 @@
                     {{item.title}}
                   </td>
                   <td>
-                    <span *ngIf="item.isPremium" class="label label-success">Yes</span>
-                    <span *ngIf="!item.isPremium" class="label label-danger">No</span>
+                    <span *ngIf="item.premium" class="label label-success">Yes</span>
+                    <span *ngIf="!item.premium" class="label label-danger">No</span>
                   </td>
                   <td>
                     <p class=" text-muted text-justify" style="white-space: normal">
