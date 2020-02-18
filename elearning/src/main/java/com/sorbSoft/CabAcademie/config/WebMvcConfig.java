@@ -14,7 +14,5 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
          return new BCryptPasswordEncoder();
-
     }
-
 }

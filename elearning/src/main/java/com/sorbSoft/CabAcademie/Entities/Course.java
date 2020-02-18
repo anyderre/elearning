@@ -1,7 +1,9 @@
 package com.sorbSoft.CabAcademie.Entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import org.hibernate.annotations.Where;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -39,7 +41,12 @@ public class Course implements Serializable {
     @JoinColumn(name = "section_id")
     private Section section;
     private boolean isPremium;
+//    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssX")
     private Date startDate;
+//    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
+//    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssX")
     private Date endDate;
     private boolean deleted = false;
 }

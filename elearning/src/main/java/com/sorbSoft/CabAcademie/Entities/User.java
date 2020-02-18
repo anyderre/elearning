@@ -28,7 +28,7 @@ public class User {
     @NotNull(message="Password invalid")
     @Size(max=60)
     private String password;
-    @OneToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<Rol> roles;
-
+    private boolean deleted = false;
 }

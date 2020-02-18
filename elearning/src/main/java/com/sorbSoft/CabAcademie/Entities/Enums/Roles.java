@@ -1,13 +1,11 @@
-package com.b.r.loteriab.r.Model.Enums;
+package com.sorbSoft.CabAcademie.Entities.Enums;
 
 /**
  * Created by Dany on 28/05/2019.
  */
 public enum Roles {
     ROLE_ADMIN,
-    ROLE_SELLER,
-    ROLE_SUPERVISOR,
-    ROLE_COLLECTOR,
+    ROLE_USER,
+    ROLE_PROFESSOR,
     ROLE_SUPER_ADMIN,
-    ROLE_SUPER_MEGA_ADMIN,
 }
