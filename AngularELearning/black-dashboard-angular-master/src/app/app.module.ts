@@ -41,7 +41,7 @@ export function tokenGetter() {
   providers: [
     {provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true},
     {provide: HTTP_INTERCEPTORS, useClass: AngularDateHttpInterceptor, multi: true},
-    {provide: HTTP_INTERCEPTORS, useClass: AngularDateSentHttpInterceptor, multi: true},
+    // {provide: HTTP_INTERCEPTORS, useClass: AngularDateSentHttpInterceptor, multi: true},
   ],
   bootstrap: [AppComponent]
 })

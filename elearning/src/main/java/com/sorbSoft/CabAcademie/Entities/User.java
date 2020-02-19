@@ -26,7 +26,7 @@ public class User {
     @Column(name="enabled", nullable = false, columnDefinition = "int default 1")
     private int enable = 1;
     @NotNull(message="Password invalid")
-    @Size(max=60)
+    @Size(max=20)
     private String password;
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<Rol> roles;

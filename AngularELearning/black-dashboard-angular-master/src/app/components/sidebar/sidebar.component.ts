@@ -38,6 +38,13 @@ export const ROUTES: RouteInfo[] = [
     class: '',
   },
   {
+    path: '/admin',
+    title: 'Admin',
+    rtlTitle: 'لوحة القيادة',
+    icon: 'icon-chart-pie-36',
+    class: '',
+  },
+  {
     path: '/syllabus',
     title: 'Syllabus',
     rtlTitle: 'لوحة القيادة',
