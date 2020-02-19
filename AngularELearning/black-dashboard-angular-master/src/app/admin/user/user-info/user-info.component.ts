@@ -1,60 +1,59 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Section } from '../shared/section.model';
+import { User } from '../shared/user.model';
 import { Subscription } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
-import { SectionService } from '../shared/section.service';
+import { UserService } from '../shared/user.service';
 
 @Component({
-  selector: 'app-courses-section-info',
-  templateUrl: 'section-info.component.html',
-  styleUrls: ['section-info.component.css']
+  selector: 'app-admin-user-info',
+  templateUrl: 'user-info.component.html',
+  styleUrls: ['user-info.component.css']
 })
-export class SectionInfoComponent implements OnInit, OnDestroy {
+export class UserInfoComponent implements OnInit, OnDestroy {
    public saving = false;
    public subscription: Subscription;
-   public sectionList: Section[];
-   public vm: Section;
+   public userList: User[];
+   public vm: User;
 
-   constructor(private sectionService: SectionService) { }
+   constructor(private userService: UserService) { }
 
   ngOnInit() {
    this.loadVm();
   }
 
   public loadVm(): void {
-    this.subscription = this.sectionService.getAll()
+    this.subscription = this.userService.getAll()
     .subscribe(
       data => {
-        this.sectionList = data;
+        this.userList = data;
         console.log(data);
       },
       error => {
         this.saving = false;
-        alert('Failed to load sections');
+        alert('Failed to load users');
       });
   }
 
   public getVm(): void {
-    this.subscription = this.sectionService.getSectionViewModel()
+    this.subscription = this.userService.getUserViewModel()
     .subscribe(
       data => {
         this.vm = data;
       },
       error => {
         this.saving = false;
-        alert('Failed to load section');
+        alert('Failed to load user');
       });
   }
 
-  public getById(sectionId: number): void {
-    this.subscription = this.sectionService.getSectionById(sectionId)
+  public getById(userId: number): void {
+    this.subscription = this.userService.getUserById(userId)
     .subscribe(
       data => {
         this.vm = data;
       },
       error => {
         this.saving = false;
-        alert('Failed to load section');
+        alert('Failed to load user');
       });
   }
 
@@ -67,7 +66,7 @@ export class SectionInfoComponent implements OnInit, OnDestroy {
       return;
     }
     this.saving = true;
-    this.sectionService.saveOrEditSection(this.vm)
+    this.userService.saveOrEditUser(this.vm)
     .subscribe(message => {
       this.saving = false;
       alert(message);
@@ -80,8 +79,8 @@ export class SectionInfoComponent implements OnInit, OnDestroy {
   }
 
   public edit(index: number): void {
-    // this.vm = <Section>JSON.parse(JSON.stringify(this.sectionList[index]));
-    this.getById(this.sectionList[index].id);
+    // this.vm = <User>JSON.parse(JSON.stringify(this.userList[index]));
+    this.getById(this.userList[index].id);
   }
 
   public back(data: boolean): void {
@@ -93,7 +92,7 @@ export class SectionInfoComponent implements OnInit, OnDestroy {
 
   public isValid(): boolean {
     if (this.vm.name === '') {
-      alert('You should specify the section name.');
+      alert('You should specify the user name.');
       return false;
     }
     return true;
@@ -103,14 +102,14 @@ export class SectionInfoComponent implements OnInit, OnDestroy {
     this.loadVm();
   }
 
-  public delete(sectionId: number): void {
-    const section = this.sectionList.find(o => o.id === sectionId);
-    if (!section) {
+  public delete(userId: number): void {
+    const user = this.userList.find(o => o.id === userId);
+    if (!user) {
       return;
     }
 
-    if (confirm(`Do you really want to delete the section ${section.name}`)) {
-      this.subscription = this.sectionService.deleteSection(sectionId)
+    if (confirm(`Do you really want to delete the user ${user.name}`)) {
+      this.subscription = this.userService.deleteUser(userId)
       .subscribe(
         data => {
           alert(data);
@@ -118,7 +117,7 @@ export class SectionInfoComponent implements OnInit, OnDestroy {
         },
         error => {
           console.log(error);
-          alert('Failed to delete that section');
+          alert('Failed to delete that user');
         });
     }
   }
