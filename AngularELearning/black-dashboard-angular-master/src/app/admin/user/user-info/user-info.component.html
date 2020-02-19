@@ -5,16 +5,16 @@
     <div class="col-lg-8 col-md-12">
       <div class=" card card-tasks pb-3">
         <div class="card-header">
-          <h6 class=" title d-inline">Sections</h6>
+          <h6 class=" title d-inline">Users</h6>
         </div>
         <div class=" card-body ">
-          <p class=" text-muted" *ngIf="!sectionList || (sectionList && sectionList.length <= 0)">
+          <p class=" text-muted" *ngIf="!userList || (userList && userList.length <= 0)">
             Nothing to show  
-            <button class=" btn btn-icon btn-round" title="Add New Section" (click)="getVm()" href="javascript:void(0)">
+            <button class=" btn btn-icon btn-round" title="Add new user" (click)="getVm()" href="javascript:void(0)">
               <i class=" tim-icons icon-simple-add"></i>
             </button>
           </p>
-          <div class="table-responsive  table-full-width "  *ngIf="sectionList && sectionList.length > 0">
+          <div class="table-responsive table-full-width "  *ngIf="userList && userList.length > 0">
             <table class=" table">
               <colgroup>
                 <col style="width: 5%;">
@@ -26,12 +26,13 @@
                 <tr>
                   <th></th>
                   <th>Name</th>
-                  <th>Description</th>
+                  <th>Username</th>
+                  <th>Is Professor</th>
                   <th>  
                     <button
-                    *ngIf="sectionList && sectionList.length > 0"
+                    *ngIf="userList && userList.length > 0"
                     class=" btn btn-icon float-right btn-round mr-3"
-                    title="Add a Section"
+                    title="Add a user"
                     (click)="getVm()"
                     type="button">
                     <i class=" tim-icons icon-simple-add"> </i>
@@ -39,7 +40,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let item of sectionList">
+                <tr *ngFor="let item of userList">
                   <td>
                     <div class=" form-check">
                       <label class=" form-check-label">
@@ -48,7 +49,7 @@
                           type="checkbox"
                           [(ngModel)]="item.selected"
                           [checked]="item.selected"
-                          (ngModelChange)="sectionSelect(sectionList.indexOf(item))"/>
+                          (ngModelChange)="userSelect(userList.indexOf(item))"/>
                         <span class=" form-check-sign">
                           <span class=" check"> </span>
                         </span>
@@ -65,10 +66,10 @@
                     </p>
                   </td>
                   <td class=" td-actions text-right">
-                    <button class=" btn btn-link" type="button" placement="left" (click)="edit(sectionList.indexOf(item))" ngbTooltip="Edit Section" container="body" >
+                    <button class=" btn btn-link" type="button" placement="left" (click)="edit(userList.indexOf(item))" ngbTooltip="Edit User" container="body" >
                       <i class=" tim-icons icon-pencil"> </i>
                     </button>
-                    <button class=" btn btn-link" type="button" placement="left" (click)="delete(item.id)" ngbTooltip="Delete Section" container="body" >
+                    <button class=" btn btn-link" type="button" placement="left" (click)="delete(item.id)" ngbTooltip="Delete User" container="body" >
                       <i class=" tim-icons icon-trash-simple"> </i>
                     </button>
                   </td>
@@ -80,11 +81,11 @@
       </div>
     </div>
     <div class="col-lg-4 col-md-12">
-      <app-courses-section-form
+      <app-courses-user-form
         *ngIf="vm"
         (goBack)="back($event)"
         [vm]="vm">
-      </app-courses-section-form>
+      </app-courses-user-form>
     </div>
   </div>
 </div>
