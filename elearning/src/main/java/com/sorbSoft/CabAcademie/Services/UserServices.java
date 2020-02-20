@@ -1,9 +1,13 @@
 package com.sorbSoft.CabAcademie.Services;
 
+import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
+import com.sorbSoft.CabAcademie.Entities.Factory.UserFactory;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
+import com.sorbSoft.CabAcademie.Entities.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import javafx.util.Pair;
+import jdk.nashorn.internal.runtime.regexp.JoniRegExp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -32,24 +36,17 @@ public class UserServices {
     @Autowired
     private UserRepository userRepository;
 
-//    public void  deleteUser(Long id){
-//        UserRepository.deleteById(id);
-//    }
-
-//    public User saveUser(User User){
-//        return UserRepository.save(User);
-//    }
-//
-    public Pair<String, User> saveUser(User user){
+    public Pair<String, User> saveUser(UserViewModel user){
+        User resultUser = UserFactory.mapUser(user);
         if (user.getId() > 0L) {
-            return updateUser(user);
+            return updateUser(resultUser);
         } else {
             User savedUser = userRepository.findByUsername(user.getUsername());
 
             if ( savedUser != null){
                 return new Pair<>("The user you are trying to save already exist", null);
             }
-            User result = userRepository.save(user);
+            User result = userRepository.save(resultUser);
             if (result == null){
                 return new Pair<>("Couldn't save the user", null);
             } else {
@@ -97,15 +94,7 @@ public class UserServices {
     public void eliminarUserPorId(Long id){
         UserRepository.deleteById(id);
     }
-    
-//    public User updateUser(User user){
-//        User currentUser = UserRepository.findById(user.getId());
-//        currentUser.setEnable(user.getEnable());
-//        currentUser.setName(user.getName());
-//        currentUser.setUsername(user.getUsername());
-//        return UserRepository.save(currentUser);
-//
-//    }
+
 
     public String deleteUser(Long id){
         if (id <= 0L) {
@@ -124,38 +113,5 @@ public class UserServices {
         return UserRepository.findById(id);
     }
 
-    public User getUserViewModel(){
-        return new User() {
-            @Override
-            public Long getId() {
-                return 0L;
-            }
-
-            @Override
-            public String getName() {
-                return "";
-            }
-
-            @Override
-            public String getUsername() {
-                return "";
-            }
-
-            @Override
-            public int getEnable() {
-                return 1;
-            }
-
-            @Override
-            public String getPassword() {
-                return "";
-            }
-
-            @Override
-            public List<Rol> getRoles() {
-                return super.getRoles();
-            }
-        };
-    }
 }
 

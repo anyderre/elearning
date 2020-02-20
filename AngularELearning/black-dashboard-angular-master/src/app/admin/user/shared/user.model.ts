@@ -7,7 +7,7 @@ export class User {
         public username: string,
         public password: string,
         public passwordConfirm: string,
-        public isProfessor: boolean,
-        public roles: Rol[],
+        public professor: boolean,
+        public admin: boolean,
     ) { }
 }

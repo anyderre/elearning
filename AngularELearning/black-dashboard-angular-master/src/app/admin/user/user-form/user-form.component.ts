@@ -32,18 +32,6 @@ export class UserFormComponent implements OnInit {
     }
   }
 
-  private updateVm(): void {
-    // if (this.sectionId) {
-    //   this.vm.section = new Section(this.sectionId, '', '');
-    // }
-    // if (this.categoryId) {
-    //   this.vm.category = new Category(this.categoryId, '', '', null);
-    // }
-    // if (!this.vm.premium) {
-    //   this.vm.price = 0;
-    // }
-  }
-
   public getVm(): void {
     this.subscription = this.userService.getUserViewModel()
     .subscribe(

@@ -26,9 +26,9 @@ public class RolServices {
         rolRepository.save(rol);
         return rol;
     }
-//    public void eliminarRolPorUsername(String username){
-//        rolRepository.deleteRolByUsername(username);
-//    }
+    public Rol getRole(String rol){
+        return rolRepository.findAllByRol(rol);
+    }
     public void elimarRolPorId(Long id){
         rolRepository.deleteRolById(id);
     }

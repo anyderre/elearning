@@ -1,6 +1,8 @@
 package com.sorbSoft.CabAcademie.Controladores;
 
+import com.sorbSoft.CabAcademie.Entities.Factory.UserFactory;
 import com.sorbSoft.CabAcademie.Entities.User;
+import com.sorbSoft.CabAcademie.Entities.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
 import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +38,7 @@ public class UserController {
 
     @GetMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<User> getCourseViewModel(){
-        return new ResponseEntity<>(userService.getUserViewModel(), HttpStatus.OK);
+        return new ResponseEntity<>(UserFactory.getUserViewModel(), HttpStatus.OK);
     }
 
     @GetMapping(value = "/loggedIn")
@@ -57,7 +59,7 @@ public class UserController {
     }
 
     @PostMapping("/save")
-    public  ResponseEntity<String> saveUser(@Valid @RequestBody User user){
+    public  ResponseEntity<String> saveUser(@Valid @RequestBody UserViewModel user){
         Pair<String, User> result = userService.saveUser(user);
         if(result.getValue() == null)
             return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);

@@ -51,7 +51,7 @@
                           [checked]="item.selected"
                           (ngModelChange)="userSelect(userList.indexOf(item))"/>
                         <span class=" form-check-sign">
-                          <span class=" check"> </span>
+                          <span class=" check"></span>
                         </span>
                       </label>
                     </div>
@@ -66,8 +66,11 @@
                     </p>
                   </td>
                   <td>
-                    <span *ngIf="item.isProfessor" class="label label-success">Yes</span>
-                    <span *ngIf="!item.isProfessor" class="label label-danger">No</span>
+                    <!-- <span *ngIf="item.isProfessor" class="label label-success">Yes</span>
+                    <span *ngIf="!item.isProfessor" class="label label-danger">No</span> -->
+                    <ng-container *ngIf="vm.roles && vm.roles.length > 0"> 
+                      <span class="b-r-default" *ngFor="let item of vm.roles">{{item.rol}}</span>
+                    </ng-container>
                   </td>
                   <td class=" td-actions text-right">
                     <button class=" btn btn-link" type="button" placement="left" (click)="edit(userList.indexOf(item))" ngbTooltip="Edit User" container="body" >
