@@ -61,13 +61,12 @@ public class CourseController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
     @PostMapping("/save")
-    public  ResponseEntity<String> saveCourse(@Valid @RequestBody Course section){
-        Pair<String, Course> result = courseService.saveCourse(section);
+    public  ResponseEntity<String> saveCourse(@Valid @RequestBody Course course){
+        Pair<String, Course> result = courseService.saveCourse(course);
         if(result.getValue() == null)
             return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(result.getKey(), HttpStatus.CREATED);
     }
-
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> deleteCourse(@PathVariable Long id ){

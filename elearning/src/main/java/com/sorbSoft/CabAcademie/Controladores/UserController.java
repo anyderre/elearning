@@ -2,8 +2,10 @@ package com.sorbSoft.CabAcademie.Controladores;
 
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Services.UserServices;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +34,11 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
+    @GetMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> getCourseViewModel(){
+        return new ResponseEntity<>(userService.getUserViewModel(), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/loggedIn")
     public ResponseEntity<User> getLoggedInUser(Principal user){
         System.out.println("Printing user");
@@ -39,10 +46,9 @@ public class UserController {
         User loadedUser= userService.findUserbyUsername(user.getName());
 
         return new ResponseEntity<>(loadedUser, HttpStatus.OK);
-
     }
 
-    @GetMapping()
+    @GetMapping(value = "/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> getAllUser(){
         List<User> users= userService.findAllUsers();
         if(users.isEmpty())
@@ -50,27 +56,35 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @PostMapping()
-    public  ResponseEntity<User> saveUsers(@Valid @RequestBody User user){
-        User currentUser= userService.saveUser(user);
-        if(currentUser==null)
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        return  new ResponseEntity<>(HttpStatus.CREATED);
+    @PostMapping("/save")
+    public  ResponseEntity<String> saveUser(@Valid @RequestBody User user){
+        Pair<String, User> result = userService.saveUser(user);
+        if(result.getValue() == null)
+            return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(result.getKey(), HttpStatus.CREATED);
     }
 
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user){
-        if(id<0)
-            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(userService.findAUser(id)==null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//    @PostMapping()
+//    public  ResponseEntity<User> saveUsers(@Valid @RequestBody User user){
+//        User currentUser= userService.saveUser(user);
+//        if(currentUser==null)
+//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//        return  new ResponseEntity<>(HttpStatus.CREATED);
+//    }
 
-        User currentUser= userService.updateUser(user);
-        if (currentUser==null)
-            return  new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
-
-        return new ResponseEntity<>(currentUser, HttpStatus.OK);
-    }
+//    @PutMapping(value = "/{id}")
+//    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user){
+//        if(id<0)
+//            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        if(userService.findAUser(id)==null)
+//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//
+//        User currentUser= userService.updateUser(user);
+//        if (currentUser==null)
+//            return  new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+//
+//        return new ResponseEntity<>(currentUser, HttpStatus.OK);
+//    }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id ){

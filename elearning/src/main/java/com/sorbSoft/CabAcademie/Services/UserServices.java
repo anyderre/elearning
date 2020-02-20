@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Services;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -27,13 +28,53 @@ public class UserServices {
    private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Autowired
    private UserServices UserServices;
+    
+    @Autowired
+    private UserRepository userRepository;
 
-    public void  deleteUser(Long id){
-        UserRepository.deleteById(id);
+//    public void  deleteUser(Long id){
+//        UserRepository.deleteById(id);
+//    }
+
+//    public User saveUser(User User){
+//        return UserRepository.save(User);
+//    }
+//
+    public Pair<String, User> saveUser(User user){
+        if (user.getId() > 0L) {
+            return updateUser(user);
+        } else {
+            User savedUser = userRepository.findByUsername(user.getUsername());
+
+            if ( savedUser != null){
+                return new Pair<>("The user you are trying to save already exist", null);
+            }
+            User result = userRepository.save(user);
+            if (result == null){
+                return new Pair<>("Couldn't save the user", null);
+            } else {
+                return  new Pair<>("User saved successfully", result);
+            }
+        }
     }
 
-    public User saveUser(User User){
-        return UserRepository.save(User);
+    public Pair<String, User> updateUser(User user){
+        User savedUser = userRepository.findUserByUsernameAndIdIsNot(user.getUsername(), user.getId());
+        if (savedUser != null) {
+            return new Pair<>("The user name already exist for another definition", null);
+        }
+        User currentUser = UserRepository.findById(user.getId());
+        currentUser.setEnable(user.getEnable());
+        currentUser.setName(user.getName());
+        currentUser.setUsername(user.getUsername());
+        currentUser.setRoles(user.getRoles());
+
+        User result = userRepository.save(currentUser);
+        if (result == null) {
+            return new Pair<>("Couldn't update the user", null);
+        } else {
+            return new Pair<>("User updated successfully", result);
+        }
     }
 
     public User findUserbyUsername(String username){
@@ -56,44 +97,65 @@ public class UserServices {
     public void eliminarUserPorId(Long id){
         UserRepository.deleteById(id);
     }
-    public User updateUser(User user){
-        User currentUser = UserRepository.findById(user.getId());
-        currentUser.setEnable(user.getEnable());
-        currentUser.setName(user.getName());
-        currentUser.setUsername(user.getUsername());
-        return UserRepository.save(currentUser);
+    
+//    public User updateUser(User user){
+//        User currentUser = UserRepository.findById(user.getId());
+//        currentUser.setEnable(user.getEnable());
+//        currentUser.setName(user.getName());
+//        currentUser.setUsername(user.getUsername());
+//        return UserRepository.save(currentUser);
+//
+//    }
 
+    public String deleteUser(Long id){
+        if (id <= 0L) {
+            return "You should indicate the id of the user";
+        }
+        User user = userRepository.findById(id);
+        if (user == null) {
+            return "The user you want to delete doesn't exist";
+        }
+        user.setDeleted(true);
+        return "User successfully deleted";
     }
+
 
     public User findAUser(Long id){
         return UserRepository.findById(id);
     }
 
-    public void createAdmin(){
-        List<User> Users = UserRepository.findAllByUsername("admin");
-        System.out.println(Users.size() +"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++=");
-        Users.get(0).getRoles().forEach(rol ->  System.out.println(rol.getRol() +"++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++="));
+    public User getUserViewModel(){
+        return new User() {
+            @Override
+            public Long getId() {
+                return 0L;
+            }
 
-        if(Users.size()<1){
-            System.out.println("There+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-            User User =  new User();
-            User.setName("OMSA");
-            User.setUsername("admin");
-            User.setPassword(bCryptPasswordEncoder.encode("omsa1234"));
-            saveUser(User);
-            Rol rol = new Rol();
-            rol.setUsername(User.getUsername());
-            rol.setRol("ROLE_ADMIN");
-            Rol rol2 = new Rol();
-            rol2.setUsername(User.getUsername());
-            rol2.setRol("ROLE_USER");
-            //rolServices.creacionRol(rol);
-            List<Rol> rols = new ArrayList<>();
-            rols.add(rol);
-            rols.add(rol2);
-            User.setRoles(rols);
-            UserServices.saveUser(User);
-        }
+            @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
+            public String getUsername() {
+                return "";
+            }
+
+            @Override
+            public int getEnable() {
+                return 1;
+            }
+
+            @Override
+            public String getPassword() {
+                return "";
+            }
+
+            @Override
+            public List<Rol> getRoles() {
+                return super.getRoles();
+            }
+        };
     }
 }
 

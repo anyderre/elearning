@@ -2,8 +2,9 @@ import { Routes, RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AuthGuard } from '../../shared/auth/auth-guard.service';
-import { UserComponent } from 'src/app/pages/user/user.component';
 import { UserFormComponent } from './user-form/user-form.component';
+import { UserInfoComponent } from './user-info/user-info.component';
+import { UserComponent } from './user.component';
 
 export const UserRoutes: Routes = [
   {
@@ -14,6 +15,14 @@ export const UserRoutes: Routes = [
       {
         path: 'form',
         component: UserFormComponent
+      },
+      {
+        path: ':id/form',
+        component: UserFormComponent
+      },
+      {
+        path: 'info',
+        component: UserInfoComponent
       }
     ]
   },

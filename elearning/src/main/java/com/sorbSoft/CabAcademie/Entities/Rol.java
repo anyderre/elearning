@@ -19,5 +19,6 @@ public class Rol implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String rol;
-    private String username;
+    private boolean deleted = false;
+    private boolean enabled = true;
 }

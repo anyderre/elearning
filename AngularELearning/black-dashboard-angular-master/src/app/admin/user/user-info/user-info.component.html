@@ -1,8 +1,8 @@
 
 
 <div class="content">
-  <div class="row">
-    <div class="col-lg-8 col-md-12">
+  <div class="row justify-content-md-center">
+    <div class="col-md-8 col-md-offset-4">
       <div class=" card card-tasks pb-3">
         <div class="card-header">
           <h6 class=" title d-inline">Users</h6>
@@ -14,7 +14,7 @@
               <i class=" tim-icons icon-simple-add"></i>
             </button>
           </p>
-          <div class="table-responsive table-full-width "  *ngIf="userList && userList.length > 0">
+          <div class="table-responsive table-full-width" *ngIf="userList && userList.length > 0">
             <table class=" table">
               <colgroup>
                 <col style="width: 5%;">
@@ -27,7 +27,7 @@
                   <th></th>
                   <th>Name</th>
                   <th>Username</th>
-                  <th>Is Professor</th>
+                  <th>Roles</th>
                   <th>  
                     <button
                     *ngIf="userList && userList.length > 0"
@@ -62,8 +62,12 @@
                   </td>
                   <td>
                     <p class=" text-muted text-justify" style="white-space: normal">
-                      {{item.description}}
+                      {{item.username}}
                     </p>
+                  </td>
+                  <td>
+                    <span *ngIf="item.isProfessor" class="label label-success">Yes</span>
+                    <span *ngIf="!item.isProfessor" class="label label-danger">No</span>
                   </td>
                   <td class=" td-actions text-right">
                     <button class=" btn btn-link" type="button" placement="left" (click)="edit(userList.indexOf(item))" ngbTooltip="Edit User" container="body" >
@@ -79,13 +83,6 @@
           </div>
         </div>
       </div>
-    </div>
-    <div class="col-lg-4 col-md-12">
-      <app-courses-user-form
-        *ngIf="vm"
-        (goBack)="back($event)"
-        [vm]="vm">
-      </app-courses-user-form>
     </div>
   </div>
 </div>

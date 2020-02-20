@@ -4,6 +4,7 @@ import { UserComponent } from './user.component';
 import { UserFormComponent } from './user-form/user-form.component';
 import { CommonModule } from '@angular/common';
 import { SharedModule } from '../../shared/shared.module';
+import { UserInfoComponent } from './user-info/user-info.component';
 
 @NgModule({
   imports: [
@@ -14,7 +15,7 @@ import { SharedModule } from '../../shared/shared.module';
   declarations: [
     UserComponent,
     UserFormComponent,
-    // UserInfoComponent,
+    UserInfoComponent
   ],
 })
 export class UserModule {

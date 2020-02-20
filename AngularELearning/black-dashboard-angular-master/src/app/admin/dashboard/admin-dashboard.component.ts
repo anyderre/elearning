@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-dashboard',
-  templateUrl: 'dashboard.component.html'
+  templateUrl: 'admin-dashboard.component.html'
 })
 
 export class AdminDashboardComponent implements OnInit {
@@ -12,10 +12,10 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit() {}
 
-  // public add(): void {
-  //   this.router.navigate(['/courses/0/form']);
-  // }
-  // public read(): void {
-  //   this.router.navigate(['/courses/read']);
-  // }
+  public add(): void {
+    this.router.navigate(['/admin/user/form']);
+  }
+  public read(): void {
+    this.router.navigate(['/admin/user/info']);
+  }
 }

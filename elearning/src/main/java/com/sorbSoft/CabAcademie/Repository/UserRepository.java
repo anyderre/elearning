@@ -17,6 +17,8 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     User findByUsername(String username);
 
+    User findUserByUsernameAndIdIsNot(String username, Long id);
+
     User findById(Long id);
 
     List<User>findAll(Pageable pageable);

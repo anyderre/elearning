@@ -1,3 +1,4 @@
+import { Rol } from './rol.model';
 
 export class User {
     constructor(
@@ -7,5 +8,6 @@ export class User {
         public password: string,
         public passwordConfirm: string,
         public isProfessor: boolean,
+        public roles: Rol[],
     ) { }
 }

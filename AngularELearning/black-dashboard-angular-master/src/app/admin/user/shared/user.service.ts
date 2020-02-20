@@ -21,6 +21,7 @@ export class UserService {
           catchError(this.handleError)
         );
     }
+
   public getUserViewModel(): Observable<any> {
     const url = `${this.apiUrl}/user`;
     return this.http.get(url)
@@ -71,6 +72,7 @@ export class UserService {
             response.password,
             response.passwordConfirm,
             response.isProfessor,
+            response.roles,
         );
     }
 

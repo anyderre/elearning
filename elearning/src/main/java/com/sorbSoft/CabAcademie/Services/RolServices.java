@@ -26,18 +26,18 @@ public class RolServices {
         rolRepository.save(rol);
         return rol;
     }
-    public void eliminarRolPorUsername(String username){
-        rolRepository.deleteRolByUsername(username);
-    }
+//    public void eliminarRolPorUsername(String username){
+//        rolRepository.deleteRolByUsername(username);
+//    }
     public void elimarRolPorId(Long id){
         rolRepository.deleteRolById(id);
     }
     public List<Rol> todosRoles(){
         return rolRepository.findAll();
     }
-    public List<Rol> rolesUsuario(User user){
-        return rolRepository.findAllByUsername(user.getUsername());
-    }
+//    public List<Rol> rolesUsuario(User user){
+//        return rolRepository.findAllByUsername(user.getUsername());
+//    }
 
 
 }
