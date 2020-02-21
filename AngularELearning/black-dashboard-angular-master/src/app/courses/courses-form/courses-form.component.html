@@ -51,13 +51,31 @@
               <div class="col-md-8">
                 <div class=" form-group">
                   <label for="description">Start Date</label>
-                  <input 
+                  <!-- <ngb-datepicker (dateSelect)="vm.startDate=$event" #datepicker></ngb-datepicker> -->
+                  <!-- <input 
                     class="form-control" 
                     id="startDate" 
                     name="startDate" 
                     #startDate="ngModel" 
+                    ngbDatepicker
                     type="date"
-                    [(ngModel)]="vm.startDate">
+                    [(ngModel)]="vm.startDate"> -->
+
+                    <input
+                    class="form-control" 
+                    placeholder="dd/mm/yyyy" 
+                    name="datePicker"
+                    maxlength="10"
+                    [container]="container"
+                    [(ngModel)]="vm.startDate"
+                    [autocomplete] = "autocomplete"
+                    [required] ="requirido"
+                    ngbDatepicker #date="ngbDatepicker"
+                    (keyup)="validarFecha()"
+                    (keyup.enter)="asignarFecha(true)"
+                    (blur)="asignarFecha(true)"
+                    (dateSelect)="asignarFecha(true)"
+                    [disabled]="disabled">
                 </div>
               </div>
             </div>

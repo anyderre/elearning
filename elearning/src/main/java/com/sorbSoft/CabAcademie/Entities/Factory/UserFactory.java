@@ -38,7 +38,6 @@ public class UserFactory {
         return resUser;
     }
 
-
     // private
     public static UserViewModel mapUserToVM(User user){
         Pair<Boolean, Boolean> roles = getUserRoles(user);

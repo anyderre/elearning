@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by anyderre on 11/08/17.
@@ -84,7 +85,7 @@ public class UserServices {
     }
 
     public List<User> findAllUsers(){
-        return UserRepository.findAll();
+        return UserRepository.findAll().stream().filter(user -> user.getRoles().stream().filter(rol -> rol.equals(Roles.ROLE_SUPER_ADMIN.name())).count() == 0).collect(Collectors.toList());
     }
 
     public List<User> findUserByUsername(String username){
