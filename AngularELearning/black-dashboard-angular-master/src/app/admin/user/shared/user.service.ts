@@ -71,8 +71,8 @@ export class UserService {
             response.username,
             response.password,
             response.passwordConfirm,
-            response.admin,
             response.professor,
+            response.admin,
         );
     }
 

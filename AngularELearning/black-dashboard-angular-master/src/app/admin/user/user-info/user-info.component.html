@@ -10,7 +10,7 @@
         <div class=" card-body ">
           <p class=" text-muted" *ngIf="!userList || (userList && userList.length <= 0)">
             Nothing to show  
-            <button class=" btn btn-icon btn-round" title="Add new user" (click)="getVm()" href="javascript:void(0)">
+            <button class=" btn btn-icon btn-round" title="Add new user" (click)="add()" href="javascript:void(0)">
               <i class=" tim-icons icon-simple-add"></i>
             </button>
           </p>
@@ -33,7 +33,7 @@
                     *ngIf="userList && userList.length > 0"
                     class=" btn btn-icon float-right btn-round mr-3"
                     title="Add a user"
-                    (click)="getVm()"
+                    (click)="add()"
                     type="button">
                     <i class=" tim-icons icon-simple-add"> </i>
                   </button></th>
@@ -68,8 +68,8 @@
                   <td>
                     <!-- <span *ngIf="item.isProfessor" class="label label-success">Yes</span>
                     <span *ngIf="!item.isProfessor" class="label label-danger">No</span> -->
-                    <ng-container *ngIf="vm.roles && vm.roles.length > 0"> 
-                      <span class="b-r-default" *ngFor="let item of vm.roles">{{item.rol}}</span>
+                    <ng-container *ngIf="item.roles && item.roles.length > 0"> 
+                      <p class="b-r-default" *ngFor="let itemSub of item.roles">{{itemSub.rol}}</p>
                     </ng-container>
                   </td>
                   <td class=" td-actions text-right">

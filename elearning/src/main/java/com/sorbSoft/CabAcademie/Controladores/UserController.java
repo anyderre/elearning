@@ -25,15 +25,15 @@ public class UserController {
     private UserServices userService;
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id){
+    public ResponseEntity<UserViewModel> getUser(@PathVariable Long id){
         if(id<0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         User user= userService.findAUser(id);
         if(user==null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        return new ResponseEntity<>(user, HttpStatus.OK);
+        UserViewModel vm = UserFactory.mapUserToVM(user);
+        return new ResponseEntity<>(vm, HttpStatus.OK);
     }
 
     @GetMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -66,27 +66,6 @@ public class UserController {
         return  new ResponseEntity<>(result.getKey(), HttpStatus.CREATED);
     }
 
-//    @PostMapping()
-//    public  ResponseEntity<User> saveUsers(@Valid @RequestBody User user){
-//        User currentUser= userService.saveUser(user);
-//        if(currentUser==null)
-//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-//        return  new ResponseEntity<>(HttpStatus.CREATED);
-//    }
-
-//    @PutMapping(value = "/{id}")
-//    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User user){
-//        if(id<0)
-//            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-//        if(userService.findAUser(id)==null)
-//            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-//
-//        User currentUser= userService.updateUser(user);
-//        if (currentUser==null)
-//            return  new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
-//
-//        return new ResponseEntity<>(currentUser, HttpStatus.OK);
-//    }
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id ){

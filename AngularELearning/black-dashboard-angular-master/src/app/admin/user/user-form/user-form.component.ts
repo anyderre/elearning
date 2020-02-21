@@ -50,18 +50,13 @@ export class UserFormComponent implements OnInit {
       data => {
         this.vm = data;
         this.cleanVm = this.vm;
-        this.fill();
+        console.log(this.vm)
+
       },
       () => {
         this.saving = false;
         alert('Failed to load course');
       });
-  }
-
-  private fill(): void {
-    // this.sectionId = this.vm.section ? this.vm.section.id : 0;
-    // this.categoryId = this.vm.section ? this.vm.category.id : 0;
-    // this.vm.startDate = this.vm.startDate ? new Date(this.vm.startDate) : null;
   }
 
   public save(form: FormGroup): void {
@@ -77,7 +72,7 @@ export class UserFormComponent implements OnInit {
     this.userService.saveOrEditUser(this.vm)
     .subscribe(() => {
       this.saving = false;
-      this.back(false);
+      this.back();
       alert('Registration correct');
       },
       () => {
@@ -87,10 +82,8 @@ export class UserFormComponent implements OnInit {
     );
   }
 
-  public back(isBack: boolean): void {
-    if (this.goBack.observers.length > 0) {
-      this.goBack.emit(isBack);
-    }
+  public back(): void {
+    this.location.back();
   }
 
   public cancel(): void {
@@ -112,17 +105,19 @@ export class UserFormComponent implements OnInit {
       alert('You should specify the username.');
       return false;
     }
-    if (this.vm.password === '') {
-      alert('You should specify the password.');
-      return false;
-    }
-    if (this.vm.passwordConfirm === '') {
-      alert('You should specify the password confirmation.');
-      return false;
-    }
-    if (this.vm.password !== this.vm.passwordConfirm) {
-      alert('The password should be the same.');
-      return false;
+    if (this.vm.id <= 0) {
+      if (this.vm.password === '') {
+        alert('You should specify the password.');
+        return false;
+      }
+      if (this.vm.passwordConfirm === '') {
+        alert('You should specify the password confirmation.');
+        return false;
+      }
+      if (this.vm.password !== this.vm.passwordConfirm) {
+        alert('The password should be the same.');
+        return false;
+      }
     }
     return true;
   }

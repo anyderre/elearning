@@ -126,7 +126,6 @@ export class CoursesFormComponent implements OnInit {
         this.vm = data;
         this.cleanVm = this.vm;
         this.fill();
-        console.log(this.vm);
       },
       () => {
         this.saving = false;
@@ -137,7 +136,8 @@ export class CoursesFormComponent implements OnInit {
   private fill(): void {
     this.sectionId = this.vm.section ? this.vm.section.id : 0;
     this.categoryId = this.vm.section ? this.vm.category.id : 0;
-    // this.vm.startDate = this.vm.startDate ? new Date(this.vm.startDate) : null;
+    this.vm.startDate = this.vm.startDate ? new Date(this.vm.startDate) : null;
+    this.vm.endDate = this.vm.endDate ? new Date(this.vm.endDate) : null;
   }
 
   public cancel(): void {

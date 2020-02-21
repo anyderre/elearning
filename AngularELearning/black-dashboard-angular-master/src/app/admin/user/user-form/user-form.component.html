@@ -41,7 +41,7 @@
                   </div>
                 </div>
               </div>
-              <div class="justify-content-md-center row">
+              <div class="justify-content-md-center row" *ngIf="vm.id <=0">
                 <div class="col-md-8">
                   <div class=" form-group">
                     <label for="password">Password</label>
@@ -58,7 +58,7 @@
                   </div>
                 </div>
               </div>
-              <div class="justify-content-md-center row">
+              <div class="justify-content-md-center row" *ngIf="vm.id <=0">
                 <div class="col-md-8">
                   <div class=" form-group">
                     <label for="passwordConfirm">Password confirm</label>
@@ -116,11 +116,11 @@
         
                 <div class=" card-footer">
                   <div class=" button-container">
-                    <button class=" btn btn-icon btn-round" type="button" title="Go back" (click)="back(true)" href="javascript:void(0)">
+                    <button class=" btn btn-icon btn-round" type="button" title="Go back" (click)="back()" href="javascript:void(0)">
                       <i class=" tim-icons icon-minimal-left"></i>
                     </button>
                     <span class="float-right">
-                      <button class=" btn btn-fill btn-danger" type="reset" (click)="cancel()">Cancel</button>
+                      <button class=" btn btn-fill btn-danger" type="reset" (click)="cancel()">reset</button>
                       <button class=" btn btn-fill btn-success" type="submit" (click)="save(sorbsoftUserForm)">Save</button>
                     </span>
                   </div>

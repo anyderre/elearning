@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { User } from '../shared/user.model';
 import { Subscription } from 'rxjs';
 import { UserService } from '../shared/user.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-admin-user-info',
@@ -14,7 +15,7 @@ export class UserInfoComponent implements OnInit, OnDestroy {
    public userList: User[];
    public vm: User;
 
-   constructor(private userService: UserService) { }
+   constructor(private userService: UserService, private router: Router) { }
 
   ngOnInit() {
    this.loadVm();
@@ -33,54 +34,57 @@ export class UserInfoComponent implements OnInit, OnDestroy {
       });
   }
 
-  public getVm(): void {
-    this.subscription = this.userService.getUserViewModel()
-    .subscribe(
-      data => {
-        this.vm = data;
-      },
-      error => {
-        this.saving = false;
-        alert('Failed to load user');
-      });
+  public add(): void {
+    this.router.navigate(['/admin/user/form']);
   }
+  // public getVm(): void {
+  //   this.subscription = this.userService.getUserViewModel()
+  //   .subscribe(
+  //     data => {
+  //       this.vm = data;
+  //     },
+  //     error => {
+  //       this.saving = false;
+  //       alert('Failed to load user');
+  //     });
+  // }
 
-  public getById(userId: number): void {
-    this.subscription = this.userService.getUserById(userId)
-    .subscribe(
-      data => {
-        this.vm = data;
-      },
-      error => {
-        this.saving = false;
-        alert('Failed to load user');
-      });
-  }
+  // public getById(userId: number): void {
+  //   this.subscription = this.userService.getUserById(userId)
+  //   .subscribe(
+  //     data => {
+  //       this.vm = data;
+  //     },
+  //     error => {
+  //       this.saving = false;
+  //       alert('Failed to load user');
+  //     });
+  // }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 
-  public save(): void {
-    if (!this.isValid()) {
-      return;
-    }
-    this.saving = true;
-    this.userService.saveOrEditUser(this.vm)
-    .subscribe(message => {
-      this.saving = false;
-      alert(message);
-      },
-      error => {
-        this.saving = false;
-        alert(error);
-      }
-    );
-  }
+  // public save(): void {
+  //   if (!this.isValid()) {
+  //     return;
+  //   }
+  //   this.saving = true;
+  //   this.userService.saveOrEditUser(this.vm)
+  //   .subscribe(message => {
+  //     this.saving = false;
+  //     alert(message);
+  //     },
+  //     error => {
+  //       this.saving = false;
+  //       alert(error);
+  //     }
+  //   );
+  // }
 
   public edit(index: number): void {
     // this.vm = <User>JSON.parse(JSON.stringify(this.userList[index]));
-    this.getById(this.userList[index].id);
+    this.router.navigate([`/admin/user/${this.userList[index].id}/form`]);
   }
 
   public back(data: boolean): void {
