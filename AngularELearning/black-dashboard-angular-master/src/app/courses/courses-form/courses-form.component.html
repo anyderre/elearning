@@ -52,6 +52,21 @@
                 <div class=" form-group">
                   <label for="description">Start Date</label>
                   <!-- <ngb-datepicker (dateSelect)="vm.startDate=$event" #datepicker></ngb-datepicker> -->
+                  <!-- <input type="text" class="form-control" ngbDatepicker (dateSelect)="onDateSelect($event)"/>
+                   -->
+                   <div class="input-group">
+                    <input 
+                      class="form-control" 
+                      placeholder="yyyy-mm-dd"
+                      name="dp" 
+                      [(ngModel)]="model" 
+                      ngbDatepicker 
+                      #d="ngbDatepicker">
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button"><i class="fa fa-calendar"></i></button>
+                    </div>
+                  </div>
+
                   <!-- <input 
                     class="form-control" 
                     id="startDate" 
@@ -60,7 +75,7 @@
                     ngbDatepicker
                     type="date"
                     [(ngModel)]="vm.startDate"> -->
-
+<!-- 
                     <input
                     class="form-control" 
                     placeholder="dd/mm/yyyy" 
@@ -70,12 +85,13 @@
                     [(ngModel)]="vm.startDate"
                     [autocomplete] = "autocomplete"
                     [required] ="requirido"
-                    ngbDatepicker #date="ngbDatepicker"
+                    ngbDatepicker 
+                    #date="ngbDatepicker"
                     (keyup)="validarFecha()"
                     (keyup.enter)="asignarFecha(true)"
                     (blur)="asignarFecha(true)"
                     (dateSelect)="asignarFecha(true)"
-                    [disabled]="disabled">
+                    [disabled]="disabled"> -->
                 </div>
               </div>
             </div>

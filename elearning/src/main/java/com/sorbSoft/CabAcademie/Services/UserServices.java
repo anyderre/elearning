@@ -6,8 +6,12 @@ import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Entities.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
+import com.sorbSoft.CabAcademie.Services.Dtos.Factory.UserFactory;
+import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.UserMapper;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import javafx.util.Pair;
 import jdk.nashorn.internal.runtime.regexp.JoniRegExp;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -37,16 +41,20 @@ public class UserServices {
     @Autowired
     private UserRepository userRepository;
 
+    private UserMapper mapper
+            = Mappers.getMapper(UserMapper.class);
+
     public Pair<String, User> saveUser(UserViewModel user){
-        User resultUser = UserFactory.mapUser(user);
         if (user.getId() > 0L) {
-            return updateUser(resultUser);
+            return updateUser(user);
         } else {
             User savedUser = userRepository.findByUsername(user.getUsername());
 
             if ( savedUser != null){
                 return new Pair<>("The user you are trying to save already exist", null);
             }
+            User resultUser = mapper.mapToEntity(user);
+            resultUser.setRoles(rolServices.getUserRoles(user));
             User result = userRepository.save(resultUser);
             if (result == null){
                 return new Pair<>("Couldn't save the user", null);
@@ -55,6 +63,7 @@ public class UserServices {
             }
         }
     }
+
 
     public Pair<String, User> updateUser(User user){
         User savedUser = userRepository.findUserByUsernameAndIdIsNot(user.getUsername(), user.getId());
@@ -112,6 +121,27 @@ public class UserServices {
 
     public User findAUser(Long id){
         return UserRepository.findById(id);
+    }
+
+
+    public UserViewModel getUserViewModel(Long userId){
+        UserViewModel vm = UserFactory.getUserViewModel();
+        if (userId != null && userId > 0) {
+            User user = this.findAUser(userId);
+            if (user == null) {
+                return null;
+            } else {
+                vm = mapper.mapToViewModel(user);
+                Pair<Boolean, Boolean> roles = rolServices.getUserRoles(vm);
+                
+                vm.setAdmin(roles.getFirst());
+                vm.setProfessor(roles.getSecond());
+        }
+        rolServices.getUserRoles()
+        vm.setSections(sectionService.fetchAllSection()); // TODO: could be filtered
+        vm.setCategories(categoryService.fetchAllCategories());// TODO: could be filtered
+        vm.setUsers(userServices.findAllUsers()); // Filtered // TODO: could have more filters
+        return vm;
     }
 
 }

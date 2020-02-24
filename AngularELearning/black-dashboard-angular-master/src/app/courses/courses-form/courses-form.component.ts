@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Courses } from '../shared/courses.model';
 import { CoursesService } from '../shared/courses.service';
@@ -12,7 +12,8 @@ import { Location, JsonPipe } from '@angular/common';
 
 @Component({
   selector: 'app-courses-form',
-  templateUrl: 'courses-form.component.html'
+  templateUrl: 'courses-form.component.html',
+  encapsulation: ViewEncapsulation.None
 })
 export class CoursesFormComponent implements OnInit {
   @Output() goBack = new EventEmitter();
@@ -36,9 +37,6 @@ export class CoursesFormComponent implements OnInit {
     private route: ActivatedRoute) {}
 
   ngOnInit() {
-    this.loadCategories();
-    this.loadSections();
-
     this.id = +this.route.snapshot.paramMap.get('id');
     if (this.id === 0 ) {
       this.getVm();
@@ -113,6 +111,8 @@ export class CoursesFormComponent implements OnInit {
       data => {
         this.vm = data;
         this.cleanVm = this.vm;
+        this.loadCategories();
+        this.loadSections();
       }, () => {
         this.saving = false;
         alert('Failed to load Course');

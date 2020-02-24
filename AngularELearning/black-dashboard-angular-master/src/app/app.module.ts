@@ -24,6 +24,7 @@ export function tokenGetter() {
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
+    ComponentsModule,
     SharedModule,
     RouterModule,
     AppRoutingModule,

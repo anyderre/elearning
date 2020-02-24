@@ -28,10 +28,6 @@ public class Course implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
     private double price;
-//    @OneToOne(optional = false)
-//    @JoinColumn(name = "syllabus_id")
-//    private Syllabus syllabus;
-
     @OneToMany(cascade = CascadeType.ALL)
     private List<Syllabus> syllabus;
     @ManyToOne(optional = false)

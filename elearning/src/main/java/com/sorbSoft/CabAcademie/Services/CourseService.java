@@ -2,8 +2,12 @@ package com.sorbSoft.CabAcademie.Services;
 
 
 import com.sorbSoft.CabAcademie.Entities.*;
+import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CourseFactory;
+import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CourseMapper;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import com.sorbSoft.CabAcademie.Repository.CourseRepository;
 import javafx.util.Pair;
+import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,8 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -23,6 +25,18 @@ import java.util.List;
 public class CourseService {
     @Autowired
     private CourseRepository courseRepository;
+
+    @Autowired
+    private SectionService sectionService;
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @Autowired
+    private UserServices userServices;
+
+    private CourseMapper mapper
+            = Mappers.getMapper(CourseMapper.class);
 
     @Autowired
     private SyllabusService syllabusService;
@@ -45,22 +59,23 @@ public class CourseService {
         return courseRepository.findOne(id);
     }
 
-    public Pair<String, Course> updateCourse(Course course){
-        Course savedCourse = courseRepository.findCourseByTitleAndIdIsNot(course.getTitle(), course.getId());
+    public Pair<String, Course> updateCourse(CourseViewModel vm){
+        Course savedCourse = courseRepository.findCourseByTitleAndIdIsNot(vm.getTitle(), vm.getId());
         if (savedCourse != null) {
             return new Pair<>("The course name already exist for another definition", null);
         }
-        Course currentCourse= courseRepository.findOne(course.getId());
-        currentCourse.setEndDate(course.getEndDate());
-        currentCourse.setCategory(course.getCategory());
-        currentCourse.setPremium(course.isPremium());
-        currentCourse.setPrice(course.getPrice());
-        currentCourse.setStartDate(course.getStartDate());
-        currentCourse.setUser(course.getUser());
-        currentCourse.setDeleted(false);
-        currentCourse.setSyllabus(course.getSyllabus());
-        
-        Course result = courseRepository.save(currentCourse);
+//        Course currentCourse= courseRepository.findOne(course.getId());
+//        currentCourse.setEndDate(course.getEndDate());
+//        currentCourse.setCategory(course.getCategory());
+//        currentCourse.setPremium(course.isPremium());
+//        currentCourse.setPrice(course.getPrice());
+//        currentCourse.setStartDate(course.getStartDate());
+//        currentCourse.setUser(course.getUser());
+//        currentCourse.setDeleted(false);
+//        currentCourse.setSyllabus(course.getSyllabus());
+
+        Course course = mapper.mapToEntity(vm);
+        Course result = courseRepository.save(course);
         if (result == null) {
             return new Pair<>("Couldn't update the course", null);
         } else {
@@ -80,75 +95,33 @@ public class CourseService {
         return "Course successfully deleted";
     }
 
-    public Course getCourseViewModel(){
-        return new Course() {
-            @Override
-            public Long getId() {
-                return 0L;
-            }
-
-            @Override
-            public String getTitle() {
-                return "";
-            }
-
-            @Override
-            public User getUser() {
+    public CourseViewModel getCourseViewModel(Long courseId){
+        CourseViewModel vm = CourseFactory.getCourseViewModel();
+        if (courseId != null && courseId > 0) {
+            Course course = this.fetchCourse(courseId);
+            if (course == null) {
                 return null;
+            } else {
+                vm = mapper.mapToViewModel(course);
             }
-
-            @Override
-            public double getPrice() {
-                return 0D;
-            }
-
-            @Override
-            public List<Syllabus> getSyllabus() {
-                return new ArrayList<>();
-            }
-
-            @Override
-            public Category getCategory() {
-                return new Category(){
-                    @Override
-                    public String getName() {
-                        return "";
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return "";
-                    }
-
-                };
-            }
-
-            @Override
-            public boolean isPremium() {
-                return true;
-            }
-
-            @Override
-            public Date getStartDate() {
-                return new Date();
-            }
-
-            @Override
-            public Date getEndDate() {
-                return new Date();
-            }
-        };
+        }
+        vm.setSections(sectionService.fetchAllSection()); // TODO: could be filtered
+        vm.setCategories(categoryService.fetchAllCategories());// TODO: could be filtered
+        vm.setUsers(userServices.findAllUsers()); // Filtered // TODO: could have more filters
+        return vm;
     }
     
-    public Pair<String, Course> saveCourse(Course course){
-        if (course.getId() > 0L) {
-            return updateCourse(course);
+    public Pair<String, Course> saveCourse(CourseViewModel vm){
+        if (vm.getId() > 0L) {
+            return updateCourse(vm);
         } else {
-            Course savedCourse = courseRepository.findCourseByTitle(course.getTitle());
+            Course savedCourse = courseRepository.findCourseByTitle(vm.getTitle());
 
             if ( savedCourse != null){
                 return new Pair<>("The course you are trying to save already exist", null);
             }
+
+            Course course = mapper.mapToEntity(vm);
             Course result = courseRepository.save(course);
             if (result == null){
                 return new Pair<>("Couldn't save the course", null);

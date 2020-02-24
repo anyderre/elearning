@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Controladores;
 
 import com.sorbSoft.CabAcademie.Entities.Course;
 import com.sorbSoft.CabAcademie.Services.CourseService;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,22 +26,26 @@ public class CourseController {
     private CourseService courseService;
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Course> getCourse(@PathVariable Long id){
+    public ResponseEntity<CourseViewModel> getCourseViewModel(@PathVariable Long id){
         if(id<0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        Course course = courseService.fetchCourse(id);
-        if(course==null)
+        CourseViewModel vm = courseService.getCourseViewModel(id);
+        if(vm==null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return new ResponseEntity<>(course, HttpStatus.OK);
+        return new ResponseEntity<>(vm, HttpStatus.OK);
     }
 
     @GetMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Course> getCourseViewModel(){
-        return new ResponseEntity<>(courseService.getCourseViewModel(), HttpStatus.OK);
+    public ResponseEntity<CourseViewModel> getCourseViewModel(){
+        CourseViewModel vm = courseService.getCourseViewModel(null);
+        if(vm==null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(vm, HttpStatus.OK);
     }
 
+    // TODO: RETURN COURSE INFO IN A STANDARD WAY NOT ALL OBJECT FOR JUST A SINGLE STRING
     @GetMapping(value = "/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Course>> getAllCourses(){
         List<Course> courses = courseService.fetchAllCourses();
@@ -60,9 +65,10 @@ public class CourseController {
         Page<Course> courses = courseService.fetchAllCoursesByPageAndSerchText(page,itemsPerPage,searchText);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
+
     @PostMapping("/save")
-    public  ResponseEntity<String> saveCourse(@Valid @RequestBody Course course){
-        Pair<String, Course> result = courseService.saveCourse(course);
+    public  ResponseEntity<String> saveCourse(@Valid @RequestBody CourseViewModel vm){
+        Pair<String, Course> result = courseService.saveCourse(vm);
         if(result.getValue() == null)
             return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(result.getKey(), HttpStatus.CREATED);

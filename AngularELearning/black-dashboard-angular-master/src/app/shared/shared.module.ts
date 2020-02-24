@@ -1,4 +1,3 @@
-import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
@@ -7,11 +6,13 @@ import { CategorySelectService } from '../category/shared/category-select.servic
 import { SectionSelectService } from '../section/shared/section-select.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { NgModule } from '@angular/core';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   imports: [
+    NgbModule,
     CommonModule,
-    NgModule,
     HttpClientModule,
     FormsModule,
     NgSelectModule,
@@ -23,7 +24,7 @@ import { HttpClientModule } from '@angular/common/http';
     SectionSelectService,
   ],
   exports: [
-    NgModule,
+    NgbModule,
     FormsModule,
     HttpClientModule,
     NgxSelectModule,
