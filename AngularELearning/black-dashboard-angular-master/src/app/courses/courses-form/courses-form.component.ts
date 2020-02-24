@@ -22,8 +22,6 @@ export class CoursesFormComponent implements OnInit {
 
   public saving = false;
   public coursesList: Courses[];
-  public sections: Section[];
-  public categories: Category[];
   public sectionId = 0;
   public categoryId = 0;
   private id: number;
@@ -48,7 +46,7 @@ export class CoursesFormComponent implements OnInit {
     this.subscription = this.categorySelectService.getAllFiltered()
     .subscribe(
       data => {
-        this.categories = data;
+        // this.categories = data;
       },
       () => {
         this.saving = false;
@@ -60,7 +58,7 @@ export class CoursesFormComponent implements OnInit {
     this.subscription = this.sectionSelectService.getAllFiltered()
     .subscribe(
       data => {
-        this.sections = data;
+        // this.sections = data;
       },
       () => {
         this.saving = false;

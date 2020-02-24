@@ -109,12 +109,32 @@
               </div>
             </div>
   
-            <div class="justify-content-md-center row" *ngIf="sections">
+            <div class="justify-content-md-center row" *ngIf="vm.sections">
               <div class="col-md-8">
                 <div class=" form-group">
                   <label>Section</label>
                   <ngx-select 
-                    [items]="sections" 
+                    [items]="vm.sections" 
+                    optionValueField="id" 
+                    optionTextField="name" 
+                    name="xSection"
+                    id="xSection" 
+                    allowClear="true" 
+                    [placeholder]="'Search for a section'" 
+                    [(ngModel)]="sectionId"
+                    autoClearSearch="true" 
+                    #xSection="ngModel">
+                  </ngx-select>
+                </div>
+              </div>
+            </div>
+            
+            <div class="justify-content-md-center row" *ngIf="vm.sections">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label>Section</label>
+                  <ngx-select 
+                    [items]="vm.sections" 
                     optionValueField="id" 
                     optionTextField="name" 
                     name="xSection"
