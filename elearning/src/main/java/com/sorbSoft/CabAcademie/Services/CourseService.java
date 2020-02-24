@@ -2,6 +2,7 @@ package com.sorbSoft.CabAcademie.Services;
 
 
 import com.sorbSoft.CabAcademie.Entities.*;
+import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CourseFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CourseMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
@@ -64,15 +65,10 @@ public class CourseService {
         if (savedCourse != null) {
             return new Pair<>("The course name already exist for another definition", null);
         }
-//        Course currentCourse= courseRepository.findOne(course.getId());
-//        currentCourse.setEndDate(course.getEndDate());
-//        currentCourse.setCategory(course.getCategory());
-//        currentCourse.setPremium(course.isPremium());
-//        currentCourse.setPrice(course.getPrice());
-//        currentCourse.setStartDate(course.getStartDate());
-//        currentCourse.setUser(course.getUser());
-//        currentCourse.setDeleted(false);
-//        currentCourse.setSyllabus(course.getSyllabus());
+        Course currentCourse = courseRepository.findOne(vm.getId());
+        if(currentCourse == null) {
+            return new Pair<>("The course you are trying to edit does not exist anymore", null);
+        }
 
         Course course = mapper.mapToEntity(vm);
         Course result = courseRepository.save(course);
@@ -107,7 +103,7 @@ public class CourseService {
         }
         vm.setSections(sectionService.fetchAllSection()); // TODO: could be filtered
         vm.setCategories(categoryService.fetchAllCategories());// TODO: could be filtered
-        vm.setUsers(userServices.findAllUsers()); // Filtered // TODO: could have more filters
+        vm.setUsers(userServices.findAllUsersFilterd(Roles.ROLE_PROFESSOR.name())); // Filtered // TODO: could have more filters
         return vm;
     }
     

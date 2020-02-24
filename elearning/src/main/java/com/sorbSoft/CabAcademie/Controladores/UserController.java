@@ -1,11 +1,10 @@
 package com.sorbSoft.CabAcademie.Controladores;
 
-import com.sorbSoft.CabAcademie.Entities.Factory.UserFactory;
 import com.sorbSoft.CabAcademie.Entities.User;
-import com.sorbSoft.CabAcademie.Entities.ViewModel.UserViewModel;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
-import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -29,16 +28,19 @@ public class UserController {
         if(id<0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        User user= userService.findAUser(id);
-        if(user==null)
+        UserViewModel vm= userService.getUserViewModel(id);
+        if(vm==null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        UserViewModel vm = UserFactory.mapUserToVM(user);
+
         return new ResponseEntity<>(vm, HttpStatus.OK);
     }
 
     @GetMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> getCourseViewModel(){
-        return new ResponseEntity<>(UserFactory.getUserViewModel(), HttpStatus.OK);
+    public ResponseEntity<UserViewModel> getCourseViewModel(){
+        UserViewModel vm= userService.getUserViewModel(null);
+        if(vm==null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(vm, HttpStatus.OK);
     }
 
     @GetMapping(value = "/loggedIn")
@@ -61,9 +63,9 @@ public class UserController {
     @PostMapping("/save")
     public  ResponseEntity<String> saveUser(@Valid @RequestBody UserViewModel user){
         Pair<String, User> result = userService.saveUser(user);
-        if(result.getValue() == null)
-            return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(result.getKey(), HttpStatus.CREATED);
+        if(result.getSecond() == null)
+            return new ResponseEntity<>(result.getFirst(), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(result.getFirst(), HttpStatus.CREATED);
     }
 
 

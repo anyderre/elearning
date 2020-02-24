@@ -52,7 +52,6 @@ public class CourseFactory {
 
                 };
             }
-
             @Override
             public boolean isPremium() {
                 return true;

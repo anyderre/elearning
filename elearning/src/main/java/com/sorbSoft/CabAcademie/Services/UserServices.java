@@ -1,20 +1,16 @@
 package com.sorbSoft.CabAcademie.Services;
 
 import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
-import com.sorbSoft.CabAcademie.Entities.Factory.UserFactory;
-import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
-import com.sorbSoft.CabAcademie.Entities.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.UserFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.UserMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
-import javafx.util.Pair;
-import jdk.nashorn.internal.runtime.regexp.JoniRegExp;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.Pair;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,17 +40,17 @@ public class UserServices {
     private UserMapper mapper
             = Mappers.getMapper(UserMapper.class);
 
-    public Pair<String, User> saveUser(UserViewModel user){
-        if (user.getId() > 0L) {
-            return updateUser(user);
+    public Pair<String, User> saveUser(UserViewModel vm){
+        if (vm.getId() > 0L) {
+            return updateUser(vm);
         } else {
-            User savedUser = userRepository.findByUsername(user.getUsername());
+            User savedUser = userRepository.findByUsername(vm.getUsername());
 
             if ( savedUser != null){
                 return new Pair<>("The user you are trying to save already exist", null);
             }
-            User resultUser = mapper.mapToEntity(user);
-            resultUser.setRoles(rolServices.getUserRoles(user));
+            User resultUser = mapper.mapToEntity(vm);
+            resultUser.setRoles(rolServices.getUserRoles(vm));
             User result = userRepository.save(resultUser);
             if (result == null){
                 return new Pair<>("Couldn't save the user", null);
@@ -65,18 +61,23 @@ public class UserServices {
     }
 
 
-    public Pair<String, User> updateUser(User user){
-        User savedUser = userRepository.findUserByUsernameAndIdIsNot(user.getUsername(), user.getId());
+    public Pair<String, User> updateUser(UserViewModel vm){
+        User savedUser = userRepository.findUserByUsernameAndIdIsNot(vm.getUsername(), vm.getId());
         if (savedUser != null) {
             return new Pair<>("The user name already exist for another definition", null);
         }
-        User currentUser = UserRepository.findById(user.getId());
-        currentUser.setEnable(user.getEnable());
-        currentUser.setName(user.getName());
-        currentUser.setUsername(user.getUsername());
-        currentUser.setRoles(user.getRoles());
+        User currentUser = UserRepository.findById(vm.getId());
 
-        User result = userRepository.save(currentUser);
+        if (currentUser == null){
+            return new Pair<>("The user you are trying to update does not esxist anymore", null);
+        }
+
+        User resultUser = mapper.mapToEntity(vm);
+        resultUser.setRoles(rolServices.getUserRoles(vm));
+//        currentUser.setName(resultUser.getName());
+//        currentUser.setUsername(resultUser.getUsername());
+        User result = userRepository.save(resultUser);
+
         if (result == null) {
             return new Pair<>("Couldn't update the user", null);
         } else {
@@ -94,7 +95,13 @@ public class UserServices {
     }
 
     public List<User> findAllUsers(){
-        return UserRepository.findAll().stream().filter(user -> user.getRoles().stream().filter(rol -> rol.equals(Roles.ROLE_SUPER_ADMIN.name())).count() == 0).collect(Collectors.toList());
+        return UserRepository.findAll();
+    }
+
+    public List<User> findAllUsersFilterd(String filter){
+        return UserRepository.findAll().stream().filter(user ->
+                user.getRoles().stream().anyMatch(rol -> rol.getRol().equals(filter))
+        ).collect(Collectors.toList());
     }
 
     public List<User> findUserByUsername(String username){
@@ -132,17 +139,13 @@ public class UserServices {
                 return null;
             } else {
                 vm = mapper.mapToViewModel(user);
-                Pair<Boolean, Boolean> roles = rolServices.getUserRoles(vm);
-                
+                Pair<Boolean, Boolean> roles = rolServices.getUserRoles(user);
                 vm.setAdmin(roles.getFirst());
                 vm.setProfessor(roles.getSecond());
+            }
+            return vm;
         }
-        rolServices.getUserRoles()
-        vm.setSections(sectionService.fetchAllSection()); // TODO: could be filtered
-        vm.setCategories(categoryService.fetchAllCategories());// TODO: could be filtered
-        vm.setUsers(userServices.findAllUsers()); // Filtered // TODO: could have more filters
         return vm;
     }
-
 }
 

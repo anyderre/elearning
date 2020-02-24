@@ -15,4 +15,6 @@ public interface CourseMapper {
         @Mapping(target = "deleted", ignore = true)
     })
     Course mapToEntity (CourseViewModel vm);
+
+    Course mapEntityToEntity (Course course);
 }

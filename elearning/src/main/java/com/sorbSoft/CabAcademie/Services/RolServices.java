@@ -3,7 +3,6 @@ package com.sorbSoft.CabAcademie.Services;
 import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
-import com.sorbSoft.CabAcademie.Entities.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Repository.RolRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import org.springframework.beans.factory.annotation.Autowired;

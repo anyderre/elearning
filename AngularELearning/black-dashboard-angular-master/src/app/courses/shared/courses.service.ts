@@ -77,6 +77,9 @@ export class CoursesService {
         response.category,
         response.section,
         response.user,
+        response.users,
+        response.sections,
+        response.categories,
     );
   }
 

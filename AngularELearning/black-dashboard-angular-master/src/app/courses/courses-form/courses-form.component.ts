@@ -111,8 +111,8 @@ export class CoursesFormComponent implements OnInit {
       data => {
         this.vm = data;
         this.cleanVm = this.vm;
-        this.loadCategories();
-        this.loadSections();
+        // this.loadCategories();
+        // this.loadSections();
       }, () => {
         this.saving = false;
         alert('Failed to load Course');
