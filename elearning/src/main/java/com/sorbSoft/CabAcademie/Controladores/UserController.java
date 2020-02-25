@@ -3,8 +3,8 @@ package com.sorbSoft.CabAcademie.Controladores;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -63,9 +63,9 @@ public class UserController {
     @PostMapping("/save")
     public  ResponseEntity<String> saveUser(@Valid @RequestBody UserViewModel user){
         Pair<String, User> result = userService.saveUser(user);
-        if(result.getSecond() == null)
-            return new ResponseEntity<>(result.getFirst(), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(result.getFirst(), HttpStatus.CREATED);
+        if(result.getValue() == null)
+            return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(result.getKey(), HttpStatus.CREATED);
     }
 
 

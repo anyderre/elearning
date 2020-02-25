@@ -9,6 +9,8 @@ import { Category } from '../../category/shared/category.model';
 import { CategorySelectService } from 'src/app/category/shared/category-select.service';
 import { SectionSelectService } from 'src/app/section/shared/section-select.service';
 import { Location, JsonPipe } from '@angular/common';
+import { User } from 'src/app/admin/user/shared/user.model';
+import { Helper } from 'src/app/shared/helper/helper';
 
 @Component({
   selector: 'app-courses-form',
@@ -21,9 +23,14 @@ export class CoursesFormComponent implements OnInit {
   public subscription: Subscription;
 
   public saving = false;
+  private fNum = Helper.obtenerValorNumerico;
   public coursesList: Courses[];
-  public sectionId = 0;
-  public categoryId = 0;
+  public courseObj = {
+    sectionId: 0,
+    userId: 0,
+    categoryId: 0,
+  };
+
   private id: number;
   public cleanVm: Courses;
 
@@ -92,11 +99,14 @@ export class CoursesFormComponent implements OnInit {
   }
 
   private updateVm(): void {
-    if (this.sectionId) {
-      this.vm.section = new Section(this.sectionId, '', '');
+    if (this.courseObj.sectionId) {
+      this.vm.section = new Section(this.courseObj.sectionId, '', '');
     }
-    if (this.categoryId) {
-      this.vm.category = new Category(this.categoryId, '', '', null);
+    if (this.courseObj.categoryId) {
+      this.vm.category = new Category(this.courseObj.categoryId, '', '', null);
+    }
+    if (this.courseObj.userId) {
+      this.vm.user = new User(this.courseObj.userId, '', '', '', '', false, false);
     }
     if (!this.vm.premium) {
       this.vm.price = 0;
@@ -109,8 +119,6 @@ export class CoursesFormComponent implements OnInit {
       data => {
         this.vm = data;
         this.cleanVm = this.vm;
-        // this.loadCategories();
-        // this.loadSections();
       }, () => {
         this.saving = false;
         alert('Failed to load Course');
@@ -132,8 +140,9 @@ export class CoursesFormComponent implements OnInit {
   }
 
   private fill(): void {
-    this.sectionId = this.vm.section ? this.vm.section.id : 0;
-    this.categoryId = this.vm.section ? this.vm.category.id : 0;
+    this.courseObj.sectionId = this.vm.section ? this.vm.section.id : 0;
+    this.courseObj.categoryId = this.vm.category ? this.vm.category.id : 0;
+    this.courseObj.userId = this.vm.user ? this.vm.user.id : 0;
     this.vm.startDate = this.vm.startDate ? new Date(this.vm.startDate) : null;
     this.vm.endDate = this.vm.endDate ? new Date(this.vm.endDate) : null;
   }
@@ -159,12 +168,16 @@ export class CoursesFormComponent implements OnInit {
         return false;
       }
     }
-    if (+this.sectionId === 0) {
+    if (this.fNum(this.courseObj.sectionId) <= 0) {
       alert('You should specify the section.');
       return false;
     }
-    if (+this.categoryId === 0) {
+    if (this.fNum(this.courseObj.categoryId) <= 0) {
       alert('You should specify the category.');
+      return false;
+    }
+    if (this.fNum(this.courseObj.userId) <= 0) {
+      alert('You should specify the user.');
       return false;
     }
 

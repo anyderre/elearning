@@ -1,16 +1,15 @@
 package com.sorbSoft.CabAcademie.Services;
 
-import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.UserFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.UserMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
+import javafx.util.Pair;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.util.Pair;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -140,8 +139,8 @@ public class UserServices {
             } else {
                 vm = mapper.mapToViewModel(user);
                 Pair<Boolean, Boolean> roles = rolServices.getUserRoles(user);
-                vm.setAdmin(roles.getFirst());
-                vm.setProfessor(roles.getSecond());
+                vm.setAdmin(roles.getKey());
+                vm.setProfessor(roles.getValue());
             }
             return vm;
         }

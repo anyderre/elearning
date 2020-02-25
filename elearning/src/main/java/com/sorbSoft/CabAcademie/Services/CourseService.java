@@ -36,7 +36,7 @@ public class CourseService {
     @Autowired
     private UserServices userServices;
 
-    private CourseMapper mapper
+    private final CourseMapper mapper
             = Mappers.getMapper(CourseMapper.class);
 
     @Autowired

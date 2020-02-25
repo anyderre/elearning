@@ -109,21 +109,21 @@
               </div>
             </div>
   
-            <div class="justify-content-md-center row" *ngIf="vm.sections">
+            <div class="justify-content-md-center row" *ngIf="vm.users">
               <div class="col-md-8">
                 <div class=" form-group">
-                  <label>Section</label>
+                  <label>User</label>
                   <ngx-select 
-                    [items]="vm.sections" 
+                    [items]="vm.users" 
                     optionValueField="id" 
                     optionTextField="name" 
-                    name="xSection"
-                    id="xSection" 
+                    name="xUser"
+                    id="xUser" 
                     allowClear="true" 
-                    [placeholder]="'Search for a section'" 
-                    [(ngModel)]="sectionId"
+                    [placeholder]="'Search for a user'" 
+                    [(ngModel)]="userId"
                     autoClearSearch="true" 
-                    #xSection="ngModel">
+                    #xUser="ngModel">
                   </ngx-select>
                 </div>
               </div>
@@ -149,12 +149,12 @@
               </div>
             </div>
   
-            <div class="justify-content-md-center row" *ngIf="categories">
+            <div class="justify-content-md-center row" *ngIf="vm.categories">
               <div class="col-md-8">
                 <div class=" form-group">
                   <label>Category</label>
                   <ngx-select 
-                    [items]="categories" 
+                    [items]="vm.categories" 
                     optionValueField="id" 
                     optionTextField="name" 
                     name="xCategory"

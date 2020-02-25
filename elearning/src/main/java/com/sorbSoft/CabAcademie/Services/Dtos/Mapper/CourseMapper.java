@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-@Mapper
+@Mapper(componentModel="spring")
 public interface CourseMapper {
 
     CourseViewModel mapToViewModel(Course course);
@@ -16,5 +16,10 @@ public interface CourseMapper {
     })
     Course mapToEntity (CourseViewModel vm);
 
+//    @Mappings({
+//            @Mapping(target="id", source="dto.employeeId"),
+//            @Mapping(target="name", source="dto.employeeName"),
+//            @Mapping(target="startDt", source="dto.employeeStartDt",
+//                    dateFormat="dd-MM-yyyy HH:mm:ss")})
     Course mapEntityToEntity (Course course);
 }

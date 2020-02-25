@@ -1,7 +1,7 @@
 import { Category } from '../../category/shared/category.model';
 import { Section } from '../../section/shared/section.model';
 import { Syllabus } from './syllabus.model';
-import { User } from 'src/app/login/shared/user.model';
+import { User } from '../../admin/user/shared/user.model';
 
 export class Courses {
     constructor(

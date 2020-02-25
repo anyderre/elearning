@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class Helper {
   /** @description get the value of string
-    ** @alias fStr 
+  ** @alias fStr 
   */
   public static obtenerValorString(texto: any): string {
     if (texto === undefined || texto === null) {
