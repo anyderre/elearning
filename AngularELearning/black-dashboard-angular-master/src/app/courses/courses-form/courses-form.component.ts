@@ -29,6 +29,8 @@ export class CoursesFormComponent implements OnInit {
     sectionId: 0,
     userId: 0,
     categoryId: 0,
+    start: null,
+    end: null,
   };
 
   private id: number;
@@ -103,13 +105,21 @@ export class CoursesFormComponent implements OnInit {
       this.vm.section = new Section(this.courseObj.sectionId, '', '');
     }
     if (this.courseObj.categoryId) {
-      this.vm.category = new Category(this.courseObj.categoryId, '', '', null);
+      this.vm.category = new Category(this.courseObj.categoryId, '', '', null, []);
     }
     if (this.courseObj.userId) {
       this.vm.user = new User(this.courseObj.userId, '', '', '', '', false, false);
     }
     if (!this.vm.premium) {
       this.vm.price = 0;
+    }
+    if (this.courseObj.start) {
+      const startDate = this.courseObj.start;
+      this.vm.startDate = new Date(startDate.year, startDate.month, startDate.day);
+    }
+    if (this.courseObj.end) {
+      const endDate = this.courseObj.end;
+      this.vm.endDate = new Date(endDate.year, endDate.month, endDate.day);
     }
   }
 
@@ -143,8 +153,18 @@ export class CoursesFormComponent implements OnInit {
     this.courseObj.sectionId = this.vm.section ? this.vm.section.id : 0;
     this.courseObj.categoryId = this.vm.category ? this.vm.category.id : 0;
     this.courseObj.userId = this.vm.user ? this.vm.user.id : 0;
-    this.vm.startDate = this.vm.startDate ? new Date(this.vm.startDate) : null;
-    this.vm.endDate = this.vm.endDate ? new Date(this.vm.endDate) : null;
+    this.courseObj.start = this.vm.startDate ?
+    {
+      year: 2020,
+      month: 2,
+      day: 25
+    } : null;
+    this.courseObj.end = this.vm.endDate ?
+    {
+      year: 2020,
+      month: 2,
+      day: 25
+    } : null;
   }
 
   public cancel(): void {
@@ -168,14 +188,17 @@ export class CoursesFormComponent implements OnInit {
         return false;
       }
     }
+
     if (this.fNum(this.courseObj.sectionId) <= 0) {
       alert('You should specify the section.');
       return false;
     }
+
     if (this.fNum(this.courseObj.categoryId) <= 0) {
       alert('You should specify the category.');
       return false;
     }
+
     if (this.fNum(this.courseObj.userId) <= 0) {
       alert('You should specify the user.');
       return false;

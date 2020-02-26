@@ -15,7 +15,7 @@ export class CoursesService {
 
   public saveOrEditCourses(vm: Courses): Observable<any> {
     const url = `${this.apiUrl}/course/save`;
-    return this.http.post(url, JSON.stringify(vm), {responseType: 'json'})
+    return this.http.post(url, JSON.stringify(vm), {responseType: 'text'})
       .pipe(
         map(response => response),
         catchError(this.handleError)

@@ -12,6 +12,11 @@ export const CoursesRoutes: Routes = [
     canActivate: [ AuthGuard ],
   },
   {
+    path: '/form',
+    component: CoursesFormComponent,
+    canActivate: [ AuthGuard ],
+  },
+  {
     path: '',
     component: CourseInfoComponent,
     canActivate: [ AuthGuard ],

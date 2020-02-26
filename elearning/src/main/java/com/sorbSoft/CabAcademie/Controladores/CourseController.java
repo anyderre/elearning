@@ -66,12 +66,12 @@ public class CourseController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
-    @PostMapping("/save")
+    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public  ResponseEntity<String> saveCourse(@Valid @RequestBody CourseViewModel vm){
         Pair<String, Course> result = courseService.saveCourse(vm);
         if(result.getValue() == null)
             return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(result.getKey(), HttpStatus.CREATED);
+        return  new ResponseEntity<>(result.getKey(), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")

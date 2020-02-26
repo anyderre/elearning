@@ -22,12 +22,12 @@
           </div>
         </div>
       </div>
-      <div class="justify-content-md-center row" *ngIf="categoryList">
+      <div class="justify-content-md-center row" *ngIf="vm.categories">
         <div class="col-md-8">
           <div class=" form-group">
             <label>Parent Category</label>
             <ngx-select 
-              [items]="categoryList" 
+              [items]="vm.categories" 
               optionValueField="id"
               optionTextField="name"
               name ="xparentCategory"

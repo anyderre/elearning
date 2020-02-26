@@ -1,22 +1,18 @@
 package com.sorbSoft.CabAcademie.Controladores;
 
 import com.sorbSoft.CabAcademie.Entities.Category;
-import com.sorbSoft.CabAcademie.Entities.Section;
 import com.sorbSoft.CabAcademie.Entities.Topic;
 import com.sorbSoft.CabAcademie.Services.CategoryService;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
 import com.sorbSoft.CabAcademie.Services.TopicService;
 import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by Dany on 20/05/2018.
@@ -31,20 +27,23 @@ public class CategoryController {
     private TopicService topicService;
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Category> getCategory(@PathVariable Long id){
+    public ResponseEntity<CategoryViewModel> getCategory(@PathVariable Long id){
         if(id<0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        Category category= categoryService.fetchCategory(id);
-        if(category == null)
+        CategoryViewModel vm = categoryService.getCategoryViewModel(id);
+        if(vm == null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        return new ResponseEntity<>(category, HttpStatus.OK);
+        return new ResponseEntity<>(vm, HttpStatus.OK);
     }
 
     @GetMapping(value = "")
-    public ResponseEntity<Category> getCategoryViewModel(){
-        return new ResponseEntity<>(categoryService.getCategoryViewModel(), HttpStatus.OK);
+    public ResponseEntity<CategoryViewModel> getCategoryViewModel(){
+        CategoryViewModel vm = categoryService.getCategoryViewModel(null);
+        if(vm == null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(vm, HttpStatus.OK);
     }
 
     @GetMapping(value = "/all")
@@ -78,8 +77,8 @@ public class CategoryController {
     }
 
     @PostMapping(value = "/save")
-    public  ResponseEntity<String> saveCategory(@Valid @RequestBody Category category){
-        Pair<String, Category> result = categoryService.saveCategory(category);
+    public  ResponseEntity<String> saveCategory(@Valid @RequestBody CategoryViewModel vm){
+        Pair<String, Category> result = categoryService.saveCategory(vm);
         if(result.getValue() == null)
             return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(result.getKey(), HttpStatus.CREATED);

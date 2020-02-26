@@ -51,51 +51,43 @@
               <div class="col-md-8">
                 <div class=" form-group">
                   <label for="description">Start Date</label>
-                  <!-- <ngb-datepicker (dateSelect)="vm.startDate=$event" #datepicker></ngb-datepicker> -->
-                  <!-- <input type="text" class="form-control" ngbDatepicker (dateSelect)="onDateSelect($event)"/>
-                   -->
-                   <div class="input-group">
+                  <div class="input-group">
                     <input 
                       class="form-control" 
                       placeholder="yyyy-mm-dd"
                       name="dp" 
-                      [(ngModel)]="model" 
+                      [(ngModel)]="courseObj.start" 
                       ngbDatepicker 
-                      #d="ngbDatepicker">
-                    <div class="input-group-append">
-                      <button class="btn btn-outline-secondary" (click)="d.toggle()" type="button"><i class="fa fa-calendar"></i></button>
-                    </div>
+                      #dStartDate="ngbDatepicker">
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" (click)="dStartDate.toggle()" type="button"><i class="fa fa-calendar"></i></button>
+                      </div>
                   </div>
-
-                  <!-- <input 
-                    class="form-control" 
-                    id="startDate" 
-                    name="startDate" 
-                    #startDate="ngModel" 
-                    ngbDatepicker
-                    type="date"
-                    [(ngModel)]="vm.startDate"> -->
-<!-- 
-                    <input
-                    class="form-control" 
-                    placeholder="dd/mm/yyyy" 
-                    name="datePicker"
-                    maxlength="10"
-                    [container]="container"
-                    [(ngModel)]="vm.startDate"
-                    [autocomplete] = "autocomplete"
-                    [required] ="requirido"
-                    ngbDatepicker 
-                    #date="ngbDatepicker"
-                    (keyup)="validarFecha()"
-                    (keyup.enter)="asignarFecha(true)"
-                    (blur)="asignarFecha(true)"
-                    (dateSelect)="asignarFecha(true)"
-                    [disabled]="disabled"> -->
                 </div>
               </div>
             </div>
+
             <div class="justify-content-md-center row">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label for="description">End Date</label>
+                  <div class="input-group">
+                    <input 
+                      class="form-control" 
+                      placeholder="yyyy-mm-dd"
+                      name="dp" 
+                      [(ngModel)]="courseObj.end" 
+                      ngbDatepicker 
+                      #dEndDate="ngbDatepicker">
+                      <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" (click)="dEndDate.toggle()" type="button"><i class="fa fa-calendar"></i></button>
+                      </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- <div class="justify-content-md-center row">
               <div class="col-md-8">
                 <div class=" form-group">
                   <label for="description">End Date</label>
@@ -107,7 +99,7 @@
                     [(ngModel)]="vm.endDate">
                 </div>
               </div>
-            </div>
+            </div> -->
   
             <div class="justify-content-md-center row" *ngIf="vm.users">
               <div class="col-md-8">
@@ -121,7 +113,7 @@
                     id="xUser" 
                     allowClear="true" 
                     [placeholder]="'Search for a user'" 
-                    [(ngModel)]="userId"
+                    [(ngModel)]="courseObj.userId"
                     autoClearSearch="true" 
                     #xUser="ngModel">
                   </ngx-select>
@@ -141,7 +133,7 @@
                     id="xSection" 
                     allowClear="true" 
                     [placeholder]="'Search for a section'" 
-                    [(ngModel)]="sectionId"
+                    [(ngModel)]="courseObj.sectionId"
                     autoClearSearch="true" 
                     #xSection="ngModel">
                   </ngx-select>
@@ -161,7 +153,7 @@
                     id="xCategory" 
                     allowClear="true" 
                     [placeholder]="'Search for a category'" 
-                    [(ngModel)]="categoryId"
+                    [(ngModel)]="courseObj.categoryId"
                     autoClearSearch="true" 
                     #xCategory="ngModel">
                   </ngx-select>

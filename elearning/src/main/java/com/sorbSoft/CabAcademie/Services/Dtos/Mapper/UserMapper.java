@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Mappings;
 
-@Mapper
+@Mapper(componentModel="spring")
 public interface UserMapper {
     UserViewModel mapToViewModel(User user);
 

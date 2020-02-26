@@ -96,7 +96,7 @@ public class TopicService {
                 topicRepository.save(topic);
             }else{
                 updateTopic(topic);
-                categoryService.updateCategory(topics.get(0).getCategory());
+//                categoryService.updateCategory(topics.get(0).getCategory());
             }
         }
     }

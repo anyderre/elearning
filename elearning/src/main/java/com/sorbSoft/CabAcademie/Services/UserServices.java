@@ -59,7 +59,6 @@ public class UserServices {
         }
     }
 
-
     public Pair<String, User> updateUser(UserViewModel vm){
         User savedUser = userRepository.findUserByUsernameAndIdIsNot(vm.getUsername(), vm.getId());
         if (savedUser != null) {

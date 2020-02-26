@@ -18,9 +18,9 @@ public class CourseViewModel {
     private Category category;
     private Section section;
     private boolean isPremium;
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssX")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private Date startDate;
-    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ssX")
+    @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private Date endDate;
     private List<Syllabus> syllabus;
     private List<Category> categories;
