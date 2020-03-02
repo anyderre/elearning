@@ -12,6 +12,9 @@ import org.mapstruct.Mappings;
 public interface CategoryMapper {
     CategoryViewModel mapToViewModel(Category category);
 
+    @Mappings({
+            @Mapping(target = "parentCategory", ignore = true),
+    })
     Category mapToEntity(CategoryViewModel vm);
 
     @Mappings({

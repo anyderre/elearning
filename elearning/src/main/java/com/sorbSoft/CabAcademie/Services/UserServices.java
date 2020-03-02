@@ -49,6 +49,7 @@ public class UserServices {
                 return new Pair<>("The user you are trying to save already exist", null);
             }
             User resultUser = mapper.mapToEntity(vm);
+            resultUser.setPassword(bCryptPasswordEncoder.encode(resultUser.getPassword()));
             resultUser.setRoles(rolServices.getUserRoles(vm));
             User result = userRepository.save(resultUser);
             if (result == null){
@@ -72,6 +73,7 @@ public class UserServices {
 
         User resultUser = mapper.mapToEntity(vm);
         resultUser.setRoles(rolServices.getUserRoles(vm));
+//        resultUser.setPassword(bCryptPasswordEncoder.encode(resultUser.getPassword()));
 //        currentUser.setName(resultUser.getName());
 //        currentUser.setUsername(resultUser.getUsername());
         User result = userRepository.save(resultUser);
@@ -98,7 +100,7 @@ public class UserServices {
 
     public List<User> findAllUsersFilterd(String filter){
         return UserRepository.findAll().stream().filter(user ->
-                user.getRoles().stream().anyMatch(rol -> rol.getRol().equals(filter))
+                user.getRoles().stream().anyMatch(rol -> !rol.getRol().equals(filter))
         ).collect(Collectors.toList());
     }
 

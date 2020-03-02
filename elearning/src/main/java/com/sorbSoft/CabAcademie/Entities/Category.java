@@ -21,7 +21,7 @@ public class Category implements Serializable {
     private String name;
     private String description;
 //    private Long parentCategoryId;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Category parentCategory;
     @OneToMany(cascade = CascadeType.ALL)
     private List<Category> childrenCategory;

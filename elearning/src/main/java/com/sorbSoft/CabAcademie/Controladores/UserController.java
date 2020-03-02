@@ -1,5 +1,6 @@
 package com.sorbSoft.CabAcademie.Controladores;
 
+import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
@@ -45,16 +46,13 @@ public class UserController {
 
     @GetMapping(value = "/loggedIn")
     public ResponseEntity<User> getLoggedInUser(Principal user){
-        System.out.println("Printing user");
-        System.out.println(user.getName());
         User loadedUser= userService.findUserbyUsername(user.getName());
-
         return new ResponseEntity<>(loadedUser, HttpStatus.OK);
     }
 
     @GetMapping(value = "/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<User>> getAllUser(){
-        List<User> users= userService.findAllUsers();
+    public ResponseEntity<List<User>> findAllUsers(){
+        List<User> users= userService.findAllUsersFilterd(Roles.ROLE_SUPER_ADMIN.name());
         if(users.isEmpty())
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(users, HttpStatus.OK);

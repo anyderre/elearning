@@ -69,6 +69,7 @@ export class CategoryService {
           response.name,
           response.description,
           response.parentCategory,
+          response.categories,
       );
     }
 
