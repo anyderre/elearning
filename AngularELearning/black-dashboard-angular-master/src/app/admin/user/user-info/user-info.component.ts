@@ -10,15 +10,16 @@ import { Router } from '@angular/router';
   styleUrls: ['user-info.component.css']
 })
 export class UserInfoComponent implements OnInit, OnDestroy {
-   public saving = false;
-   public subscription: Subscription;
-   public userList: User[];
-   public vm: User;
+  public saving = false;
+  public subscription: Subscription;
+  public userList: User[];
+  public vm: User;
+  public isSuperAdmin = false;
 
-   constructor(private userService: UserService, private router: Router) { }
+  constructor(private userService: UserService, private router: Router) { }
 
   ngOnInit() {
-   this.loadVm();
+    this.loadVm();
   }
 
   public loadVm(): void {
@@ -26,7 +27,6 @@ export class UserInfoComponent implements OnInit, OnDestroy {
     .subscribe(
       data => {
         this.userList = data;
-        console.log(data);
       },
       error => {
         this.saving = false;
@@ -37,53 +37,13 @@ export class UserInfoComponent implements OnInit, OnDestroy {
   public add(): void {
     this.router.navigate(['/admin/user/form']);
   }
-  // public getVm(): void {
-  //   this.subscription = this.userService.getUserViewModel()
-  //   .subscribe(
-  //     data => {
-  //       this.vm = data;
-  //     },
-  //     error => {
-  //       this.saving = false;
-  //       alert('Failed to load user');
-  //     });
-  // }
-
-  // public getById(userId: number): void {
-  //   this.subscription = this.userService.getUserById(userId)
-  //   .subscribe(
-  //     data => {
-  //       this.vm = data;
-  //     },
-  //     error => {
-  //       this.saving = false;
-  //       alert('Failed to load user');
-  //     });
-  // }
 
   ngOnDestroy() {
     this.subscription.unsubscribe();
   }
 
-  // public save(): void {
-  //   if (!this.isValid()) {
-  //     return;
-  //   }
-  //   this.saving = true;
-  //   this.userService.saveOrEditUser(this.vm)
-  //   .subscribe(message => {
-  //     this.saving = false;
-  //     alert(message);
-  //     },
-  //     error => {
-  //       this.saving = false;
-  //       alert(error);
-  //     }
-  //   );
-  // }
 
   public edit(index: number): void {
-    // this.vm = <User>JSON.parse(JSON.stringify(this.userList[index]));
     this.router.navigate([`/admin/user/${this.userList[index].id}/form`]);
   }
 

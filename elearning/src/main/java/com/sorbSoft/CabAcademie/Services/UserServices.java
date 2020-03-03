@@ -1,8 +1,11 @@
 package com.sorbSoft.CabAcademie.Services;
 
+import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
+import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.UserFactory;
+import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.UserMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import javafx.util.Pair;
@@ -146,6 +149,33 @@ public class UserServices {
             return vm;
         }
         return vm;
+    }
+
+    public List <UserInfo> getUserInfo(){
+        List<User> users= this.findAllUsersFilterd(Roles.ROLE_SUPER_ADMIN.name());
+        if (users.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<UserInfo> info = new ArrayList<>();
+        userLoop: for (User user : users) {
+            UserInfo uInfo = new UserInfo();
+            if (user.getRoles() != null) {
+                for (Rol rol : user.getRoles()) {
+                    if (rol.getRol().equals(Roles.ROLE_SUPER_ADMIN.name())) {
+                        continue userLoop;
+                    } else if (rol.getRol().equals(Roles.ROLE_ADMIN.name())) {
+                        uInfo.setAdmin(true);
+                    } else if (rol.getRol().equals(Roles.ROLE_PROFESSOR.name())) {
+                        uInfo.setProfessor(true);
+                    }
+                }
+            }
+            uInfo.setId(user.getId());
+            uInfo.setName(user.getName());
+            uInfo.setUsername(user.getUsername());
+            info.add(uInfo);
+        }
+        return info;
     }
 }
 

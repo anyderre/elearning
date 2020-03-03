@@ -2,6 +2,7 @@ package com.sorbSoft.CabAcademie.Services.Dtos.Mapper;
 
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
+import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2020-02-25T23:48:14-0400",
+    date = "2020-03-02T23:43:20-0400",
     comments = "version: 1.3.1.Final, compiler: javac, environment: Java 1.8.0_111 (Oracle Corporation)"
 )
 @Component
@@ -74,5 +75,20 @@ public class UserMapperImpl implements UserMapper {
         user1.setDeleted( user.isDeleted() );
 
         return user1;
+    }
+
+    @Override
+    public UserInfo mapEntityToInfo(User user) {
+        if ( user == null ) {
+            return null;
+        }
+
+        UserInfo userInfo = new UserInfo();
+
+        userInfo.setId( user.getId() );
+        userInfo.setName( user.getName() );
+        userInfo.setUsername( user.getUsername() );
+
+        return userInfo;
     }
 }

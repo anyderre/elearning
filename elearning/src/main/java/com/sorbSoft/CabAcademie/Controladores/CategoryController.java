@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Controladores;
 import com.sorbSoft.CabAcademie.Entities.Category;
 import com.sorbSoft.CabAcademie.Entities.Topic;
 import com.sorbSoft.CabAcademie.Services.CategoryService;
+import com.sorbSoft.CabAcademie.Services.Dtos.Info.CategoryInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
 import com.sorbSoft.CabAcademie.Services.TopicService;
 import javafx.util.Pair;
@@ -47,8 +48,8 @@ public class CategoryController {
     }
 
     @GetMapping(value = "/all")
-    public ResponseEntity<List<Category>> getAllCategories(){
-        List<Category> categories= categoryService.fetchAllCategories();
+    public ResponseEntity<List<CategoryInfo>> getAllCategories(){
+        List<CategoryInfo> categories= categoryService.getUserInfo();
         if(categories.isEmpty())
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(categories, HttpStatus.OK);

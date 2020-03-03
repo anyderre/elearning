@@ -5,6 +5,7 @@ import com.sorbSoft.CabAcademie.Entities.Category;
 import com.sorbSoft.CabAcademie.Entities.Section;
 import com.sorbSoft.CabAcademie.Repository.CategoryRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CategoryFactory;
+import com.sorbSoft.CabAcademie.Services.Dtos.Info.CategoryInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CategoryMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
 import javafx.util.Pair;
@@ -134,6 +135,23 @@ public class CategoryService {
             return new ArrayList<>();
         }
         return categoriesFiltered.stream().filter(o -> o.getParentCategory() == null || !o.getParentCategory().getId().equals(categoryId)).collect(Collectors.toList());
+    }
+
+    public List <CategoryInfo> getUserInfo(){
+        List<Category> categories = this.fetchAllCategories();
+        if (categories.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<CategoryInfo> info = new ArrayList<>();
+        for (Category category : categories) {
+            CategoryInfo cInfo = new CategoryInfo();
+            cInfo.setId(category.getId());
+            cInfo.setName(category.getName());
+            cInfo.setDescription(category.getDescription());
+            cInfo.setParentCategoryDescription(category.getParentCategory() != null ? category.getParentCategory().getName(): "");
+            info.add(cInfo);
+        }
+        return info;
     }
 
 }

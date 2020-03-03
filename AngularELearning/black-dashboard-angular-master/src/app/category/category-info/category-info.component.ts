@@ -39,8 +39,6 @@ export class CategoryInfoComponent implements OnInit, OnDestroy {
     .subscribe(
       data => {
         this.vm = data;
-        console.log(this.vm)
-
       },
       () => {
         this.saving = false;
@@ -53,7 +51,6 @@ export class CategoryInfoComponent implements OnInit, OnDestroy {
     .subscribe(
       data => {
         this.vm = data;
-        console.log(this.vm)
       },
       () => {
         this.saving = false;

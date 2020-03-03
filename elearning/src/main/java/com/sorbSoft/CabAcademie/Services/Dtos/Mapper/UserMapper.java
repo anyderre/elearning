@@ -1,6 +1,7 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.Mapper;
 
 import com.sorbSoft.CabAcademie.Entities.User;
+import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,4 +24,6 @@ public interface UserMapper {
             @Mapping(target = "id", ignore = true),
     })
     User mapEntityToEntity (User user);
+
+    UserInfo mapEntityToInfo (User user);
 }

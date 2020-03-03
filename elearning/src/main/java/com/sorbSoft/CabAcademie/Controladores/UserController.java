@@ -2,6 +2,7 @@ package com.sorbSoft.CabAcademie.Controladores;
 
 import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.User;
+import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
 import javafx.util.Pair;
@@ -51,8 +52,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<User>> findAllUsers(){
-        List<User> users= userService.findAllUsersFilterd(Roles.ROLE_SUPER_ADMIN.name());
+    public ResponseEntity<List<UserInfo>> findAllUsers(){
+        List<UserInfo> users= userService.getUserInfo();
         if(users.isEmpty())
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(users, HttpStatus.OK);
