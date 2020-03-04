@@ -11,8 +11,6 @@ import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import javafx.util.Pair;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +31,7 @@ public class UserServices {
     private RolServices rolServices;
     @Autowired
    private BCryptPasswordEncoder bCryptPasswordEncoder;
-    @Autowired
-   private UserServices UserServices;
-    
+
     @Autowired
     private UserRepository userRepository;
 
@@ -76,9 +72,6 @@ public class UserServices {
 
         User resultUser = mapper.mapToEntity(vm);
         resultUser.setRoles(rolServices.getUserRoles(vm));
-//        resultUser.setPassword(bCryptPasswordEncoder.encode(resultUser.getPassword()));
-//        currentUser.setName(resultUser.getName());
-//        currentUser.setUsername(resultUser.getUsername());
         User result = userRepository.save(resultUser);
 
         if (result == null) {
@@ -92,29 +85,11 @@ public class UserServices {
         return UserRepository.findByUsername(username);
     }
 
-    public List<User> findUsers(int page, int itemPerPage){
-        Pageable pageable = new PageRequest(page,itemPerPage);
-        return UserRepository.findAll(pageable);
-    }
-
-    public List<User> findAllUsers(){
-        return UserRepository.findAll();
-    }
-
     public List<User> findAllUsersFilterd(String filter){
         return UserRepository.findAll().stream().filter(user ->
                 user.getRoles().stream().anyMatch(rol -> !rol.getRol().equals(filter))
         ).collect(Collectors.toList());
     }
-
-    public List<User> findUserByUsername(String username){
-        return UserRepository.findAllByUsername(username);
-    }
-
-    public void eliminarUserPorId(Long id){
-        UserRepository.deleteById(id);
-    }
-
 
     public String deleteUser(Long id){
         if (id <= 0L) {
@@ -128,11 +103,9 @@ public class UserServices {
         return "User successfully deleted";
     }
 
-
     public User findAUser(Long id){
         return UserRepository.findById(id);
     }
-
 
     public UserViewModel getUserViewModel(Long userId){
         UserViewModel vm = UserFactory.getUserViewModel();

@@ -38,6 +38,4 @@ public class LearningPurposeService {
     public void deleteLearningPurpose(Long id){
         learningPurposeRepository.delete(id);
     }
-    //other delete methods
-    //other fetching methods
 }

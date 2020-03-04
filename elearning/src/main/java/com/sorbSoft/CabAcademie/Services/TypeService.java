@@ -20,21 +20,10 @@ public class TypeService {
         return typeRepository.findAll();
     }
 
-    public Type fetchRole(Long id){
-        return typeRepository.findOne(id);
-    }
-
-    public Type updateRole(Type type){
-        Type currentType= typeRepository.findOne(type.getId());
-        currentType.setType(type.getType());
-        return typeRepository.save(currentType);
-    }
     public Type saveType(Type type){
         return typeRepository.save(type);
     }
     public void deleteType(Long id){
         typeRepository.delete(id);
     }
-    //other delete methods
-    //other fetching methods
 }

@@ -25,7 +25,6 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Authentication authentication) throws IOException, ServletException {
         //do some logic here if you want something to be done whenever
         //the user successfully logs in.
-
         HttpSession session = httpServletRequest.getSession();
         User authUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         session.setAttribute("username", authUser.getUsername());

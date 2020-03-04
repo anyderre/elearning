@@ -26,7 +26,7 @@ public class InitService {
 
     public void init() {
         createRoles();
-        crearAdmin();
+        createAdmin();
     }
     /**
      * Create ROLES on Init
@@ -59,16 +59,14 @@ public class InitService {
     }
 
     /**
-     * Create user y his role.
+     * Create user and his role.
      */
-    public void crearAdmin() {
+    public void createAdmin() {
         System.out.println("Creating user ...");
         User userAdmin = userRepository.findByUsername("admin");
         if (userAdmin == null) {
             Rol rolSuperAdmin = rolRepository.findAllByRol(Roles.ROLE_SUPER_ADMIN.name());
-//            rolSuperAdmin.setRol("ROLE_SUPER_ADMIN");
             Rol rolAdmin = rolRepository.findAllByRol(Roles.ROLE_ADMIN.name());
-//            rolAdmin.setRol("ROLE_ADMIN");
             List<Rol> roles = new ArrayList<>();
             roles.add(rolSuperAdmin);
             roles.add(rolAdmin);

@@ -12,7 +12,6 @@ import java.util.List;
  * Created by Dany on 15/05/2018.
  */
 public interface CourseRepository extends JpaRepository<Course, Long> {
-
     Page<Course> findAll(Pageable pagin);
     Course findCourseByTitle(String name);
     Course findCourseByTitleAndIdIsNot(String title, Long id);

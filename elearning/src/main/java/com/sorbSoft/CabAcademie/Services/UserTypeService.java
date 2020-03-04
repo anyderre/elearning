@@ -38,7 +38,4 @@ public class UserTypeService {
     public void deleteUserType(Long id){
         userTypeRepository.delete(id);
     }
-    //other delete methods
-    //other fetching methods
-
 }

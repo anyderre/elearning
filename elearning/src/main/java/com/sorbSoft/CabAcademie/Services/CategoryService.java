@@ -53,9 +53,6 @@ public class CategoryService {
         }
 
         Category resultCategory = mapper.mapToEntity(vm);
-//        currentCategory.setDescription(category.getDescription());
-//        currentCategory.setName(category.getName());
-//        currentCategory.setParentCategory(category.getParentCategory());
         Category current = categoryRepository.findOne(vm.getId());
         current.setParentCategory(resultCategory.getParentCategory());
         current.setDescription(resultCategory.getDescription());
@@ -117,9 +114,7 @@ public class CategoryService {
             if (category == null) {
                 return null;
             } else {
-//                vm.setCategories(getAllFiltered(categoryId));
                 vm = mapper.mapToViewModel(category);
-//                return vm;
             }
         }
         vm.setCategories(getAllFiltered(categoryId));
@@ -153,5 +148,4 @@ public class CategoryService {
         }
         return info;
     }
-
 }
