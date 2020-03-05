@@ -3,8 +3,8 @@ package com.sorbSoft.CabAcademie.Controllers;
 import com.sorbSoft.CabAcademie.Entities.Section;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SectionViewModel;
 import com.sorbSoft.CabAcademie.Services.SectionService;
-import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -59,9 +59,9 @@ public class SectionController {
     @PostMapping("/save")
     public  ResponseEntity<String> saveSection(@Valid @RequestBody SectionViewModel vm){
         Pair<String, Section> result = sectionService.saveSection(vm);
-        if(result.getValue() == null)
-            return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(result.getKey(), HttpStatus.CREATED);
+        if(result.getSecond() == null)
+            return new ResponseEntity<>(result.getFirst(), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(result.getFirst(), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/delete/{id}")

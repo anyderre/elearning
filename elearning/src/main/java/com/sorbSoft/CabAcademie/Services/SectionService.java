@@ -7,9 +7,9 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Factory.SectionFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.SectionInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.SectionMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SectionViewModel;
-import javafx.util.Pair;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,7 +41,7 @@ public class SectionService {
     public Pair<String, Section> updateSection(SectionViewModel vm){
         Section savedSection = sectionRepository.findSectionByNameAndIdIsNot(vm.getName(), vm.getId());
         if (savedSection != null) {
-            return new Pair<>("The section name already exist for another definition", null);
+            return Pair.of("The section name already exist for another definition", null);
         }
         Section resultSection = mapper.mapToEntity(vm);
         Section currentSection= sectionRepository.findOne(vm.getId());
@@ -50,9 +50,9 @@ public class SectionService {
 
         Section result = sectionRepository.save(currentSection);
         if (result == null) {
-            return new Pair<>("Couldn't update the section", null);
+            return Pair.of("Couldn't update the section", null);
         } else {
-           return new Pair<>("Section updated successfully", result);
+           return Pair.of("Section updated successfully", result);
         }
     }
     public Pair<String, Section> saveSection(SectionViewModel vm){
@@ -62,14 +62,14 @@ public class SectionService {
             Section savedSection = sectionRepository.findSectionByName(vm.getName());
 
             if (savedSection!= null){
-                return new Pair<>("The section you are trying to save already exist", null);
+                return Pair.of("The section you are trying to save already exist", null);
             }
             Section resultSection = mapper.mapToEntity(vm);
             Section result = sectionRepository.save(resultSection);
             if (result == null){
-                return new Pair<>("Couldn't save the section", null);
+                return Pair.of("Couldn't save the section", null);
             } else {
-                return  new Pair<>("Section saved successfully", result);
+                return  Pair.of("Section saved successfully", result);
             }
         }
     }
@@ -109,12 +109,12 @@ public class SectionService {
     }
 
     public List <SectionInfo> getUserInfo(){
-        List<Section> categories = this.fetchAllSection();
-        if (categories.isEmpty()) {
+        List<Section> sections = this.fetchAllSection();
+        if (sections.isEmpty()) {
             return new ArrayList<>();
         }
         List<SectionInfo> info = new ArrayList<>();
-        for (Section category : categories) {
+        for (Section category : sections) {
             SectionInfo sInfo = new SectionInfo();
             sInfo.setId(category.getId());
             sInfo.setName(category.getName());
