@@ -7,11 +7,11 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CourseFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CourseMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import com.sorbSoft.CabAcademie.Repository.CourseRepository;
-import javafx.util.Pair;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
@@ -63,19 +63,19 @@ public class CourseService {
     public Pair<String, Course> updateCourse(CourseViewModel vm){
         Course savedCourse = courseRepository.findCourseByTitleAndIdIsNot(vm.getTitle(), vm.getId());
         if (savedCourse != null) {
-            return new Pair<>("The course name already exist for another definition", null);
+            return Pair.of("The course name already exist for another definition", null);
         }
         Course currentCourse = courseRepository.findOne(vm.getId());
         if(currentCourse == null) {
-            return new Pair<>("The course you are trying to edit does not exist anymore", null);
+            return Pair.of("The course you are trying to edit does not exist anymore", null);
         }
 
         Course course = mapper.mapToEntity(vm);
         Course result = courseRepository.save(course);
         if (result == null) {
-            return new Pair<>("Couldn't update the course", null);
+            return Pair.of("Couldn't update the course", null);
         } else {
-            return new Pair<>("Course updated successfully", result);
+            return Pair.of("Course updated successfully", result);
         }
     }
 
@@ -114,15 +114,15 @@ public class CourseService {
             Course savedCourse = courseRepository.findCourseByTitle(vm.getTitle());
 
             if ( savedCourse != null){
-                return new Pair<>("The course you are trying to save already exist", null);
+                return Pair.of("The course you are trying to save already exist", null);
             }
 
             Course course = mapper.mapToEntity(vm);
             Course result = courseRepository.save(course);
             if (result == null){
-                return new Pair<>("Couldn't save the course", null);
+                return Pair.of("Couldn't save the course", null);
             } else {
-                return  new Pair<>("Course saved successfully", result);
+                return  Pair.of("Course saved successfully", result);
             }
         }
     }

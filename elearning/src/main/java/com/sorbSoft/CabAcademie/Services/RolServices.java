@@ -5,8 +5,8 @@ import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Repository.RolRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
-import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,7 +59,7 @@ public class RolServices {
 
     public Pair<Boolean, Boolean> getUserRoles (User user) {
         if (user.getRoles().isEmpty()){
-            return new Pair<>(false, false);
+            return Pair.of(false, false);
         }
         boolean admin = false;
         boolean prof = false;
@@ -70,7 +70,7 @@ public class RolServices {
                 prof = true;
             }
         }
-        return new Pair<>(admin, prof);
+        return Pair.of(admin, prof);
     }
 
 

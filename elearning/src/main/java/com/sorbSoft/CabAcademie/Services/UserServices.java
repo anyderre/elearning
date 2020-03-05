@@ -8,9 +8,9 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Factory.UserFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.UserMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
-import javafx.util.Pair;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,16 +45,16 @@ public class UserServices {
             User savedUser = userRepository.findByUsername(vm.getUsername());
 
             if ( savedUser != null){
-                return new Pair<>("The user you are trying to save already exist", null);
+                return Pair.of("The user you are trying to save already exist", null);
             }
             User resultUser = mapper.mapToEntity(vm);
             resultUser.setPassword(bCryptPasswordEncoder.encode(resultUser.getPassword()));
             resultUser.setRoles(rolServices.getUserRoles(vm));
             User result = userRepository.save(resultUser);
             if (result == null){
-                return new Pair<>("Couldn't save the user", null);
+                return Pair.of("Couldn't save the user", null);
             } else {
-                return  new Pair<>("User saved successfully", result);
+                return  Pair.of("User saved successfully", result);
             }
         }
     }
@@ -62,12 +62,12 @@ public class UserServices {
     public Pair<String, User> updateUser(UserViewModel vm){
         User savedUser = userRepository.findUserByUsernameAndIdIsNot(vm.getUsername(), vm.getId());
         if (savedUser != null) {
-            return new Pair<>("The user name already exist for another definition", null);
+            return Pair.of("The user name already exist for another definition", null);
         }
         User currentUser = UserRepository.findById(vm.getId());
 
         if (currentUser == null){
-            return new Pair<>("The user you are trying to update does not esxist anymore", null);
+            return Pair.of("The user you are trying to update does not esxist anymore", null);
         }
 
         User resultUser = mapper.mapToEntity(vm);
@@ -75,9 +75,9 @@ public class UserServices {
         User result = userRepository.save(resultUser);
 
         if (result == null) {
-            return new Pair<>("Couldn't update the user", null);
+            return Pair.of("Couldn't update the user", null);
         } else {
-            return new Pair<>("User updated successfully", result);
+            return Pair.of("User updated successfully", result);
         }
     }
 
@@ -116,8 +116,8 @@ public class UserServices {
             } else {
                 vm = mapper.mapToViewModel(user);
                 Pair<Boolean, Boolean> roles = rolServices.getUserRoles(user);
-                vm.setAdmin(roles.getKey());
-                vm.setProfessor(roles.getValue());
+                vm.setAdmin(roles.getFirst());
+                vm.setProfessor(roles.getSecond());
             }
             return vm;
         }

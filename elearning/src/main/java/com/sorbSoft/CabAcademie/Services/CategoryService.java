@@ -8,9 +8,9 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CategoryFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.CategoryInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CategoryMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
-import javafx.util.Pair;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,13 +43,13 @@ public class CategoryService {
         Category savedCategory = categoryRepository.findCategoryByNameAndIdIsNot(vm.getName(), vm.getId());
 
         if (savedCategory != null) {
-            return new Pair<>("The category name already exist for another definition", null);
+            return Pair.of("The category name already exist for another definition", null);
         }
 
         Category currentCategory= categoryRepository.findOne(vm.getId());
 
         if (currentCategory == null) {
-            return new Pair<>("The category you want to update doesn't exist", null);
+            return Pair.of("The category you want to update doesn't exist", null);
         }
 
         Category resultCategory = mapper.mapToEntity(vm);
@@ -59,9 +59,9 @@ public class CategoryService {
         current.setName(resultCategory.getName());
         Category result = categoryRepository.save(resultCategory);
         if (result == null) {
-            return new Pair<>("Couldn't update the category", null);
+            return Pair.of("Couldn't update the category", null);
         } else {
-            return new Pair<>("Category updated successfully", result);
+            return Pair.of("Category updated successfully", result);
         }
     }
 
@@ -72,7 +72,7 @@ public class CategoryService {
             Category savedCategory = categoryRepository.findCategoryByName(vm.getName());
 
             if ( savedCategory != null){
-                return new Pair<>("The category you are trying to save already exist", null);
+                return Pair.of("The category you are trying to save already exist", null);
             }
             Category resultCategory = mapper.mapToEntity(vm);
             if (vm.getParentCategory()!= null && vm.getParentCategory().getId() != null && vm.getParentCategory().getId() > 0){
@@ -80,9 +80,9 @@ public class CategoryService {
             }
             Category result = categoryRepository.save(resultCategory);
             if (result == null){
-                return new Pair<>("Couldn't save the category", null);
+                return Pair.of("Couldn't save the category", null);
             } else {
-                return  new Pair<>("Category saved successfully", result);
+                return  Pair.of("Category saved successfully", result);
             }
         }
     }

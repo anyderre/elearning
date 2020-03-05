@@ -6,8 +6,8 @@ import com.sorbSoft.CabAcademie.Services.CategoryService;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.CategoryInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
 import com.sorbSoft.CabAcademie.Services.TopicService;
-import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -80,9 +80,9 @@ public class CategoryController {
     @PostMapping(value = "/save")
     public  ResponseEntity<String> saveCategory(@Valid @RequestBody CategoryViewModel vm){
         Pair<String, Category> result = categoryService.saveCategory(vm);
-        if(result.getValue() == null)
-            return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(result.getKey(), HttpStatus.CREATED);
+        if(result.getSecond() == null)
+            return new ResponseEntity<>(result.getFirst(), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(result.getFirst(), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/delete/{id}")
