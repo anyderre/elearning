@@ -2,7 +2,7 @@ package com.sorbSoft.CabAcademie.Services;
 
 import com.sorbSoft.CabAcademie.Entities.Syllabus;
 import com.sorbSoft.CabAcademie.Repository.SyllabusRepository;
-import javafx.util.Pair;
+import org.springframework.data.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,13 +28,13 @@ public class SyllabusService {
         Syllabus savedSyllabus = syllabusRepository.findSyllabusById(syllabus.getId());
 
         if (savedSyllabus != null) {
-            return new Pair<>("The syllabus name already exist for another definition", null);
+            return Pair.of("The syllabus name already exist for another definition", null);
         }
 
         Syllabus currentSyllabus= syllabusRepository.findOne(syllabus.getId());
 
         if (currentSyllabus == null) {
-            return new Pair<>("The syllabus you want to update doesn't exist", null);
+            return Pair.of("The syllabus you want to update doesn't exist", null);
         }
         currentSyllabus.setDescription(syllabus.getDescription());
         currentSyllabus.setTitle(syllabus.getTitle());
@@ -42,9 +42,9 @@ public class SyllabusService {
 
         Syllabus result = syllabusRepository.save(syllabus);
         if (result == null) {
-            return new Pair<>("Couldn't update the syllabus", null);
+            return Pair.of("Couldn't update the syllabus", null);
         } else {
-            return new Pair<>("Syllabus updated successfully", result);
+            return Pair.of("Syllabus updated successfully", result);
         }
     }
 
@@ -74,13 +74,13 @@ public class SyllabusService {
             Syllabus savedSyllabus = syllabusRepository.findSyllabusByTitle(syllabus.getTitle());
 
             if ( savedSyllabus != null){
-                return new Pair<>("The syllabus you are trying to save already exist", null);
+                return Pair.of("The syllabus you are trying to save already exist", null);
             }
             Syllabus result = syllabusRepository.save(syllabus);
             if (result == null){
-                return new Pair<>("Couldn't save the syllabus", null);
+                return Pair.of("Couldn't save the syllabus", null);
             } else {
-                return  new Pair<>("Syllabus saved successfully", result);
+                return  Pair.of("Syllabus saved successfully", result);
             }
         }
     }

@@ -3,7 +3,7 @@ package com.sorbSoft.CabAcademie.Controllers;
 
 import com.sorbSoft.CabAcademie.Entities.Syllabus;
 import com.sorbSoft.CabAcademie.Services.SyllabusService;
-import javafx.util.Pair;
+import org.springframework.data.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -49,9 +49,9 @@ public class SyllabusController {
     @PostMapping("/save")
     public  ResponseEntity<String> saveSyllabus(@Valid @RequestBody Syllabus syllabus){
         Pair<String, Syllabus> result = syllabusService.saveSyllabus(syllabus);
-        if(result.getValue() == null)
-            return new ResponseEntity<>(result.getKey(), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(HttpStatus.CREATED);
+        if(result.getSecond() == null)
+            return new ResponseEntity<>(result.getFirst(), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(result.getFirst(), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/delete/{id}")
