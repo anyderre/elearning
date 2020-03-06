@@ -23,9 +23,5 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     List<User>findAll(Pageable pageable);
 
-    List<User> findAllByUsername(String username);
-
     List<User>findAll();
-
-    void deleteById(Long id);
 }
