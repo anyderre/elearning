@@ -18,7 +18,11 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Size(min = 2, max = 100)
-    private String name;
+    private String firstName;
+    @Size(min = 2, max = 100)
+    private String lastName;
+    @Size(min = 2, max = 100)
+    private String email;
     @NotNull
     @Size(min = 4, max = 30)
     @Column(unique=true)
@@ -28,7 +32,11 @@ public class User {
     @NotNull(message="Password invalid")
     @Size(max=60)
     private String password;
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-    private List<Rol> roles;
+//    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+//    private List<Rol> roles;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "rol_id")
+    private Rol role;
+    private boolean agreeWithTerms;
     private boolean deleted = false;
 }

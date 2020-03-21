@@ -4,8 +4,11 @@ import lombok.Data;
 @Data
 public class UserInfo {
     private Long id;
-    private String name;
+    private String firstName;
+    private String lastName;
+    private String email;
     private String username;
-    private boolean professor;
-    private boolean admin;
+    private String roleName;
+    private boolean agreeWithTerms;
 }
+

@@ -49,7 +49,7 @@ public class UserServices {
             }
             User resultUser = mapper.mapToEntity(vm);
             resultUser.setPassword(bCryptPasswordEncoder.encode(resultUser.getPassword()));
-            resultUser.setRoles(rolServices.getUserRoles(vm));
+//            resultUser.setRole(rolServices.getUserRoles(vm));
             User result = userRepository.save(resultUser);
             if (result == null){
                 return Pair.of("Couldn't save the user", null);
@@ -71,7 +71,7 @@ public class UserServices {
         }
 
         User resultUser = mapper.mapToEntity(vm);
-        resultUser.setRoles(rolServices.getUserRoles(vm));
+//        resultUser.setRoles(rolServices.getUserRoles(vm));
         User result = userRepository.save(resultUser);
 
         if (result == null) {
@@ -86,9 +86,9 @@ public class UserServices {
     }
 
     public List<User> findAllUsersFilterd(String filter){
-        return UserRepository.findAll().stream().filter(user ->
-                user.getRoles().stream().anyMatch(rol -> !rol.getRol().equals(filter))
-        ).collect(Collectors.toList());
+        List<User> collect = UserRepository.findAll().stream().filter(user ->
+                !user.getRole().equals(filter)).collect(Collectors.toList());
+        return collect;
     }
 
     public String deleteUser(Long id){
@@ -115,9 +115,10 @@ public class UserServices {
                 return null;
             } else {
                 vm = mapper.mapToViewModel(user);
-                Pair<Boolean, Boolean> roles = rolServices.getUserRoles(user);
-                vm.setAdmin(roles.getFirst());
-                vm.setProfessor(roles.getSecond());
+//                Pair<Boolean, Boolean> roles = rolServices.getUserRoles(user);
+//                vm.setAdmin(roles.getFirst());
+//                vm.setProfessor(roles.getSecond());
+                vm.setAllRoles(rolServices.todosRoles());
             }
             return vm;
         }
@@ -130,22 +131,11 @@ public class UserServices {
             return new ArrayList<>();
         }
         List<UserInfo> info = new ArrayList<>();
-        userLoop: for (User user : users) {
-            UserInfo uInfo = new UserInfo();
-            if (user.getRoles() != null) {
-                for (Rol rol : user.getRoles()) {
-                    if (rol.getRol().equals(Roles.ROLE_SUPER_ADMIN.name())) {
-                        continue userLoop;
-                    } else if (rol.getRol().equals(Roles.ROLE_ADMIN.name())) {
-                        uInfo.setAdmin(true);
-                    } else if (rol.getRol().equals(Roles.ROLE_PROFESSOR.name())) {
-                        uInfo.setProfessor(true);
-                    }
-                }
+        for (User user : users) {
+            UserInfo uInfo = mapper.mapEntityToInfo(user);
+            if (user.getRole() != null) {
+                uInfo.setRoleName(user.getRole().getName());
             }
-            uInfo.setId(user.getId());
-            uInfo.setName(user.getName());
-            uInfo.setUsername(user.getUsername());
             info.add(uInfo);
         }
         return info;

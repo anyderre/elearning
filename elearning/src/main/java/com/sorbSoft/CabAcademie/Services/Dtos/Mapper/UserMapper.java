@@ -15,15 +15,18 @@ public interface UserMapper {
 //        @Mapping(target="employeeId", source="entity.id"),
 //        @Mapping(target="employeeName", source="entity.name")
         @Mapping(target = "enable", ignore = true),
-        @Mapping(target = "roles", ignore = true),
+        @Mapping(target = "deleted", ignore = true),
+//        @Mapping(target = "roles", ignore = true),
     })
     User mapToEntity(UserViewModel vm);
-
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
     })
     User mapEntityToEntity (User user);
 
+    @Mappings({
+            @Mapping(target = "role", ignore = true),
+    })
     UserInfo mapEntityToInfo (User user);
 }
