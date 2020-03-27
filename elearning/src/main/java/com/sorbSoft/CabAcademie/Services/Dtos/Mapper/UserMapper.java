@@ -9,6 +9,9 @@ import org.mapstruct.Mappings;
 
 @Mapper(componentModel="spring")
 public interface UserMapper {
+    @Mappings({
+            @Mapping(target = "allRoles", ignore = true),
+    })
     UserViewModel mapToViewModel(User user);
 
     @Mappings({
@@ -26,7 +29,7 @@ public interface UserMapper {
     User mapEntityToEntity (User user);
 
     @Mappings({
-            @Mapping(target = "role", ignore = true),
+            @Mapping(target = "roleName",  source = "role.name"),
     })
     UserInfo mapEntityToInfo (User user);
 }

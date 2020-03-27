@@ -22,12 +22,10 @@ public class UserViewModel {
     @NotNull
     @Size(min = 4, max = 30)
     private String username;
-    private int enable;
     @NotNull(message="Password invalid")
     @Size(max=60)
     private String password;
     private Rol role;
     private List<Rol> allRoles;
-    private boolean deleted;
     private boolean agreeWithTerms;
 }

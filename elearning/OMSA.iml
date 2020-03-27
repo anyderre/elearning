@@ -8,5 +8,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <modules>
+        <module fileurl="file://$MODULE_DIR$/OMSA.iml" filepath="file://$MODULE_DIR$/OMSA.iml"/>
+    </modules>
   </component>
 </module>

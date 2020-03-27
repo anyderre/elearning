@@ -9,6 +9,5 @@ public class UserInfo {
     private String email;
     private String username;
     private String roleName;
-    private boolean agreeWithTerms;
 }
 

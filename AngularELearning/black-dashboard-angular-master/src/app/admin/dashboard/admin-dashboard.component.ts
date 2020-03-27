@@ -12,10 +12,16 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit() {}
 
-  public add(): void {
+  public addUser(): void {
     this.router.navigate(['/admin/user/form']);
   }
-  public read(): void {
+  public readUser(): void {
     this.router.navigate(['/admin/user/info']);
+  }
+  public addRole(): void {
+    this.router.navigate(['/admin/role/form']);
+  }
+  public readRole(): void {
+    this.router.navigate(['/admin/role/info']);
   }
 }

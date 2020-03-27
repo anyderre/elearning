@@ -85,6 +85,10 @@ public class UserServices {
         return UserRepository.findByUsername(username);
     }
 
+    public List<User> findAllUser(){
+        return UserRepository.findAll();
+    }
+
     public List<User> findAllUsersFilterd(String filter){
         List<User> collect = UserRepository.findAll().stream().filter(user ->
                 !user.getRole().equals(filter)).collect(Collectors.toList());
@@ -118,10 +122,9 @@ public class UserServices {
 //                Pair<Boolean, Boolean> roles = rolServices.getUserRoles(user);
 //                vm.setAdmin(roles.getFirst());
 //                vm.setProfessor(roles.getSecond());
-                vm.setAllRoles(rolServices.todosRoles());
             }
-            return vm;
         }
+        vm.setAllRoles(rolServices.fetchAllRole());
         return vm;
     }
 

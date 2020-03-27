@@ -23,7 +23,7 @@ export class CoursesFormComponent implements OnInit {
   public subscription: Subscription;
 
   public saving = false;
-  private fNum = Helper.obtenerValorNumerico;
+  private fNum = Helper.getNumericValue;
   public coursesList: Courses[];
   public courseObj = {
     sectionId: 0,
@@ -108,7 +108,7 @@ export class CoursesFormComponent implements OnInit {
       this.vm.category = new Category(this.courseObj.categoryId, '', '', null, []);
     }
     if (this.courseObj.userId) {
-      this.vm.user = new User(this.courseObj.userId, '', '', '', '', false, false);
+      this.vm.user = new User(this.courseObj.userId, '', '', '', '', '', '', null, [], true);
     }
     if (!this.vm.premium) {
       this.vm.price = 0;

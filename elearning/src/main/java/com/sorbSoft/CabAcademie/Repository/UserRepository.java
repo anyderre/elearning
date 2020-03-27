@@ -11,7 +11,6 @@ import java.util.List;
  * Created by anyderre on 11/08/17.
  */
 @Repository
-
 public interface UserRepository extends CrudRepository<User, Long> {
     User save(User User);
 

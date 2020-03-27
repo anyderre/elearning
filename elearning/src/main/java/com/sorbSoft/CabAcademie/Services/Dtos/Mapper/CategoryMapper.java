@@ -10,6 +10,9 @@ import org.mapstruct.Mappings;
 
 @Mapper(componentModel="spring")
 public interface CategoryMapper {
+    @Mappings({
+            @Mapping(target = "categories", ignore = true),
+    })
     CategoryViewModel mapToViewModel(Category category);
 
     @Mappings({

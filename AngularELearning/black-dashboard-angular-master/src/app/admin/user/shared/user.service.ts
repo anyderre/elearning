@@ -53,6 +53,15 @@ export class UserService {
       );
   }
 
+  public getInfo(): Observable<any> {
+    const url = `${this.apiUrl}/user/info`;
+    return this.http.get(url)
+      .pipe(
+        map(result => result),
+        catchError(this.handleError)
+      );
+  }
+
   public deleteUser(userId: number): Observable<any> {
     const url = `${this.apiUrl}/user/delete/${userId}`;
     return this.http.delete(url, {responseType: 'text'})
@@ -67,12 +76,15 @@ export class UserService {
     public mapResult(response: any): User {
         return new User(
             response.id,
-            response.name,
+            response.firstName,
+            response.lastName,
+            response.email,
             response.username,
             response.password,
             response.passwordConfirm,
-            response.professor,
-            response.admin,
+            response.role,
+            response.allRoles,
+            response.agreeWithTerms,
         );
     }
 

@@ -4,14 +4,12 @@ import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2020-03-06T21:46:03-0400",
+    date = "2020-03-25T23:25:18-0400",
     comments = "version: 1.3.1.Final, compiler: javac, environment: Java 1.8.0_111 (Oracle Corporation)"
 )
 @Component
@@ -26,15 +24,13 @@ public class UserMapperImpl implements UserMapper {
         UserViewModel userViewModel = new UserViewModel();
 
         userViewModel.setId( user.getId() );
-        userViewModel.setName( user.getName() );
+        userViewModel.setFirstName( user.getFirstName() );
+        userViewModel.setLastName( user.getLastName() );
+        userViewModel.setEmail( user.getEmail() );
         userViewModel.setUsername( user.getUsername() );
-        userViewModel.setEnable( user.getEnable() );
         userViewModel.setPassword( user.getPassword() );
-        List<Rol> list = user.getRoles();
-        if ( list != null ) {
-            userViewModel.setRoles( new ArrayList<Rol>( list ) );
-        }
-        userViewModel.setDeleted( user.isDeleted() );
+        userViewModel.setRole( user.getRole() );
+        userViewModel.setAgreeWithTerms( user.isAgreeWithTerms() );
 
         return userViewModel;
     }
@@ -48,10 +44,13 @@ public class UserMapperImpl implements UserMapper {
         User user = new User();
 
         user.setId( vm.getId() );
-        user.setName( vm.getName() );
+        user.setFirstName( vm.getFirstName() );
+        user.setLastName( vm.getLastName() );
+        user.setEmail( vm.getEmail() );
         user.setUsername( vm.getUsername() );
         user.setPassword( vm.getPassword() );
-        user.setDeleted( vm.isDeleted() );
+        user.setRole( vm.getRole() );
+        user.setAgreeWithTerms( vm.isAgreeWithTerms() );
 
         return user;
     }
@@ -64,14 +63,14 @@ public class UserMapperImpl implements UserMapper {
 
         User user1 = new User();
 
-        user1.setName( user.getName() );
+        user1.setFirstName( user.getFirstName() );
+        user1.setLastName( user.getLastName() );
+        user1.setEmail( user.getEmail() );
         user1.setUsername( user.getUsername() );
         user1.setEnable( user.getEnable() );
         user1.setPassword( user.getPassword() );
-        List<Rol> list = user.getRoles();
-        if ( list != null ) {
-            user1.setRoles( new ArrayList<Rol>( list ) );
-        }
+        user1.setRole( user.getRole() );
+        user1.setAgreeWithTerms( user.isAgreeWithTerms() );
         user1.setDeleted( user.isDeleted() );
 
         return user1;
@@ -85,10 +84,28 @@ public class UserMapperImpl implements UserMapper {
 
         UserInfo userInfo = new UserInfo();
 
+        userInfo.setRoleName( userRoleName( user ) );
         userInfo.setId( user.getId() );
-        userInfo.setName( user.getName() );
+        userInfo.setFirstName( user.getFirstName() );
+        userInfo.setLastName( user.getLastName() );
+        userInfo.setEmail( user.getEmail() );
         userInfo.setUsername( user.getUsername() );
 
         return userInfo;
+    }
+
+    private String userRoleName(User user) {
+        if ( user == null ) {
+            return null;
+        }
+        Rol role = user.getRole();
+        if ( role == null ) {
+            return null;
+        }
+        String name = role.getName();
+        if ( name == null ) {
+            return null;
+        }
+        return name;
     }
 }

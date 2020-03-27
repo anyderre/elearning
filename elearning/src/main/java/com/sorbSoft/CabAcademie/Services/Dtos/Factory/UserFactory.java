@@ -27,7 +27,7 @@ public class UserFactory {
             }
 
             @Override
-            public Rol getRol() {
+            public Rol getRole() {
                 return new Rol() {
                     @Override
                     public Long getId() {
