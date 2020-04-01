@@ -37,9 +37,13 @@ public class CategoryFactory {
 
             @Override
             public Category getParentCategory() {
-                return null;
+                return new Category() {
+                    @Override
+                    public Long getId() {
+                        return 0L;
+                    }
+                };
             }
-
         };
     }
 }

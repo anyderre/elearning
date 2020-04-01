@@ -29,12 +29,9 @@ public class VideoService {
     }
 
     public Video updateVideo(Video video){
-        Video currentVideo= videoRepository.findOne(video.getId());
-        currentVideo.setCourse(video.getCourse());
-        currentVideo.setNext(video.getNext());
-        currentVideo.setPremium(video.isPremium());
-        currentVideo.setPrevious(video.getPrevious());
-        currentVideo.setUrl(video.getUrl());
+        Video currentVideo = videoRepository.findOne(video.getId());
+        currentVideo.setVideoTitle(video.getVideoTitle());
+        currentVideo.setVideoURL(video.getVideoURL());
 
         return videoRepository.save(currentVideo);
     }

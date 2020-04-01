@@ -5,6 +5,7 @@ import { User } from '../shared/user.model';
 import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Location } from '@angular/common';
+import { Helper } from 'src/app/shared/helper/helper';
 
 @Component({
   selector: 'app-admin-user-form',
@@ -40,22 +41,20 @@ export class UserFormComponent implements OnInit {
         this.cleanVm = this.vm;
       }, () => {
         this.saving = false;
-        alert('Failed to load Course');
+        alert('Failed to load the user');
       });
   }
 
-  public getById(courseId: number): void {
-    this.subscription = this.userService.getUserById(courseId)
+  public getById(userId: number): void {
+    this.subscription = this.userService.getUserById(userId)
     .subscribe(
       data => {
         this.vm = data;
         this.cleanVm = this.vm;
-        console.log(this.vm)
-
       },
       () => {
         this.saving = false;
-        alert('Failed to load course');
+        alert('Failed to load the user');
       });
   }
 
@@ -68,6 +67,7 @@ export class UserFormComponent implements OnInit {
     if (!this.isValid()) {
       return;
     }
+    this.completeVm();
     this.saving = true;
     this.userService.saveOrEditUser(this.vm)
     .subscribe(() => {
@@ -96,13 +96,33 @@ export class UserFormComponent implements OnInit {
     }
   }
 
-  public isValid(): boolean {
-    if (this.vm.name === '') {
-      alert('You should specify the name.');
+  private completeVm(): void {
+    this.vm.agreeWithTerms = true;
+  }
+
+  private isValid(): boolean {
+    if (Helper.getNumericValue(this.vm.role.id) <= 0) {
+      alert('You should specify the role.');
+      return false;
+    }
+    if (this.vm.firstName === '') {
+      alert('You should specify the first name.');
+      return false;
+    }
+    if (this.vm.lastName === '') {
+      alert('You should specify the first name.');
+      return false;
+    }
+    if (this.vm.email === '') {
+      alert('You should specify the email.');
       return false;
     }
     if (this.vm.username === '') {
       alert('You should specify the username.');
+      return false;
+    }
+    if (Helper.getNumericValue(this.vm.role.id) <= 0) {
+      alert('You should specify the role.');
       return false;
     }
     if (this.vm.id <= 0) {

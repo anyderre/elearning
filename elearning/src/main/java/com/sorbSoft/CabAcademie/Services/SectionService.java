@@ -55,6 +55,7 @@ public class SectionService {
            return Pair.of("Section updated successfully", result);
         }
     }
+
     public Pair<String, Section> saveSection(SectionViewModel vm){
         if (vm.getId() > 0L) {
             return updateSection(vm);
@@ -108,17 +109,17 @@ public class SectionService {
         return vm;
     }
 
-    public List <SectionInfo> getUserInfo(){
+    public List <SectionInfo> getSectionInfo(){
         List<Section> sections = this.fetchAllSection();
         if (sections.isEmpty()) {
             return new ArrayList<>();
         }
         List<SectionInfo> info = new ArrayList<>();
-        for (Section category : sections) {
+        for (Section section : sections) {
             SectionInfo sInfo = new SectionInfo();
-            sInfo.setId(category.getId());
-            sInfo.setName(category.getName());
-            sInfo.setDescription(category.getDescription());
+            sInfo.setId(section.getId());
+            sInfo.setName(section.getName());
+            sInfo.setDescription(section.getDescription());
             info.add(sInfo);
         }
         return info;

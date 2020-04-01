@@ -27,8 +27,8 @@
                   <th></th>
                   <th>Name</th>
                   <th>Username</th>
-                  <th>Is Admin</th>
-                  <th>Is Professor</th>
+                  <th>Email</th>
+                  <th>Role</th>
                   <th>  
                     <button
                     *ngIf="userList && userList.length > 0"
@@ -59,28 +59,37 @@
                   </td>
                   <td>
                     <p class="text-muted"></p>
-                    {{item.name}}
+                    {{item.firstName}} {{item.lastName}}
                   </td>
                   <td>
                     <p class=" text-muted text-justify" style="white-space: normal">
                       {{item.username}}
                     </p>
                   </td>
-                  <td class="text-center">
+                  <td>
+                    <p class=" text-muted text-justify" style="white-space: normal">
+                      {{item.email}}
+                    </p>
+                  </td>
+                  <td>
+                    <p class="text-muted"></p>
+                    {{item.roleName}}
+                  </td>
+                  <!-- <td class="text-center">
                     <i style="color: red;" class="fa fa-times" *ngIf="!item.admin"></i>
                     <i style="color: green;" class="fa fa-check" *ngIf="item.admin"></i>
-                  </td>
+                  </td> 
                   <td class="text-center">
                     <i style="color: red;" class="fa fa-times" *ngIf="!item.professor"></i>
                     <i style="color: green;" class="fa fa-check" *ngIf="item.professor"></i>
-                    <!-- <span *ngIf="item.isProfessor" class="label label-success">Yes</span>
+                     <span *ngIf="item.isProfessor" class="label label-success">Yes</span>
                     <span *ngIf="!item.isProfessor" class="label label-danger">No</span> -->
                     <!-- <ng-container *ngIf="item.roles && item.roles.length > 0"> 
                       <p class="b-r-default" *ngFor="let itemSub of item.roles">{{itemSub.rol}}</p>
-                    </ng-container> -->
-                  </td>
+                    </ng-container> 
+                  </td>-->
                   <td class=" td-actions text-right">
-                    <button class=" btn btn-link" type="button" placement="left" (click)="edit(userList.indexOf(item))" ngbTooltip="Edit User" container="body" >
+                    <button class=" btn btn-link" *ngIf="item.roleName !== 'Admin' && item.roleName !== 'Super Admin'" type="button" placement="left" (click)="edit(userList.indexOf(item))" ngbTooltip="Edit User" container="body" >
                       <i class=" tim-icons icon-pencil"> </i>
                     </button>
                     <button class=" btn btn-link" type="button" placement="left" (click)="delete(item.id)" ngbTooltip="Delete User" container="body" >

@@ -1,22 +1,52 @@
 
 <div class="content" *ngIf="vm">
   <form #sorbsoftSectionForm>
-    <div class="row justify-content-md-center">
-      <div class="col-md-6 col-md-offset-6">
+    <div class="row">
+      <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12">
         <div class=" card">
           <div class="card-header text-center">
-            <h4>{{vm.id ? 'Edit' : 'Add'}} Courses</h4>
+            <h4>{{vm.id ? 'Edit' : 'Add'}} Course</h4>
           </div>
           <div class=" card-body">
             <div class="justify-content-md-center row">
               <div class="col-md-8">
                 <div class=" form-group">
                   <label for="title">Title</label>
-                  <input class=" form-control" name="title" id="title" placeholder="Enter the courses title"
-                    #title="ngModel" type="text" required autocomplete="off" [(ngModel)]="vm.title" maxlength="50" />
+                  <input
+                    class=" form-control" 
+                    name="title"
+                    id="title" 
+                    placeholder="Enter the course title"
+                    #title="ngModel"
+                    type="text"
+                    required
+                    autocomplete="off" 
+                    [(ngModel)]="vm.title" 
+                    maxlength="50" />
                 </div>
               </div>
             </div>
+
+            <div class="justify-content-md-center row">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label for="description">Description</label>
+                  <textarea
+                    class=" form-control"
+                    cols="80"
+                    id="description"
+                    name="description"
+                    rows="1"
+                    placeholder="Enter the category description"
+                    autocomplete="off"
+                    #description="ngModel"
+                    maxlength="250"
+                    [(ngModel)]="vm.description">
+                  </textarea>  
+                </div>
+              </div>
+            </div>
+
             <div class="justify-content-md-center row">
               <div class="col-md-8">
                 <div class=" form-group">
@@ -37,12 +67,37 @@
                 </div>
               </div>
             </div>
-  
+
             <div class="justify-content-md-center row" *ngIf="vm.premium">
               <div class="col-md-8">
                 <div class=" form-group">
                   <label for="description">Price</label>
-                  <input class=" form-control" type="number" id="price" name="price" #price="ngModel" min="0" [(ngModel)]="vm.price">
+                  <input 
+                    class="form-control" 
+                    type="number" 
+                    id="price" 
+                    name="price" 
+                    #price="ngModel" 
+                    [(ngModel)]="vm.price">
+                </div>
+              </div>
+            </div>
+            
+            <div class="justify-content-md-center row">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label for="author">Author</label>
+                  <input
+                    class=" form-control" 
+                    name="author"
+                    id="author" 
+                    placeholder="Enter the author"
+                    #author="ngModel"
+                    type="text"
+                    required
+                    autocomplete="off" 
+                    [(ngModel)]="vm.author" 
+                    maxlength="50" />
                 </div>
               </div>
             </div>
@@ -87,20 +142,6 @@
               </div>
             </div>
 
-            <!-- <div class="justify-content-md-center row">
-              <div class="col-md-8">
-                <div class=" form-group">
-                  <label for="description">End Date</label>
-                  <input class="form-control" 
-                    id="endDate" 
-                    name="endDate" 
-                    type="date" 
-                    #endDate="ngModel" 
-                    [(ngModel)]="vm.endDate">
-                </div>
-              </div>
-            </div> -->
-  
             <div class="justify-content-md-center row" *ngIf="vm.users">
               <div class="col-md-8">
                 <div class=" form-group">
@@ -163,14 +204,26 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <app-courses-syllabus-form 
-      [details]="vm.syllabus">
-    </app-courses-syllabus-form>
+      <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12">
+        <app-courses-objective-form
+          *ngIf="vm && vm.objectives"
+          [details]="vm.objectives">
+        </app-courses-objective-form>
     
-    <div class="row justify-content-md-center">
-      <div class="col-md-6 col-md-offset-6">
+        <app-courses-overview-feature-form
+          *ngIf="vm && vm.overview && vm.overview.features"
+          [details]="vm.overview.features">
+        </app-courses-overview-feature-form>
+    
+        <app-courses-overview-requirement-form
+          *ngIf="vm && vm.overview && vm.overview.requirements"
+          [details]="vm.overview.requirements">
+        </app-courses-overview-requirement-form>
+
+        <app-courses-syllabus-form 
+          *ngIf="vm && vm.syllabus"
+          [details]="vm.syllabus">
+        </app-courses-syllabus-form>
         <div class=" card">
           <div class=" card-footer">
             <div class=" button-container">
@@ -183,6 +236,12 @@
         </div>
       </div>
     </div>
+    
+    <!-- <div class="row">
+      <div class="col-md-6 col-lg-6 col-xl-6 col-sm-12">
+        
+      </div>
+    </div> -->
   
   </form>
 </div>
