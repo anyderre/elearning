@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -36,11 +37,7 @@ public class CourseService {
     @Autowired
     private UserServices userServices;
 
-    private final CourseMapper mapper
-            = Mappers.getMapper(CourseMapper.class);
-
-    @Autowired
-    private SyllabusService syllabusService;
+    private final CourseMapper mapper = Mappers.getMapper(CourseMapper.class);
 
     public List<Course> fetchAllCourses(){
         return courseRepository.findAll();
@@ -71,6 +68,7 @@ public class CourseService {
         }
 
         Course course = mapper.mapToEntity(vm);
+        course.setLastUpdate(new Date());
         Course result = courseRepository.save(course);
         if (result == null) {
             return Pair.of("Couldn't update the course", null);
@@ -103,7 +101,7 @@ public class CourseService {
         }
         vm.setSections(sectionService.fetchAllSection()); // TODO: could be filtered
         vm.setCategories(categoryService.fetchAllCategories());// TODO: could be filtered
-        vm.setUsers(userServices.findAllUsersFilterd(Roles.ROLE_PROFESSOR.name())); // Filtered // TODO: could have more filters
+        vm.setUsers(userServices.findAllUser()); // Filtered // TODO: could have more filters
         return vm;
     }
     
@@ -118,6 +116,10 @@ public class CourseService {
             }
 
             Course course = mapper.mapToEntity(vm);
+            course.setCreationDate(new Date());
+            course.setLastUpdate(new Date());
+            course.setCreationDate(new Date());
+            course.setLastUpdate(new Date());
             Course result = courseRepository.save(course);
             if (result == null){
                 return Pair.of("Couldn't save the course", null);

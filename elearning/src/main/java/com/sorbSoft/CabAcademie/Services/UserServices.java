@@ -49,7 +49,6 @@ public class UserServices {
             }
             User resultUser = mapper.mapToEntity(vm);
             resultUser.setPassword(bCryptPasswordEncoder.encode(resultUser.getPassword()));
-//            resultUser.setRole(rolServices.getUserRoles(vm));
             User result = userRepository.save(resultUser);
             if (result == null){
                 return Pair.of("Couldn't save the user", null);
@@ -67,11 +66,12 @@ public class UserServices {
         User currentUser = UserRepository.findById(vm.getId());
 
         if (currentUser == null){
-            return Pair.of("The user you are trying to update does not esxist anymore", null);
+            return Pair.of("The user you are trying to update does not exist anymore", null);
         }
 
         User resultUser = mapper.mapToEntity(vm);
 //        resultUser.setRoles(rolServices.getUserRoles(vm));
+        resultUser.setName(resultUser.getFirstName() + ' ' + resultUser.getLastName());
         User result = userRepository.save(resultUser);
 
         if (result == null) {
@@ -89,10 +89,9 @@ public class UserServices {
         return UserRepository.findAll();
     }
 
-    public List<User> findAllUsersFilterd(String filter){
-        List<User> collect = UserRepository.findAll().stream().filter(user ->
-                !user.getRole().equals(filter)).collect(Collectors.toList());
-        return collect;
+    public List<User> findAllUsersFiltered(){
+        return UserRepository.findAll().stream().filter(user ->
+                !user.getRole().getDescription().equals(Roles.ROLE_ADMIN.name()) && !user.getRole().getDescription().equals(Roles.ROLE_ADMIN.name())).collect(Collectors.toList());
     }
 
     public String deleteUser(Long id){
@@ -125,11 +124,12 @@ public class UserServices {
             }
         }
         vm.setAllRoles(rolServices.fetchAllRole());
+        vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
         return vm;
     }
 
     public List <UserInfo> getUserInfo(){
-        List<User> users= this.findAllUsersFilterd(Roles.ROLE_SUPER_ADMIN.name());
+        List<User> users= this.findAllUser();
         if (users.isEmpty()) {
             return new ArrayList<>();
         }

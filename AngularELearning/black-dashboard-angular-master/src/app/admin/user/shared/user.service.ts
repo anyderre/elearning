@@ -76,6 +76,7 @@ export class UserService {
     public mapResult(response: any): User {
         return new User(
             response.id,
+            response.name,
             response.firstName,
             response.lastName,
             response.email,

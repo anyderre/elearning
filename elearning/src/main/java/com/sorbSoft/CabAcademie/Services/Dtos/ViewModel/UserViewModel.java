@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 public class UserViewModel {
     private Long id;
+    private String name;
     @Size(min = 2, max = 100)
     private String firstName;
     @Size(min = 2, max = 100)

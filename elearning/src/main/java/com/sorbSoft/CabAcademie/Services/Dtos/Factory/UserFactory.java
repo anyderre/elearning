@@ -17,6 +17,11 @@ public class UserFactory {
             }
 
             @Override
+            public String getName() {
+                return "";
+            }
+
+            @Override
             public String getLastName() {
                 return "";
             }
@@ -32,16 +37,6 @@ public class UserFactory {
                     @Override
                     public Long getId() {
                         return 0L;
-                    }
-
-                    @Override
-                    public String getName() {
-                        return "";
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return "";
                     }
                 };
             }

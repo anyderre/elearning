@@ -1,9 +1,9 @@
 
-  <div class="row justify-content-md-center">
-    <div class="col-md-6 col-md-offset-6">
+  <!-- <div class="row justify-content-md-center"> -->
+    <!-- <div class="col-md-6 col-md-offset-6"> -->
       <div class=" card" *ngIf="editing">
         <div class="card-header text-center">
-          <h4>{{vm.id ? 'Editing ': 'Adding '}} Syllabus</h4>
+          <h4>{{vm.id ? 'Editing ': 'Adding '}} Feature</h4>
         </div>
         <div class=" card-body" >
           <div class="justify-content-md-center row">
@@ -20,25 +20,25 @@
                   required 
                   autocomplete="off"
                   [(ngModel)]="vm.title"
-                  maxlength="50" />
+                  maxlength="250" />
               </div>
             </div>
           </div>
           <div class="justify-content-md-center row">
             <div class="col-md-8">
               <div class=" form-group">
-                <label for="description">Description</label>
-                <textarea class=" form-control" 
-                  cols="80" 
-                  id="description"
-                  name="description"
-                  rows="1" 
-                  placeholder="Enter the syllabus description"
-                  autocomplete="off" 
-                  #description="ngModel"
-                   maxlength="250" 
-                   [(ngModel)]="vm.description">
-                </textarea>
+                <label for="icon">Icon</label>
+                <input 
+                  class="form-control" 
+                  name="icon" 
+                  id="icon" 
+                  placeholder="Enter the syllbus icon"
+                  #icon="ngModel" 
+                  type="text" 
+                  required 
+                  autocomplete="off"
+                  [(ngModel)]="vm.icon"
+                  maxlength="250" />
               </div>
             </div>
           </div>
@@ -52,12 +52,12 @@
       </div>
       <div class=" card" *ngIf="!editing">
         <div class="card-header text-center">
-          <h4>Syllabus</h4>
+          <h4>Feature</h4>
         </div>
         <div class=" card-body ">
           <p class=" text-muted" *ngIf="!details || (details && details.length <= 0)">
             Nothing to show  
-            <button class=" btn btn-icon btn-round" title="Add new Syllabus" (click)="add()" href="javascript:void(0)">
+            <button class=" btn btn-icon btn-round" title="Add new Feature" (click)="add()" href="javascript:void(0)">
               <i class=" tim-icons icon-simple-add"></i>
             </button>
           </p>
@@ -65,20 +65,20 @@
             <table class=" table">
               <colgroup>
                 <col style="width: 5%;">
-                <col style="width: 20%;">
                 <col style="width: 60%;">
+                <col style="width: 20%;">
                 <col style="width: 15%;">
               </colgroup>
               <thead class=" text-primary">
                 <tr>
                   <th></th>
                   <th>Title</th>
-                  <th>Description</th>
+                  <th>Icon</th>
                   <th>  
                     <button
                     *ngIf="details && details.length > 0"
                     class=" btn btn-icon float-right btn-round mr-3"
-                    title="Add a Syllabus"
+                    title="Add a Feature"
                     (click)="add()"
                     type="button">
                     <i class=" tim-icons icon-simple-add"> </i>
@@ -95,7 +95,7 @@
                           type="checkbox"
                           [(ngModel)]="item.selected"
                           [checked]="item.selected"
-                          (ngModelChange)="syllabusSelect(details.indexOf(item))"/>
+                          (ngModelChange)="featureSelect(details.indexOf(item))"/>
                         <span class=" form-check-sign">
                           <span class=" check"> </span>
                         </span>
@@ -108,14 +108,15 @@
                   </td>
                   <td>
                     <p class=" text-muted text-justify" style="white-space: normal">
-                      {{item.description}}
+                      <!-- {{item.icon}} -->
+                      <i [title]="item.icon" [className]="'ti ' +  item.icon"></i>
                     </p>
                   </td>
                   <td class=" td-actions text-right">
-                    <button class=" btn btn-link" type="button" placement="left" (click)="edit(details.indexOf(item))" ngbTooltip="Edit Syllabus" container="body" >
+                    <button class=" btn btn-link" type="button" placement="left" (click)="edit(details.indexOf(item))" ngbTooltip="Edit Feature" container="body" >
                       <i class=" tim-icons icon-pencil"> </i>
                     </button>
-                    <button class=" btn btn-link" type="button" placement="left" (click)="delete(details.indexOf(item), item.title)" ngbTooltip="Delete Syllabus" container="body" >
+                    <button class=" btn btn-link" type="button" placement="left" (click)="delete(details.indexOf(item), item.title)" ngbTooltip="Delete Feature" container="body" >
                       <i class=" tim-icons icon-trash-simple"> </i>
                     </button>
                   </td>
@@ -126,5 +127,5 @@
         </div>
       </div>
 
-    </div>
-  </div>
+    <!-- </div> -->
+  <!-- </div> -->

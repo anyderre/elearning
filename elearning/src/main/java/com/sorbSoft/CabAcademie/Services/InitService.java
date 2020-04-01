@@ -70,6 +70,7 @@ public class InitService {
             admin.setUsername("admin");
             admin.setFirstName("Joseph Marc-Antoine");
             admin.setLastName("Ridore");
+            admin.setName(admin.getFirstName() + ' ' + admin.getLastName());
             admin.setEmail("marcridore@gmail.com");
             admin.setAgreeWithTerms(true);
             admin.setPassword(bCryptPasswordEncoder.encode("admin")); // Todo: Change password

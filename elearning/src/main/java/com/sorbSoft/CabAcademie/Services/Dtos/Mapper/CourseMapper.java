@@ -16,7 +16,9 @@ public interface CourseMapper {
     CourseViewModel mapToViewModel(Course course);
 
     @Mappings({
-        @Mapping(target = "deleted", ignore = true)
+        @Mapping(target = "deleted", ignore = true),
+        @Mapping(target = "lastUpdate", ignore = true),
+        @Mapping(target = "creationDate", ignore = true)
     })
     Course mapToEntity (CourseViewModel vm);
 

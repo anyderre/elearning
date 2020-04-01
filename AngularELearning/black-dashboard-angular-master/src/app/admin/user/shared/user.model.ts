@@ -3,6 +3,7 @@ import { Rol } from '../../role/shared/role.model';
 export class User {
     constructor(
         public id: number,
+        public name: string,
         public firstName: string,
         public lastName: string,
         public email: string,

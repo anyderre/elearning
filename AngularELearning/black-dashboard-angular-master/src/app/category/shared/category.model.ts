@@ -5,5 +5,6 @@ export class Category {
         public description: string,
         public parentCategory: Category | null,
         public categories: Category[] | null,
+        public selected: boolean | false,
     ) { }
 }

@@ -1,6 +1,7 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.Mapper;
 
 import com.sorbSoft.CabAcademie.Entities.Course;
+import com.sorbSoft.CabAcademie.Entities.Objective;
 import com.sorbSoft.CabAcademie.Entities.Syllabus;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2020-03-25T23:25:19-0400",
+    date = "2020-04-01T00:57:50-0400",
     comments = "version: 1.3.1.Final, compiler: javac, environment: Java 1.8.0_111 (Oracle Corporation)"
 )
 @Component
@@ -26,18 +27,27 @@ public class CourseMapperImpl implements CourseMapper {
 
         courseViewModel.setId( course.getId() );
         courseViewModel.setTitle( course.getTitle() );
-        courseViewModel.setUser( course.getUser() );
+        courseViewModel.setDescription( course.getDescription() );
+        courseViewModel.setImageUrl( course.getImageUrl() );
+        courseViewModel.setRatings( course.getRatings() );
         courseViewModel.setPrice( course.getPrice() );
-        courseViewModel.setCategory( course.getCategory() );
-        courseViewModel.setSection( course.getSection() );
+        courseViewModel.setEnrolled( course.getEnrolled() );
+        courseViewModel.setAuthor( course.getAuthor() );
         courseViewModel.setPremium( course.isPremium() );
         courseViewModel.setStartDate( course.getStartDate() );
         courseViewModel.setEndDate( course.getEndDate() );
+        courseViewModel.setSection( course.getSection() );
+        courseViewModel.setCategory( course.getCategory() );
+        courseViewModel.setUser( course.getUser() );
+        courseViewModel.setOverview( course.getOverview() );
         List<Syllabus> list = course.getSyllabus();
         if ( list != null ) {
             courseViewModel.setSyllabus( new ArrayList<Syllabus>( list ) );
         }
-        courseViewModel.setDeleted( course.isDeleted() );
+        List<Objective> list1 = course.getObjectives();
+        if ( list1 != null ) {
+            courseViewModel.setObjectives( new ArrayList<Objective>( list1 ) );
+        }
 
         return courseViewModel;
     }
@@ -52,17 +62,27 @@ public class CourseMapperImpl implements CourseMapper {
 
         course.setId( vm.getId() );
         course.setTitle( vm.getTitle() );
-        course.setUser( vm.getUser() );
+        course.setDescription( vm.getDescription() );
+        course.setImageUrl( vm.getImageUrl() );
+        course.setRatings( vm.getRatings() );
+        course.setEnrolled( vm.getEnrolled() );
+        course.setAuthor( vm.getAuthor() );
         course.setPrice( vm.getPrice() );
+        course.setPremium( vm.isPremium() );
+        course.setStartDate( vm.getStartDate() );
+        course.setEndDate( vm.getEndDate() );
+        course.setUser( vm.getUser() );
         List<Syllabus> list = vm.getSyllabus();
         if ( list != null ) {
             course.setSyllabus( new ArrayList<Syllabus>( list ) );
         }
         course.setCategory( vm.getCategory() );
         course.setSection( vm.getSection() );
-        course.setPremium( vm.isPremium() );
-        course.setStartDate( vm.getStartDate() );
-        course.setEndDate( vm.getEndDate() );
+        course.setOverview( vm.getOverview() );
+        List<Objective> list1 = vm.getObjectives();
+        if ( list1 != null ) {
+            course.setObjectives( new ArrayList<Objective>( list1 ) );
+        }
 
         return course;
     }
@@ -77,18 +97,30 @@ public class CourseMapperImpl implements CourseMapper {
 
         course1.setId( course.getId() );
         course1.setTitle( course.getTitle() );
-        course1.setUser( course.getUser() );
+        course1.setDescription( course.getDescription() );
+        course1.setImageUrl( course.getImageUrl() );
+        course1.setRatings( course.getRatings() );
+        course1.setEnrolled( course.getEnrolled() );
+        course1.setAuthor( course.getAuthor() );
         course1.setPrice( course.getPrice() );
+        course1.setPremium( course.isPremium() );
+        course1.setDeleted( course.isDeleted() );
+        course1.setStartDate( course.getStartDate() );
+        course1.setEndDate( course.getEndDate() );
+        course1.setLastUpdate( course.getLastUpdate() );
+        course1.setCreationDate( course.getCreationDate() );
+        course1.setUser( course.getUser() );
         List<Syllabus> list = course.getSyllabus();
         if ( list != null ) {
             course1.setSyllabus( new ArrayList<Syllabus>( list ) );
         }
         course1.setCategory( course.getCategory() );
         course1.setSection( course.getSection() );
-        course1.setPremium( course.isPremium() );
-        course1.setStartDate( course.getStartDate() );
-        course1.setEndDate( course.getEndDate() );
-        course1.setDeleted( course.isDeleted() );
+        course1.setOverview( course.getOverview() );
+        List<Objective> list1 = course.getObjectives();
+        if ( list1 != null ) {
+            course1.setObjectives( new ArrayList<Objective>( list1 ) );
+        }
 
         return course1;
     }

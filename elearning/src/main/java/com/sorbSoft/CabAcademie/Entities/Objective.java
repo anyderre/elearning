@@ -1,6 +1,7 @@
 package com.sorbSoft.CabAcademie.Entities;
 
 import lombok.Data;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,12 +11,12 @@ import java.io.Serializable;
  */
 @Entity
 @Data
-@Table(name = "requirements")
-public class Requirements implements Serializable {
+@Table(name = "objective")
+@Where(clause = "deleted=false")
+public class Objective implements Serializable {
     @Id()
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @ManyToOne(optional = false)
-    @JoinColumn(name="syllabus_id")
-    private Syllabus syllabus;
+    private String description;
+    private boolean deleted = false;
 }

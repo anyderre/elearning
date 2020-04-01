@@ -1,11 +1,13 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { Syllabus } from '../shared/syllabus.model';
+import { Syllabus } from '../../shared/syllabus.model';
+import { ModalManager } from 'ngb-modal';
+import { Helper } from 'src/app/shared/helper/helper';
 
 @Component({
   selector: 'app-courses-syllabus-form',
   templateUrl: 'syllabus-form.component.html'
 })
-export class SyllabusFormComponent implements OnInit {
+export class CourseSyllabusFormComponent implements OnInit {
   @Output() goBack = new EventEmitter();
   @Input() details: Syllabus[] = [];
   public formIndex = -1;
@@ -16,7 +18,7 @@ export class SyllabusFormComponent implements OnInit {
   ngOnInit() {}
 
   public add(): void {
-    this.vm = new Syllabus(0, '' , '');
+    this.vm = new Syllabus(0, '' , []);
     this.formIndex = -1;
     this.editing = true;
   }
@@ -27,7 +29,7 @@ export class SyllabusFormComponent implements OnInit {
   }
 
   public edit(index: number): void {
-    this.vm = this.details[index];
+    this.vm = JSON.parse(JSON.stringify(this.details[index]));
     this.formIndex = index;
     this.editing = true;
   }
@@ -53,14 +55,16 @@ export class SyllabusFormComponent implements OnInit {
   }
 
   public isValid(): boolean {
-    if (this.vm.title === '') {
-      alert('You should specify a title for the syllabus');
+    if (Helper.getStringValue(this.vm.chapterTitle) === '') {
+      alert('You should specify a the chapter title for the syllabus');
       return false;
     }
-    if (this.vm.description === '') {
-      alert('You should specify a description for the syllabus');
-      return false;
+
+    if (this.vm.chapterTuts.some(o => o.updating)) {
+      alert('There is a video in edition.');
+      return;
     }
+
     if (!this.validateDuplicity()) {
       return false;
     }
@@ -69,7 +73,8 @@ export class SyllabusFormComponent implements OnInit {
 
   private validateDuplicity(): boolean {
     for (let i = 0; i < this.details.length; i++) {
-      if (this.formIndex !== i && this.vm.title === this.details[i].title) {
+      if (this.formIndex !== i &&
+         this.vm.chapterTitle === this.details[i].chapterTitle) {
         alert('This title already exist for another definition.');
         return false;
       }

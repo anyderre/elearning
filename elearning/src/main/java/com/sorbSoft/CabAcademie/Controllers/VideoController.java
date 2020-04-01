@@ -24,8 +24,8 @@ public class VideoController {
         if(id<0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        Video video= videoService.fetchVideo(id);
-        if(video==null)
+        Video video = videoService.fetchVideo(id);
+        if(video ==null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(video, HttpStatus.OK);
@@ -33,7 +33,7 @@ public class VideoController {
 
     @GetMapping()
     public ResponseEntity<List<Video>> getAllVideos(){
-        List<Video> videos= videoService.fetchAllVideo();
+        List<Video> videos = videoService.fetchAllVideo();
         if(videos.isEmpty())
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(videos, HttpStatus.OK);
@@ -41,8 +41,8 @@ public class VideoController {
 
     @PostMapping()
     public  ResponseEntity<Video> saveVideo(@Valid @RequestBody Video video){
-        Video currentVideo= videoService.saveVideo(video);
-        if(currentVideo==null)
+        Video currentVideo = videoService.saveVideo(video);
+        if(currentVideo ==null)
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return  new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -54,8 +54,8 @@ public class VideoController {
         if(videoService.fetchVideo(id)==null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
-        Video currentVideo= videoService.updateVideo(video);
-        if (currentVideo==null)
+        Video currentVideo = videoService.updateVideo(video);
+        if (currentVideo ==null)
             return  new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
 
         return new ResponseEntity<>(currentVideo, HttpStatus.OK);
