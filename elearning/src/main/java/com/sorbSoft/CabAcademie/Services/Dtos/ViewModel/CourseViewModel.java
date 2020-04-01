@@ -13,18 +13,24 @@ import java.util.List;
 public class CourseViewModel {
     private Long id;
     private String title;
-    private User user;
+    private String description;
+    private String imageUrl;
+    private float ratings;
     private double price;
-    private Category category;
-    private Section section;
+    private int enrolled;
+    private String author;
     private boolean isPremium;
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private Date startDate;
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private Date endDate;
+    private Section section;
+    private Category category;
+    private User user;
+    private Overview overview;
     private List<Syllabus> syllabus;
+    private List<Objective> objectives;
     private List<Category> categories;
     private List<Section> sections;
     private List<User> users;
-    private boolean deleted;
 }

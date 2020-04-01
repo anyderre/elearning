@@ -1,11 +1,10 @@
-import { Component, NgZone } from "@angular/core";
+import { Component, NgZone } from '@angular/core';
 
 @Component({
-  selector: "app-root",
-  templateUrl: "./app.component.html",
-  styleUrls: ["./app.component.scss"]
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = "black-dashboard-angular";
-  
+  title = 'black-dashboard-angular';
 }

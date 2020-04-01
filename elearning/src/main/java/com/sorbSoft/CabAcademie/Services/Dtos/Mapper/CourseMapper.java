@@ -9,10 +9,16 @@ import org.mapstruct.Mappings;
 @Mapper(componentModel="spring")
 public interface CourseMapper {
 
+        @Mappings({
+            @Mapping(target="categories", ignore = true),
+            @Mapping(target="users", ignore = true),
+            @Mapping(target="sections", ignore = true)})
     CourseViewModel mapToViewModel(Course course);
 
     @Mappings({
-        @Mapping(target = "deleted", ignore = true)
+        @Mapping(target = "deleted", ignore = true),
+        @Mapping(target = "lastUpdate", ignore = true),
+        @Mapping(target = "creationDate", ignore = true)
     })
     Course mapToEntity (CourseViewModel vm);
 

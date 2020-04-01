@@ -7,23 +7,86 @@
           </div>
           <div class=" card-body">
             <form #sorbsoftUserForm>
+
+              <div class="justify-content-md-center row" *ngIf="vm.allRoles">
+                <div class="col-md-8">
+                  <div class=" form-group">
+                    <label>Role</label>
+                    <ngx-select 
+                      [items]="vm.allRoles" 
+                      optionValueField="id" 
+                      optionTextField="name" 
+                      name="xRole"
+                      id="xRole" 
+                      allowClear="true" 
+                      [placeholder]="'Search for a role'" 
+                      [(ngModel)]="vm.role.id"
+                      autoClearSearch="true"
+                      required 
+                      #xRole="ngModel">
+                    </ngx-select>
+                  </div>
+                </div>
+              </div>
+
               <div class="justify-content-md-center row">
                 <div class="col-md-8">
                   <div class=" form-group">
-                    <label for="name">Name</label>
+                    <label for="firstName">First Name</label>
                     <input
                       class=" form-control"
-                      name="name"
-                      id="name"
-                      placeholder="Enter the name"
-                      #name="ngModel"
+                      name="firstName"
+                      id="firstName"
+                      placeholder="Enter the firstName"
+                      #firstName="ngModel"
                       type="text"
                       autocomplete="off"
-                      [(ngModel)]="vm.name"
+                      required 
+                      [(ngModel)]="vm.firstName"
                       maxlength="100"/>
                   </div>
                 </div>
               </div>
+
+              <div class="justify-content-md-center row">
+                <div class="col-md-8">
+                  <div class=" form-group">
+                    <label for="lastName">Last Name</label>
+                    <input
+                      class=" form-control"
+                      name="lastName"
+                      id="lastName"
+                      placeholder="Enter the last name"
+                      #lastName="ngModel"
+                      type="text"
+                      autocomplete="off"
+                      required 
+                      [(ngModel)]="vm.lastName"
+                      maxlength="100"/>
+                  </div>
+                </div>
+              </div>
+
+              <div class="justify-content-md-center row">
+                <div class="col-md-8">
+                  <div class=" form-group">
+                    <label for="email">Email</label>
+                    <input
+                      class=" form-control"
+                      name="email"
+                      id="email"
+                      placeholder="Enter the email"
+                      #email="ngModel"
+                      type="email"
+                      email=true
+                      required 
+                      autocomplete="off"
+                      [(ngModel)]="vm.email"
+                      maxlength="100"/>
+                  </div>
+                </div>
+              </div>
+
               <div class="justify-content-md-center row">
                 <div class="col-md-8">
                   <div class=" form-group">
@@ -35,12 +98,14 @@
                       placeholder="Enter the username"
                       #username="ngModel"
                       type="text"
+                      required 
                       autocomplete="off"
                       [(ngModel)]="vm.username"
                       maxlength="30"/>
                   </div>
                 </div>
               </div>
+              
               <div class="justify-content-md-center row" *ngIf="vm.id <=0">
                 <div class="col-md-8">
                   <div class=" form-group">
@@ -52,12 +117,14 @@
                       placeholder="*******"
                       #name="ngModel"
                       type="password"
+                      required 
                       autocomplete="off"
                       [(ngModel)]="vm.password"
                       maxlength="20"/>
                   </div>
                 </div>
               </div>
+
               <div class="justify-content-md-center row" *ngIf="vm.id <=0">
                 <div class="col-md-8">
                   <div class=" form-group">
@@ -68,6 +135,7 @@
                       id="passwordConfirm"
                       placeholder="*******"
                       #name="ngModel"
+                      required 
                       type="password"
                       autocomplete="off"
                       [(ngModel)]="vm.passwordConfirm"
@@ -75,56 +143,18 @@
                   </div>
                 </div>
               </div>
-        
-              <div class="justify-content-md-center row">
-                <div class="col-md-8">
-                  <div class=" form-group">
-                    <div class=" form-check">
-                      <label class=" form-check-label">
-                        <input class="form-check-input" 
-                        type="checkbox" 
-                        name="admin" 
-                        id="admin" 
-                        #admin="ngModel"
-                        [(ngModel)]="vm.admin"/>
-                        <span class=" form-check-sign">
-                          <span class="check"> </span>
-                          <label> Admin </label> 
-                        </span>
-                      </label>
-                    </div>
-                  </div>
 
-                  <div class=" form-group">
-                    <div class=" form-check">
-                      <label class=" form-check-label">
-                        <input class="form-check-input" 
-                        type="checkbox" 
-                        name="professor" 
-                        id="professor" 
-                        #professor="ngModel"
-                        [(ngModel)]="vm.professor"/>
-                        <span class=" form-check-sign">
-                          <span class="check"> </span>
-                          <label> Professor </label> 
-                        </span>
-                      </label>
-                    </div>
-                  </div>
+              <div class=" card-footer">
+                <div class=" button-container">
+                  <button class=" btn btn-icon btn-round" type="button" title="Go back" (click)="back()" href="javascript:void(0)">
+                    <i class=" tim-icons icon-minimal-left"></i>
+                  </button>
+                  <span class="float-right">
+                    <button class=" btn btn-fill btn-danger" type="reset" (click)="cancel()">reset</button>
+                    <button class=" btn btn-fill btn-success" type="submit" (click)="save(sorbsoftUserForm)">Save</button>
+                  </span>
                 </div>
               </div>
-        
-                <div class=" card-footer">
-                  <div class=" button-container">
-                    <button class=" btn btn-icon btn-round" type="button" title="Go back" (click)="back()" href="javascript:void(0)">
-                      <i class=" tim-icons icon-minimal-left"></i>
-                    </button>
-                    <span class="float-right">
-                      <button class=" btn btn-fill btn-danger" type="reset" (click)="cancel()">reset</button>
-                      <button class=" btn btn-fill btn-success" type="submit" (click)="save(sorbsoftUserForm)">Save</button>
-                    </span>
-                  </div>
-                </div>
             </form>
           </div>
         </div>

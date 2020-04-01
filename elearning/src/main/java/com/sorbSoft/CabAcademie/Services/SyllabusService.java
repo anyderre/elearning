@@ -36,9 +36,8 @@ public class SyllabusService {
         if (currentSyllabus == null) {
             return Pair.of("The syllabus you want to update doesn't exist", null);
         }
-        currentSyllabus.setDescription(syllabus.getDescription());
-        currentSyllabus.setTitle(syllabus.getTitle());
-        currentSyllabus.setDescription(syllabus.getDescription());
+        currentSyllabus.setChapterTitle(syllabus.getChapterTitle());
+        currentSyllabus.setChapterTuts(syllabus.getChapterTuts());
 
         Syllabus result = syllabusRepository.save(syllabus);
         if (result == null) {
@@ -47,31 +46,12 @@ public class SyllabusService {
             return Pair.of("Syllabus updated successfully", result);
         }
     }
-
-    public Syllabus getSyllabusViewModel(){
-        return new Syllabus(){
-            @Override
-            public Long getId() {
-                return 0L;
-            }
-
-            @Override
-            public String getTitle() {
-                return "";
-            }
-
-            @Override
-            public String getDescription() {
-                return "";
-            }
-        };
-    }
     
     public Pair<String, Syllabus> saveSyllabus(Syllabus syllabus){
         if (syllabus.getId() > 0L) {
             return updateSyllabus(syllabus);
         } else {
-            Syllabus savedSyllabus = syllabusRepository.findSyllabusByTitle(syllabus.getTitle());
+            Syllabus savedSyllabus = syllabusRepository.findSyllabusByChapterTitle(syllabus.getChapterTitle());
 
             if ( savedSyllabus != null){
                 return Pair.of("The syllabus you are trying to save already exist", null);

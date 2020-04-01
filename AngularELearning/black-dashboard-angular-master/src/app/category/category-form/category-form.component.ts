@@ -15,20 +15,14 @@ export class CategoryFormComponent implements OnInit {
   @Input() vm: Category;
   public loading = false;
   public selectedCategory = null;
-  public parentCategoryId: number;
 
   public saving = false;
-  // public categoryList: Category[];
-  public filter = {
-    categoryId: 0,
-  };
 
   constructor(
     private categoryService: CategoryService,
     public categorySelectService: CategorySelectService) {}
 
   ngOnInit() {
-    // this.loadCategories();
   }
 
   public save(form: FormGroup): void {
@@ -40,6 +34,7 @@ export class CategoryFormComponent implements OnInit {
     if (!this.isValid()) {
       return;
     }
+
     this.updateVm();
     this.saving = true;
     this.categoryService.saveOrEditCategory(this.vm)
@@ -56,28 +51,10 @@ export class CategoryFormComponent implements OnInit {
   }
 
   private updateVm(): void {
-    if (this.parentCategoryId) {
-      this.vm.parentCategory = new Category(this.parentCategoryId, '', '', null, []);
-    }
+    // if (this.parentCategoryId) {
+    //   this.vm.parentCategory = new Category(this.parentCategoryId, '', '', null, []);
+    // }
   }
-
-  // private loadCategories(): void {
-  //   this.loading = true;
-  //   let obj = {};
-  //   if (this.vm) {
-  //     obj = {categoryId: `${this.vm.id}`};
-  //   }
-  //   this.categorySelectService.getAllFiltered(obj)
-  //   .subscribe(
-  //     data => {
-  //       this.categoryList = data;
-  //       this.loading = false;
-  //     },
-  //     () => {
-  //       this.loading = false;
-  //       alert('Failed to load categories');
-  //     });
-  // }
 
   public back(isBack: boolean): void {
     if (this.goBack.observers.length > 0) {

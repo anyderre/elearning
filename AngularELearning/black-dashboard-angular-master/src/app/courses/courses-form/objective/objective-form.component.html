@@ -1,0 +1,102 @@
+
+  <!-- <div class="row justify-content-md-center"> -->
+    <!-- <div class="col-md-6 col-md-offset-6"> -->
+      <div class=" card">
+        <div class="card-header text-center">
+          <h4>Objectives</h4>
+        </div>
+        <div class=" card-body ">
+          <p class=" text-muted" *ngIf="!details || (details && details.length <= 0)">
+            Nothing to show  
+            <button class=" btn btn-icon btn-round" title="Add new Objectives" (click)="add()" href="javascript:void(0)">
+              <i class=" tim-icons icon-simple-add"></i>
+            </button>
+          </p>
+          <div class="table-responsive  table-full-width "  *ngIf="details && details.length > 0">
+            <table class=" table">
+              <colgroup>
+                <col style="width: 5%;">
+                <col style="width: 80%;">
+                <col style="width: 15%;">
+              </colgroup>
+              <thead class=" text-primary">
+                <tr>
+                  <th></th>
+                  <th>Objectives</th>
+                  <th>  
+                    <button
+                    *ngIf="details && details.length > 0"
+                    class=" btn btn-icon float-right btn-round mr-3"
+                    title="Add a Objective"
+                    (click)="add()"
+                    type="button">
+                    <i class=" tim-icons icon-simple-add"> </i>
+                  </button></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of details">
+                  
+                  <ng-container  *ngIf="item.updating; else infoView">
+                    <td></td>
+                    <td class="align-middle">
+                      <textarea
+                        class=" form-control"
+                        cols="80"
+                        id="description"
+                        name="description"
+                        placeholder="objectives..."
+                        rows="1"
+                        autocomplete="off"
+                        #description="ngModel"
+                        maxlength="250"
+                        [(ngModel)]="item.description">
+                      </textarea>  
+                    </td>
+                    <td class=" td-actions text-right">
+                      <button class=" btn btn-link" type="button" placement="left" (click)="acceptEdit(details.indexOf(item))" ngbTooltip="Accept edition" container="body" >
+                        <i class="fa fa-check"> </i>
+                      </button>
+                      <button class=" btn btn-link" type="button" placement="left" (click)="cancelEdit(details.indexOf(item), item.title)" ngbTooltip="Cancel Edition" container="body" >
+                        <i class="fa fa-ban"> </i>
+                      </button>
+                    </td>
+                  </ng-container>
+                  <ng-template #infoView>
+                    <td>
+                      <div class=" form-check">
+                        <label class=" form-check-label">
+                          <input
+                            class=" form-check-input"
+                            type="checkbox"
+                            [(ngModel)]="item.selected"
+                            [checked]="item.selected"/>
+                          <span class=" form-check-sign">
+                            <span class=" check"> </span>
+                          </span>
+                        </label>
+                      </div>
+                    </td>
+                    <td>
+                      <p class=" text-muted text-justify" style="white-space: normal">
+                        {{item.description}}
+                      </p>
+                    </td>
+                    <td class=" td-actions text-right">
+                      <button class=" btn btn-link" type="button" placement="left" (click)="edit(details.indexOf(item))" ngbTooltip="Edit Objectives" container="body" >
+                        <i class=" tim-icons icon-pencil"> </i>
+                      </button>
+                      <button class=" btn btn-link" type="button" placement="left" (click)="delete(details.indexOf(item), item.title)" ngbTooltip="Delete Objectives" container="body" >
+                        <i class=" tim-icons icon-trash-simple"> </i>
+                      </button>
+                    </td>
+                  </ng-template>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    <!-- </div> -->
+  <!-- </div> -->

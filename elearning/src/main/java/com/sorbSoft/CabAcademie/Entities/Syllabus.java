@@ -5,6 +5,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Dany on 13/05/2018.
@@ -17,7 +18,8 @@ public class Syllabus implements Serializable {
     @Id()
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String title;
-    private String description;
+    private String chapterTitle;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Video> chapterTuts;
     private boolean deleted = false;
 }

@@ -1,7 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Category } from '../shared/category.model';
 import { Subscription } from 'rxjs';
-import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryService } from '../shared/category.service';
 
 @Component({
@@ -14,6 +13,7 @@ export class CategoryInfoComponent implements OnInit, OnDestroy {
    public subscription: Subscription;
    public categoryList: Category[];
    public vm: Category;
+   public categorySelected = 0;
 
   constructor(private categoryService: CategoryService) {
   }
@@ -80,7 +80,6 @@ export class CategoryInfoComponent implements OnInit, OnDestroy {
   }
 
   public edit(index: number): void {
-    // this.vm = <Category>JSON.parse(JSON.stringify(this.categoryList[index]));
     this.getById(this.categoryList[index].id);
   }
 
@@ -97,10 +96,6 @@ export class CategoryInfoComponent implements OnInit, OnDestroy {
       return false;
     }
     return true;
-  }
-
-  public vmChanged(data: any): void {
-    this.loadVm();
   }
 
   public delete(categoryId: number): void {
@@ -121,5 +116,17 @@ export class CategoryInfoComponent implements OnInit, OnDestroy {
           alert('Failed to delete that category');
         });
     }
+  }
+  public categorySelect(): void {
+    setTimeout(() => {
+      this.categorySelected = 0;
+      const categories = this.categoryList.filter(o => o.selected);
+      if (categories && categories.length > 0) {
+        this.categorySelected = categories.length;
+      }
+    }, 0);
+  }
+  public deleteSelected(): void {
+    // TODO: endpoint to delete selected categories
   }
 }

@@ -23,12 +23,12 @@ export class UserInfoComponent implements OnInit, OnDestroy {
   }
 
   public loadVm(): void {
-    this.subscription = this.userService.getAll()
+    this.subscription = this.userService.getInfo()
     .subscribe(
       data => {
         this.userList = data;
       },
-      error => {
+      () => {
         this.saving = false;
         alert('Failed to load users');
       });
@@ -42,7 +42,6 @@ export class UserInfoComponent implements OnInit, OnDestroy {
     this.subscription.unsubscribe();
   }
 
-
   public edit(index: number): void {
     this.router.navigate([`/admin/user/${this.userList[index].id}/form`]);
   }
@@ -52,14 +51,6 @@ export class UserInfoComponent implements OnInit, OnDestroy {
       this.loadVm();
     }
     this.vm = null;
-  }
-
-  public isValid(): boolean {
-    if (this.vm.name === '') {
-      alert('You should specify the user name.');
-      return false;
-    }
-    return true;
   }
 
   public vmChanged(data: any): void {
@@ -72,7 +63,7 @@ export class UserInfoComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (confirm(`Do you really want to delete the user ${user.name}`)) {
+    if (confirm(`Do you really want to delete the user ${user.firstName}`)) {
       this.subscription = this.userService.deleteUser(userId)
       .subscribe(
         data => {

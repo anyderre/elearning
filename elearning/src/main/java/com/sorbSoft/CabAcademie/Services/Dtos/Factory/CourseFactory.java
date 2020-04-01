@@ -23,8 +23,18 @@ public class CourseFactory {
             }
 
             @Override
-            public User getUser() {
-                return null;
+            public String getDescription() {
+                return "";
+            }
+
+            @Override
+            public String getImageUrl() {
+                return "";
+            }
+
+            @Override
+            public float getRatings() {
+                return 5.0f;
             }
 
             @Override
@@ -33,25 +43,15 @@ public class CourseFactory {
             }
 
             @Override
-            public List<Syllabus> getSyllabus() {
-                return new ArrayList<>();
+            public int getEnrolled() {
+                return 0;
             }
 
             @Override
-            public Category getCategory() {
-                return new Category(){
-                    @Override
-                    public String getName() {
-                        return "";
-                    }
-
-                    @Override
-                    public String getDescription() {
-                        return "";
-                    }
-
-                };
+            public String getAuthor() {
+                return "";
             }
+
             @Override
             public boolean isPremium() {
                 return true;
@@ -68,30 +68,65 @@ public class CourseFactory {
             }
 
             @Override
-            public boolean isDeleted() {
-                return false;
-            }
-
-            @Override
             public Section getSection() {
                 return new Section(){
                     @Override
                     public Long getId() {
                         return 0L;
                     }
+                };
+            }
 
+            @Override
+            public Category getCategory() {
+                return new Category(){
                     @Override
-                    public String getDescription() {
-                        return "";
-                    }
-
-                    @Override
-                    public String getName() {
-                        return "";
+                    public Long getId() {
+                        return 0L;
                     }
                 };
             }
+
+            @Override
+            public User getUser() {
+
+                return new User() {
+                    @Override
+                    public Long getId() {
+                        return 0L;
+                    }
+                };
+            }
+
+            @Override
+            public Overview getOverview() {
+                return new Overview() {
+                    @Override
+                    public Long getId() {
+                        return 0L;
+                    }
+
+                    @Override
+                    public List<Requirement> getRequirements() {
+                        return new ArrayList<>();
+                    }
+
+                    @Override
+                    public List<Feature> getFeatures() {
+                        return new ArrayList<>();
+                    }
+                };
+            }
+
+            @Override
+            public List<Objective> getObjectives() {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public List<Syllabus> getSyllabus() {
+                return new  ArrayList<>();
+            }
         };
     }
-
 }

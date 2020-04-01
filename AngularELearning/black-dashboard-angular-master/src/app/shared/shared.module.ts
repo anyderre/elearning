@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { CustomModalComponent } from './component/modal.component';
 
 @NgModule({
   imports: [
@@ -30,6 +31,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
     NgxSelectModule,
     NgSelectModule,
     FormsModule,
+    // CustomModalComponent,
   ]
 })
 export class SharedModule {}

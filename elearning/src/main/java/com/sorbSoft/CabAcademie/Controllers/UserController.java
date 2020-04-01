@@ -51,7 +51,15 @@ public class UserController {
     }
 
     @GetMapping(value = "/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<UserInfo>> findAllUsers(){
+    public ResponseEntity<List<User>> findAllUsers(){
+        List<User> users= userService.findAllUser();
+        if(users.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/info" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<UserInfo>> findUserInfo(){
         List<UserInfo> users= userService.getUserInfo();
         if(users.isEmpty())
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);

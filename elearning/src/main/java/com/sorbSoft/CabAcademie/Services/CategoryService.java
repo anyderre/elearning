@@ -8,6 +8,7 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CategoryFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.CategoryInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CategoryMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
+import lombok.experimental.var;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -51,13 +52,7 @@ public class CategoryService {
         if (currentCategory == null) {
             return Pair.of("The category you want to update doesn't exist", null);
         }
-
-        Category resultCategory = mapper.mapToEntity(vm);
-        Category current = categoryRepository.findOne(vm.getId());
-        current.setParentCategory(resultCategory.getParentCategory());
-        current.setDescription(resultCategory.getDescription());
-        current.setName(resultCategory.getName());
-        Category result = categoryRepository.save(resultCategory);
+        Category result = categoryRepository.save(getEntity(vm));
         if (result == null) {
             return Pair.of("Couldn't update the category", null);
         } else {
@@ -74,11 +69,8 @@ public class CategoryService {
             if ( savedCategory != null){
                 return Pair.of("The category you are trying to save already exist", null);
             }
-            Category resultCategory = mapper.mapToEntity(vm);
-            if (vm.getParentCategory()!= null && vm.getParentCategory().getId() != null && vm.getParentCategory().getId() > 0){
-                resultCategory.setParentCategory(categoryRepository.findOne(vm.getParentCategory().getId()));
-            }
-            Category result = categoryRepository.save(resultCategory);
+
+            Category result = categoryRepository.save(getEntity(vm));
             if (result == null){
                 return Pair.of("Couldn't save the category", null);
             } else {
@@ -118,6 +110,10 @@ public class CategoryService {
             }
         }
         vm.setCategories(getAllFiltered(categoryId));
+        if (vm.getParentCategory() == null) {
+            Category category = new Category();
+            vm.setParentCategory(category);
+        }
         return vm;
     }
 
@@ -147,5 +143,13 @@ public class CategoryService {
             info.add(cInfo);
         }
         return info;
+    }
+
+    private Category getEntity(CategoryViewModel vm){
+        Category resultCategory = mapper.mapToEntity(vm);
+        if (vm.getParentCategory()!= null && vm.getParentCategory().getId() != null && vm.getParentCategory().getId() > 0){
+            resultCategory.setParentCategory(categoryRepository.findOne(vm.getParentCategory().getId()));
+        }
+        return  resultCategory;
     }
 }

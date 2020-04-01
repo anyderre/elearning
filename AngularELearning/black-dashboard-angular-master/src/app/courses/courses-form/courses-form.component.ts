@@ -6,11 +6,10 @@ import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Section } from '../../section/shared/section.model';
 import { Category } from '../../category/shared/category.model';
-import { CategorySelectService } from 'src/app/category/shared/category-select.service';
-import { SectionSelectService } from 'src/app/section/shared/section-select.service';
-import { Location, JsonPipe } from '@angular/common';
+import { Location } from '@angular/common';
 import { User } from 'src/app/admin/user/shared/user.model';
 import { Helper } from 'src/app/shared/helper/helper';
+import { Objective } from '../shared/objective.model';
 
 @Component({
   selector: 'app-courses-form',
@@ -21,9 +20,10 @@ export class CoursesFormComponent implements OnInit {
   @Output() goBack = new EventEmitter();
   @Input() vm: Courses;
   public subscription: Subscription;
+  public listObjectives: Objective[] = [];
 
   public saving = false;
-  private fNum = Helper.obtenerValorNumerico;
+  private fNum = Helper.getNumericValue;
   public coursesList: Courses[];
   public courseObj = {
     sectionId: 0,
@@ -38,8 +38,6 @@ export class CoursesFormComponent implements OnInit {
 
   constructor(
     private courseService: CoursesService,
-    private categorySelectService: CategorySelectService,
-    private sectionSelectService: SectionSelectService,
     private location: Location,
     private route: ActivatedRoute) {}
 
@@ -50,29 +48,6 @@ export class CoursesFormComponent implements OnInit {
     } else {
       this.getById(this.id);
     }
-  }
-  private loadSections(): void {
-    this.subscription = this.categorySelectService.getAllFiltered()
-    .subscribe(
-      data => {
-        // this.categories = data;
-      },
-      () => {
-        this.saving = false;
-        alert('Failed to load Categories');
-      });
-  }
-
-  private loadCategories(): void {
-    this.subscription = this.sectionSelectService.getAllFiltered()
-    .subscribe(
-      data => {
-        // this.sections = data;
-      },
-      () => {
-        this.saving = false;
-        alert('Failed to load Sections');
-      });
   }
 
   public save(form: FormGroup): void {
@@ -105,10 +80,10 @@ export class CoursesFormComponent implements OnInit {
       this.vm.section = new Section(this.courseObj.sectionId, '', '');
     }
     if (this.courseObj.categoryId) {
-      this.vm.category = new Category(this.courseObj.categoryId, '', '', null, []);
+      this.vm.category = new Category(this.courseObj.categoryId, '', '', null, [], false);
     }
     if (this.courseObj.userId) {
-      this.vm.user = new User(this.courseObj.userId, '', '', '', '', false, false);
+      this.vm.user = new User(this.courseObj.userId, '', '', '', '', '', '', '', null, [], true);
     }
     if (!this.vm.premium) {
       this.vm.price = 0;
@@ -182,6 +157,7 @@ export class CoursesFormComponent implements OnInit {
       alert('You should specify the course title.');
       return false;
     }
+
     if (this.vm.premium) {
       if (+this.vm.price <= 0) {
         alert('You should specify the course price.');
