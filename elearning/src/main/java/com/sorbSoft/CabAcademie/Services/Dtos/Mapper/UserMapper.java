@@ -9,21 +9,27 @@ import org.mapstruct.Mappings;
 
 @Mapper(componentModel="spring")
 public interface UserMapper {
+    @Mappings({
+            @Mapping(target = "allRoles", ignore = true),
+    })
     UserViewModel mapToViewModel(User user);
 
     @Mappings({
 //        @Mapping(target="employeeId", source="entity.id"),
 //        @Mapping(target="employeeName", source="entity.name")
         @Mapping(target = "enable", ignore = true),
-        @Mapping(target = "roles", ignore = true),
+        @Mapping(target = "deleted", ignore = true),
+//        @Mapping(target = "roles", ignore = true),
     })
     User mapToEntity(UserViewModel vm);
-
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
     })
     User mapEntityToEntity (User user);
 
+    @Mappings({
+            @Mapping(target = "roleName",  source = "role.name"),
+    })
     UserInfo mapEntityToInfo (User user);
 }

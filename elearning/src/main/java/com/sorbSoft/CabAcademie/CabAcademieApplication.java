@@ -5,12 +5,14 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import javax.annotation.PostConstruct;
 import java.util.TimeZone;
 
 @SpringBootApplication
 @EntityScan(basePackages = "com.sorbSoft.CabAcademie")
+@EnableJpaRepositories(basePackages="com.sorbSoft.CabAcademie")
 public class CabAcademieApplication{
 
 	public static void main(String[] args) {

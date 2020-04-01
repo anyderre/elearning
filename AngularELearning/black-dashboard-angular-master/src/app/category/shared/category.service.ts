@@ -70,6 +70,7 @@ export class CategoryService {
           response.description,
           response.parentCategory,
           response.categories,
+          response.selected,
       );
     }
 

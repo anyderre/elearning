@@ -16,14 +16,18 @@ import java.util.List;
 @Service
 public class InitService {
 
-    @Autowired
-    private RolRepository rolRepository;
+    private final RolRepository rolRepository;
+
+    private final UserRepository userRepository;
+
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    public InitService(RolRepository rolRepository, UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.rolRepository = rolRepository;
+        this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
 
     public void init() {
         createRoles();
@@ -40,19 +44,13 @@ public class InitService {
             for (Roles role : Roles.values()) {
                 if (role.name().equals(Roles.ROLE_SUPER_ADMIN.name())) {
                     Rol newRole = new Rol();
-                    newRole.setRol(role.name());
+                    newRole.setName("Super Admin");
+                    newRole.setDescription(role.name());
                     rolRepository.save(newRole);
                 } else if (role.name().equals(Roles.ROLE_ADMIN.name())) {
                     Rol newRole = new Rol();
-                    newRole.setRol(role.name());
-                    rolRepository.save(newRole);
-                } else if (role.name().equals(Roles.ROLE_PROFESSOR.name())) {
-                    Rol newRole = new Rol();
-                    newRole.setRol(role.name());
-                    rolRepository.save(newRole);
-                } else if (role.name().equals(Roles.ROLE_USER.name())) {
-                    Rol newRole = new Rol();
-                    newRole.setRol(role.name());
+                    newRole.setName("Admin");
+                    newRole.setDescription(role.name());
                     rolRepository.save(newRole);
                 }
             }
@@ -66,15 +64,15 @@ public class InitService {
         System.out.println("Creating user ...");
         User userAdmin = userRepository.findByUsername("admin");
         if (userAdmin == null) {
-            Rol rolSuperAdmin = rolRepository.findAllByRol(Roles.ROLE_SUPER_ADMIN.name());
-            Rol rolAdmin = rolRepository.findAllByRol(Roles.ROLE_ADMIN.name());
-            List<Rol> roles = new ArrayList<>();
-            roles.add(rolSuperAdmin);
-            roles.add(rolAdmin);
+            Rol roleAdmin = rolRepository.findByName("Admin");
             User admin = new User();
-            admin.setRoles(roles);
+            admin.setRole(roleAdmin);
             admin.setUsername("admin");
-            admin.setName("Joseph Marc-Antoine Ridore");
+            admin.setFirstName("Joseph Marc-Antoine");
+            admin.setLastName("Ridore");
+            admin.setName(admin.getFirstName() + ' ' + admin.getLastName());
+            admin.setEmail("marcridore@gmail.com");
+            admin.setAgreeWithTerms(true);
             admin.setPassword(bCryptPasswordEncoder.encode("admin")); // Todo: Change password
             userRepository.save(admin);
         }

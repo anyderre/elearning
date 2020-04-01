@@ -15,7 +15,9 @@ public interface RolRepository  extends CrudRepository<Rol, Long> {
 
     List<Rol> findAll();
 
-    Rol findAllByRol(String role);
+    Rol findByName(String role);
+
+    Rol findRolByNameAndIdIsNot(String name, Long id);
 
     void deleteRolById(Long id);
 }
