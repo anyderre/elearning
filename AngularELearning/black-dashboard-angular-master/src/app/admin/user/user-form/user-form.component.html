@@ -144,6 +144,26 @@
                 </div>
               </div>
 
+              <div class="justify-content-md-center row" *ngIf="vm.sections">
+                <div class="col-md-8">
+                  <div class=" form-group">
+                    <label>Section</label>
+                    <ngx-select 
+                      [items]="vm.sections" 
+                      optionValueField="id" 
+                      optionTextField="name" 
+                      name="xSection"
+                      id="xSection" 
+                      allowClear="true" 
+                      [placeholder]="'Search for a section'" 
+                      [(ngModel)]="vm.section.id"
+                      autoClearSearch="true" 
+                      #xSection="ngModel">
+                    </ngx-select>
+                  </div>
+                </div>
+              </div>
+
               <div class=" card-footer">
                 <div class=" button-container">
                   <button class=" btn btn-icon btn-round" type="button" title="Go back" (click)="back()" href="javascript:void(0)">

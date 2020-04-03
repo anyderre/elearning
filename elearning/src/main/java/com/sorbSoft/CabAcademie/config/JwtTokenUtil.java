@@ -21,6 +21,11 @@ public class JwtTokenUtil implements Serializable {
 
     public static final long JWT_TOKEN_VALIDITY = 5 * 60 * 60;
 
+    public static final String TOKEN_PREFIX = "Bearer ";
+
+    public static final String SIGN_UP_URL = "/api/user/save";
+    public static final String PRE_SIGN_UP_URL = "/api/user";
+
     @Value("${jwt.secret}")
     private String secret;
 

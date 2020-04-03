@@ -83,7 +83,7 @@ export class CoursesFormComponent implements OnInit {
       this.vm.category = new Category(this.courseObj.categoryId, '', '', null, [], false);
     }
     if (this.courseObj.userId) {
-      this.vm.user = new User(this.courseObj.userId, '', '', '', '', '', '', '', null, [], true);
+      this.vm.user = new User(this.courseObj.userId, '', '', '', '', '', '', '', false, '', '', '', null, null, [], [], [], []);
     }
     if (!this.vm.premium) {
       this.vm.price = 0;

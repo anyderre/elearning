@@ -1,7 +1,12 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.Factory;
 
+import com.sorbSoft.CabAcademie.Entities.Course;
 import com.sorbSoft.CabAcademie.Entities.Rol;
+import com.sorbSoft.CabAcademie.Entities.Section;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserFactory {
     public static UserViewModel getUserViewModel(){
@@ -29,6 +34,36 @@ public class UserFactory {
             @Override
             public String getEmail() {
                 return "";
+            }
+
+            @Override
+            public String getBio() {
+                return "";
+            }
+
+            @Override
+            public String getPhotoURL() {
+                return "";
+            }
+
+            @Override
+            public String getCountry() {
+                return "";
+            }
+
+            @Override
+            public Section getSection() {
+                return new Section() {
+                    @Override
+                    public Long getId() {
+                        return 0L;
+                    }
+                };
+            }
+
+            @Override
+            public List<Course> getCourses() {
+                return new ArrayList<>();
             }
 
             @Override

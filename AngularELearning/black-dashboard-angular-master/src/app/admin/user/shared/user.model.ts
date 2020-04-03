@@ -1,4 +1,6 @@
 import { Rol } from '../../role/shared/role.model';
+import { Section } from 'src/app/section/shared/section.model';
+import { Courses } from 'src/app/courses/shared/courses.model';
 
 export class User {
     constructor(
@@ -10,8 +12,15 @@ export class User {
         public username: string,
         public password: string,
         public passwordConfirm: string,
-        public role: Rol | null,
-        public allRoles: Rol[] | null,
         public agreeWithTerms: boolean,
+        public bio: string,
+        public country: string,
+        public photoURL: string,
+        public role: Rol | null,
+        public section: Section | null,
+        public sections: Section[] | null,
+        public allRoles: Rol[] | null,
+        public courses: Courses[] | null,
+        public allCourses: Courses[] | null,
     ) { }
 }

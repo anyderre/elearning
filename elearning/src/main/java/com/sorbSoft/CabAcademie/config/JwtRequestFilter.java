@@ -19,6 +19,8 @@ import com.sorbSoft.CabAcademie.Services.JwtUserDetailsService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 
+import static com.sorbSoft.CabAcademie.config.JwtTokenUtil.TOKEN_PREFIX;
+
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -38,7 +40,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String jwtToken = null;
         // JWT Token is in the form "Bearer token". Remove Bearer word and get
         // only the Token
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
+        if (requestTokenHeader != null && requestTokenHeader.startsWith(TOKEN_PREFIX)) {
             jwtToken = requestTokenHeader.substring(7);
             try {
                 username = jwtTokenUtil.getUsernameFromToken(jwtToken);

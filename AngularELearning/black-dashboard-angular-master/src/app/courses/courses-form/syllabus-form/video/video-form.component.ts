@@ -30,7 +30,7 @@ export class CourseSyllabusVideoFormComponent implements OnInit {
 
   public selectFile(event: any, index: number): void {
     this.details[index].selectedFile = (event.target as HTMLInputElement).files[0];
-    this.details[index].videoURL = `https://YOUR S3 BUCKET NAME.s3.amazonaws.com/${this.details[index].selectedFile.name}`;
+    this.details[index].attachment = `https://YOUR S3 BUCKET NAME.s3.amazonaws.com/${this.details[index].selectedFile.name}`;
   }
 
   public add(): void {
@@ -38,7 +38,7 @@ export class CourseSyllabusVideoFormComponent implements OnInit {
       alert('There is another video in edition.');
       return;
     }
-    this.vm = new Video(0, '', '' , true, null);
+    this.vm = new Video(0, '', '' , '', true, null);
     this.details.push(JSON.parse(JSON.stringify(this.vm)));
   }
 
@@ -96,8 +96,8 @@ export class CourseSyllabusVideoFormComponent implements OnInit {
       alert('You should specify the title');
       return false;
     }
-    if (!this.details[index].selectedFile) {
-      alert('You should specify the video');
+    if (Helper.getStringValue(this.details[index].videoURL) === '' && !this.details[index].selectedFile) {
+      alert('You should specify an attachment or a url');
       return false;
     }
     return true;

@@ -1,15 +1,18 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.Mapper;
 
+import com.sorbSoft.CabAcademie.Entities.Course;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
+import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2020-04-01T00:57:50-0400",
+    date = "2020-04-03T00:34:16-0400",
     comments = "version: 1.3.1.Final, compiler: javac, environment: Java 1.8.0_111 (Oracle Corporation)"
 )
 @Component
@@ -30,8 +33,16 @@ public class UserMapperImpl implements UserMapper {
         userViewModel.setEmail( user.getEmail() );
         userViewModel.setUsername( user.getUsername() );
         userViewModel.setPassword( user.getPassword() );
-        userViewModel.setRole( user.getRole() );
+        userViewModel.setPhotoURL( user.getPhotoURL() );
+        userViewModel.setBio( user.getBio() );
+        userViewModel.setCountry( user.getCountry() );
         userViewModel.setAgreeWithTerms( user.isAgreeWithTerms() );
+        userViewModel.setSection( user.getSection() );
+        userViewModel.setRole( user.getRole() );
+        List<Course> list = user.getCourses();
+        if ( list != null ) {
+            userViewModel.setCourses( new ArrayList<Course>( list ) );
+        }
 
         return userViewModel;
     }
@@ -51,7 +62,15 @@ public class UserMapperImpl implements UserMapper {
         user.setEmail( vm.getEmail() );
         user.setUsername( vm.getUsername() );
         user.setPassword( vm.getPassword() );
+        user.setPhotoURL( vm.getPhotoURL() );
+        user.setBio( vm.getBio() );
+        user.setCountry( vm.getCountry() );
         user.setRole( vm.getRole() );
+        user.setSection( vm.getSection() );
+        List<Course> list = vm.getCourses();
+        if ( list != null ) {
+            user.setCourses( new ArrayList<Course>( list ) );
+        }
         user.setAgreeWithTerms( vm.isAgreeWithTerms() );
 
         return user;
@@ -72,7 +91,15 @@ public class UserMapperImpl implements UserMapper {
         user1.setUsername( user.getUsername() );
         user1.setEnable( user.getEnable() );
         user1.setPassword( user.getPassword() );
+        user1.setPhotoURL( user.getPhotoURL() );
+        user1.setBio( user.getBio() );
+        user1.setCountry( user.getCountry() );
         user1.setRole( user.getRole() );
+        user1.setSection( user.getSection() );
+        List<Course> list = user.getCourses();
+        if ( list != null ) {
+            user1.setCourses( new ArrayList<Course>( list ) );
+        }
         user1.setAgreeWithTerms( user.isAgreeWithTerms() );
         user1.setDeleted( user.isDeleted() );
 

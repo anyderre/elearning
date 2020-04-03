@@ -17,6 +17,7 @@ public class CategoryViewModel {
     private String description;
     private Category parentCategory;
     private List<Category> childrenCategory;
+    // for select purpose
     private List<Category> categories;
     private boolean deleted;
 }

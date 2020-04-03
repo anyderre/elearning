@@ -1,6 +1,8 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.ViewModel;
 
+import com.sorbSoft.CabAcademie.Entities.Course;
 import com.sorbSoft.CabAcademie.Entities.Rol;
+import com.sorbSoft.CabAcademie.Entities.Section;
 import lombok.Data;
 
 import javax.persistence.CascadeType;
@@ -26,7 +28,17 @@ public class UserViewModel {
     @NotNull(message="Password invalid")
     @Size(max=60)
     private String password;
-    private Rol role;
-    private List<Rol> allRoles;
+    public String photoURL;
+    public String bio;
+    public String country;
     private boolean agreeWithTerms;
+    private Section section;
+    private Rol role;
+    private List<Course> courses;
+    // for select purpose
+    private List<Section> sections;
+    // for select purpose
+    private List<Rol> allRoles;
+    // for select purpose
+    private List<Course> allCourses;
 }

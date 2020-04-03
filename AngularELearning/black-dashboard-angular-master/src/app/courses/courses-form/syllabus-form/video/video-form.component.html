@@ -21,7 +21,8 @@
           <tr>
             <th></th>
             <th>Title</th>
-            <th>Video</th>
+            <th>URL</th>
+            <th>Attachment</th>
             <th>  
               <button
               *ngIf="details && details.length > 0"
@@ -47,19 +48,18 @@
                   type="text" 
                   required 
                   autocomplete="off"
-                  [(ngModel)]="item.videoTitle"
-                  maxlength="250" />
+                  [(ngModel)]="item.videoTitle"/>
               </td>
               <td class="align-middle">
                 <input 
-                name="videoURL" 
-                id="videoURL"
+                name="attachment" 
+                id="attachment"
                 required 
                 (change)="selectFile($event, details.indexOf(item))"
                 placeholder="Upload the video" 
                 type="file" />
                 <button class="btn btn-primary btn-sm" 
-                  [disabled]="!selectedFiles" 
+                  [disabled]="!item.selectedFile" 
                   (click)="upload()">Updload
                 </button>
               </td>
@@ -97,6 +97,11 @@
                   {{item.videoURL}}
                 </p>
               </td>
+              <td>
+                <p class=" text-muted text-justify" style="white-space: normal">
+                  {{item.attachment}}
+                </p>
+              </td>
               <td class=" td-actions text-right">
                 <button class=" btn btn-link" type="button" placement="left" (click)="edit(details.indexOf(item))" ngbTooltip="Edit Objectives" container="body" >
                   <i class=" tim-icons icon-pencil"> </i>
@@ -107,126 +112,9 @@
               </td>
             </ng-template>
 
-
-
-
-
-
-
-
-<!-- 
-
-
-
-
-
-
-            <td>
-              <div class=" form-check">
-                <label class=" form-check-label">
-                  <input
-                    class=" form-check-input"
-                    type="checkbox"
-                    [(ngModel)]="item.selected"
-                    [checked]="item.selected"/>
-                  <span class=" form-check-sign">
-                    <span class=" check"> </span>
-                  </span>
-                </label>
-              </div>
-            </td>
-            <td>
-              <p class=" text-muted text-justify" style="white-space: normal">
-                {{item.videoTitle}}
-              </p>
-            </td>
-            <td>
-              <p class=" text-muted text-justify" style="white-space: normal">
-                {{item.videoURL}}
-              </p>
-            </td>
-            <td class=" td-actions text-right">
-              <button class=" btn btn-link" type="button" placement="left" (click)="edit(details.indexOf(item))" ngbTooltip="Edit Requirements" container="body" >
-                <i class=" tim-icons icon-pencil"> </i>
-              </button>
-              <button class=" btn btn-link" type="button" placement="left" (click)="delete(details.indexOf(item), item.title)" ngbTooltip="Delete Requirements" container="body" >
-                <i class=" tim-icons icon-trash-simple"> </i>
-              </button>
-            </td> -->
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
-<!-- 
-
-<modal #content>
-  <div class=" card">
-    <div class=" card-body ">
-
-    <modal-header>
-      <h1>Video</h1>
-    </modal-header>
-    <modal-content>
-      <div class="modal-body" *ngIf="vm">
-        <div class="justify-content-md-center row">
-          <div class="col-md-8">
-            <div class=" form-group">
-              <label for="videoTitle">Video Title</label>
-              <input 
-                class="form-control" 
-                name="videoTitle" 
-                id="videoTitle" 
-                placeholder="Enter the videoTitle of te video"
-                #videoTitle="ngModel" 
-                type="text" 
-                required 
-                autocomplete="off"
-                [(ngModel)]="vm.videoTitle"
-                maxlength="250" />
-            </div>
-          </div>
-        </div>
-        <div class="justify-content-md-center row">
-          <div class="col-md-8">
-            <div class=" form-group">
-              <label for="icon">URL</label>
-              <input 
-                name="videoURL" 
-                id="videoURL"
-                required 
-                (change)="selectFile($event)"
-                placeholder="Upload the video" 
-                type="file" />
-                <button class="btn btn-primary" 
-                  [disabled]="!selectedFiles" 
-                  (click)="upload()">Updload
-                </button>
-            </div>
-          </div>
-        </div>
-        <div *ngIf="vm.videoURL">
-           Preview Image from AWS 
-          Preview Image
-          <br />
-          <img width="200px" src="{{vm.videoUrl}}" 
-          />
-           <img width="200px" src="https://YOUR S3 BUCKET 
-          NAME.s3.amazonaws.com/{{ 
-          imageUrl }}" 
-          /> 
-          <input type="text" placeholder="File to View or Delete"  name="image" [(ngModel)]="file">
-          <button class="btn btn-primary" style="margin-left: 10px" (click)="viewFile()">View File</button>
-          <button class="btn btn-primary" style="margin-left: 10px" (click)="deleteFile()">Delete File</button>
-          </div>
-      </div>
-
-    </modal-content>
-    <modal-footer>
-      <button class="btn btn-primary" (click)="acceptEdit()">Accept</button>
-      <button class="btn btn-default" (click)="closeModal()">Close</button>
-    </modal-footer>
-    </div>
-  </div>
-</modal> -->

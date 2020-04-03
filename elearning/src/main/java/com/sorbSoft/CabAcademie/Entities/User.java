@@ -1,6 +1,8 @@
 package com.sorbSoft.CabAcademie.Entities;
 
 import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -35,11 +37,19 @@ public class User {
     @NotNull(message="Password invalid")
     @Size(max=60)
     private String password;
-//    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-//    private List<Rol> roles;
+    public String photoURL;
+    @Lob
+    public String bio;
+    public String country;
     @ManyToOne(optional = false)
     @JoinColumn(name = "rol_id")
     private Rol role;
+    @ManyToOne
+    @JoinColumn(name = "section_id")
+    private Section section;
+    @Fetch(value = FetchMode.SUBSELECT)
+    @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    private List<Course> courses;
     private boolean agreeWithTerms;
     private boolean deleted = false;
 }

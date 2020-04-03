@@ -30,6 +30,10 @@ public class UserServices {
     @Autowired
     private RolServices rolServices;
     @Autowired
+    private SectionService sectionService;
+    @Autowired
+    private CourseService courseService;
+    @Autowired
    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
@@ -118,12 +122,11 @@ public class UserServices {
                 return null;
             } else {
                 vm = mapper.mapToViewModel(user);
-//                Pair<Boolean, Boolean> roles = rolServices.getUserRoles(user);
-//                vm.setAdmin(roles.getFirst());
-//                vm.setProfessor(roles.getSecond());
             }
         }
         vm.setAllRoles(rolServices.fetchAllRole());
+        vm.setSections(sectionService.fetchAllSection());
+        vm.setAllCourses(courseService.fetchAllCourses());
         vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
         return vm;
     }

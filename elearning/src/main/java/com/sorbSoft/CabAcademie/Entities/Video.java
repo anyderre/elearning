@@ -17,7 +17,11 @@ public class Video implements Serializable {
     @Id()
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Lob
     private String videoURL;
+    @Lob
     private String videoTitle;
+    @Lob
+    private String attachment;
     private boolean deleted = false;
 }

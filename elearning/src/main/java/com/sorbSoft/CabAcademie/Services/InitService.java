@@ -73,6 +73,11 @@ public class InitService {
             admin.setName(admin.getFirstName() + ' ' + admin.getLastName());
             admin.setEmail("marcridore@gmail.com");
             admin.setAgreeWithTerms(true);
+            admin.setBio("");
+            admin.setPhotoURL("");
+            admin.setCountry("Haiti");
+            admin.setSection(null);
+            admin.setCourses(new ArrayList<>());
             admin.setPassword(bCryptPasswordEncoder.encode("admin")); // Todo: Change password
             userRepository.save(admin);
         }

@@ -28,7 +28,9 @@ public class Course implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String title;
+    @Lob
     private String description;
+    @Lob
     private String imageUrl;
     private float ratings;
     private int enrolled;
@@ -48,7 +50,7 @@ public class Course implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Syllabus> syllabus;
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_id")

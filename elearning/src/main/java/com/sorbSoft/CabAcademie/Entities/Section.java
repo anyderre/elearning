@@ -18,9 +18,9 @@ public class Section implements Serializable {
     @Id()
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Size(max=250, message = "The description can't be longer than 250 characters")
+    @Lob
     private String description;
-    @Size(max=50, message = "The name can't be longer than 250 characters")
+    @Size(min = 1 )
     private String name;
     private boolean deleted = false;
 }

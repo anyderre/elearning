@@ -30,7 +30,10 @@ public class CourseViewModel {
     private Overview overview;
     private List<Syllabus> syllabus;
     private List<Objective> objectives;
+    // for select purpose
     private List<Category> categories;
+    // for select purpose
     private List<Section> sections;
+    // for select purpose
     private List<User> users;
 }

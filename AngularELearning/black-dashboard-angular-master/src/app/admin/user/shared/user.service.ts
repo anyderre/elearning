@@ -74,19 +74,26 @@ export class UserService {
   }
 
     public mapResult(response: any): User {
-        return new User(
-            response.id,
-            response.name,
-            response.firstName,
-            response.lastName,
-            response.email,
-            response.username,
-            response.password,
-            response.passwordConfirm,
-            response.role,
-            response.allRoles,
-            response.agreeWithTerms,
-        );
+      return new User(
+        response.id,
+        response.name,
+        response.firstName,
+        response.lastName,
+        response.email,
+        response.username,
+        response.password,
+        response.passwordConfirm,
+        response.agreeWithTerms,
+        response.bio,
+        response.country,
+        response.photoURL,
+        response.role, 
+        response.section, 
+        response.sections, 
+        response.allRoles,
+        response.courses,
+        response.allCourses,
+      );
     }
 
     public handleError(error: any) {

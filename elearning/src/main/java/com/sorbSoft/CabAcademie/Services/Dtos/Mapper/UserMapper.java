@@ -11,6 +11,8 @@ import org.mapstruct.Mappings;
 public interface UserMapper {
     @Mappings({
             @Mapping(target = "allRoles", ignore = true),
+            @Mapping(target = "allCourses", ignore = true),
+            @Mapping(target = "sections", ignore = true),
     })
     UserViewModel mapToViewModel(User user);
 
