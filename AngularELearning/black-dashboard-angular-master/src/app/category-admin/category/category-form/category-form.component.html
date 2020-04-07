@@ -22,26 +22,6 @@
           </div>
         </div>
       </div>
-      <div class="justify-content-md-center row" *ngIf="vm && vm.categories && vm.categories.length > 0">
-        <div class="col-md-8">
-          <div class=" form-group">
-            <label>Parent Category</label>
-            <ngx-select 
-              [items]="vm.categories" 
-              optionValueField="id"
-              optionTextField="name"
-              name ="parentCategoryId"
-              id ="parentCategoryId"
-              allowClear="true"
-              [placeholder]="'Search for a category'"
-              [(ngModel)]="vm.parentCategory.id"
-              autoClearSearch="true"
-              #parent="ngModel">
-            </ngx-select>
-          
-          </div>
-        </div>
-      </div>
 
         <div class="justify-content-md-center row">
           <div class="col-md-8">

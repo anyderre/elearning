@@ -6,7 +6,6 @@ import { CategoryService } from '../shared/category.service';
 @Component({
   selector: 'app-courses-category-info',
   templateUrl: 'category-info.component.html',
-  styleUrls: ['category-info.component.css']
 })
 export class CategoryInfoComponent implements OnInit, OnDestroy {
    public saving = false;

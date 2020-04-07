@@ -4,10 +4,7 @@ import { Courses } from '../shared/courses.model';
 import { CoursesService } from '../shared/courses.service';
 import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { Section } from '../../section/shared/section.model';
-import { Category } from '../../category/shared/category.model';
 import { Location } from '@angular/common';
-import { User } from 'src/app/admin/user/shared/user.model';
 import { Helper } from 'src/app/shared/helper/helper';
 import { Objective } from '../shared/objective.model';
 
@@ -76,15 +73,6 @@ export class CoursesFormComponent implements OnInit {
   }
 
   private updateVm(): void {
-    if (this.courseObj.sectionId) {
-      this.vm.section = new Section(this.courseObj.sectionId, '', '');
-    }
-    if (this.courseObj.categoryId) {
-      this.vm.category = new Category(this.courseObj.categoryId, '', '', null, [], false);
-    }
-    if (this.courseObj.userId) {
-      this.vm.user = new User(this.courseObj.userId, '', '', '', '', '', '', '', false, '', '', '', null, null, [], [], [], []);
-    }
     if (!this.vm.premium) {
       this.vm.price = 0;
     }
@@ -125,9 +113,6 @@ export class CoursesFormComponent implements OnInit {
   }
 
   private fill(): void {
-    this.courseObj.sectionId = this.vm.section ? this.vm.section.id : 0;
-    this.courseObj.categoryId = this.vm.category ? this.vm.category.id : 0;
-    this.courseObj.userId = this.vm.user ? this.vm.user.id : 0;
     this.courseObj.start = this.vm.startDate ?
     {
       year: 2020,
@@ -165,17 +150,17 @@ export class CoursesFormComponent implements OnInit {
       }
     }
 
-    if (this.fNum(this.courseObj.sectionId) <= 0) {
+    if (this.vm.section && this.fNum(this.vm.section.id) <= 0) {
       alert('You should specify the section.');
       return false;
     }
 
-    if (this.fNum(this.courseObj.categoryId) <= 0) {
+    if (this.vm.category && this.fNum(this.vm.category.id) <= 0) {
       alert('You should specify the category.');
       return false;
     }
 
-    if (this.fNum(this.courseObj.userId) <= 0) {
+    if (this.vm.user && this.fNum(this.vm.user.id) <= 0) {
       alert('You should specify the user.');
       return false;
     }

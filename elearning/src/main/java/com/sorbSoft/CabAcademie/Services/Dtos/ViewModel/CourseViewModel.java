@@ -26,12 +26,15 @@ public class CourseViewModel {
     private Date endDate;
     private Section section;
     private Category category;
+    private SubCategory subCategory;
     private User user;
     private Overview overview;
     private List<Syllabus> syllabus;
     private List<Objective> objectives;
     // for select purpose
     private List<Category> categories;
+    // for select purpose
+    private List<SubCategory> subCategories;
     // for select purpose
     private List<Section> sections;
     // for select purpose

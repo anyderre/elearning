@@ -14,7 +14,7 @@
                   class="form-control" 
                   name="title" 
                   id="title" 
-                  placeholder="Enter the syllbus title"
+                  placeholder="Enter the syllabus title"
                   #title="ngModel" 
                   type="text" 
                   required 
@@ -32,7 +32,7 @@
                   class="form-control" 
                   name="icon" 
                   id="icon" 
-                  placeholder="Enter the syllbus icon"
+                  placeholder="Enter the syllabus icon"
                   #icon="ngModel" 
                   type="text" 
                   required 
@@ -44,6 +44,10 @@
           </div>
         </div>
         <div class="card-footer">
+          <span >
+            <a href="https://themify.me/themify-icons" target="_blank" rel="noopener noreferrer">Themify</a><br>
+            <a href="https://fontawesome.com/" target="_blank" rel="noopener noreferrer">Font Awesome</a>
+          </span>
           <span class="float-right">
             <button class=" btn btn-fill btn-warning btn-sm" type="reset" (click)="cancel()">Cancel</button>
             <button class=" btn btn-fill btn-info btn-sm" type="submit" (click)="accept()">Accept</button>
@@ -109,7 +113,7 @@
                   <td>
                     <p class=" text-muted text-justify" style="white-space: normal">
                       <!-- {{item.icon}} -->
-                      <i [title]="item.icon" [className]="'ti ' +  item.icon"></i>
+                      <i [title]="item.icon" [className]="'fa ti ' +  item.icon"></i>
                     </p>
                   </td>
                   <td class=" td-actions text-right">

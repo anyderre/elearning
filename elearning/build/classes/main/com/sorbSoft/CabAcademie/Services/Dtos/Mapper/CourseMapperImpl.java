@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2020-04-03T00:34:16-0400",
+    date = "2020-04-07T01:20:06-0400",
     comments = "version: 1.3.1.Final, compiler: javac, environment: Java 1.8.0_111 (Oracle Corporation)"
 )
 @Component
@@ -38,6 +38,7 @@ public class CourseMapperImpl implements CourseMapper {
         courseViewModel.setEndDate( course.getEndDate() );
         courseViewModel.setSection( course.getSection() );
         courseViewModel.setCategory( course.getCategory() );
+        courseViewModel.setSubCategory( course.getSubCategory() );
         courseViewModel.setUser( course.getUser() );
         courseViewModel.setOverview( course.getOverview() );
         List<Syllabus> list = course.getSyllabus();
@@ -77,6 +78,7 @@ public class CourseMapperImpl implements CourseMapper {
             course.setSyllabus( new ArrayList<Syllabus>( list ) );
         }
         course.setCategory( vm.getCategory() );
+        course.setSubCategory( vm.getSubCategory() );
         course.setSection( vm.getSection() );
         course.setOverview( vm.getOverview() );
         List<Objective> list1 = vm.getObjectives();
@@ -115,6 +117,7 @@ public class CourseMapperImpl implements CourseMapper {
             course1.setSyllabus( new ArrayList<Syllabus>( list ) );
         }
         course1.setCategory( course.getCategory() );
+        course1.setSubCategory( course.getSubCategory() );
         course1.setSection( course.getSection() );
         course1.setOverview( course.getOverview() );
         List<Objective> list1 = course.getObjectives();

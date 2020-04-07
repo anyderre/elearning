@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -59,9 +60,20 @@ public class CourseController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
-    @GetMapping(value={"/{page}/{itemsPerPage}/{searchText}"})
-    public ResponseEntity<Page<Course>> getAllCoursesByPageAndSearchText(@PathVariable int  page, @PathVariable int itemsPerPage, @PathVariable String searchText){
-        Page<Course> courses = courseService.fetchAllCoursesByPageAndSerchText(page,itemsPerPage,searchText);
+    /**
+     * Get All Courses Paginate
+     * * @param count
+     * * @param page
+     *
+     * @return courses
+     */
+
+    @GetMapping(value="/paginate", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<Course>> getAllCoursesByPageAndSearchText(@RequestParam(value = "count", defaultValue = "10") String count,
+                                                                         @RequestParam(value = "page", defaultValue = "1") String page){
+        Page<Course> courses = courseService.fetchAllCoursesByPage(Integer.valueOf(page), Integer.valueOf(count));
+        if (courses.getContent().isEmpty())
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 

@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -28,6 +29,7 @@ public class CategoryController {
     private TopicService topicService;
 
     @GetMapping(value = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<CategoryViewModel> getCategory(@PathVariable Long id){
         if(id<0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -40,6 +42,7 @@ public class CategoryController {
     }
 
     @GetMapping(value = "")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<CategoryViewModel> getCategoryViewModel(){
         CategoryViewModel vm = categoryService.getCategoryViewModel(null);
         if(vm == null)
@@ -63,21 +66,8 @@ public class CategoryController {
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
-    @GetMapping(value="/topics/{id}")
-    public ResponseEntity<List<Topic>> getAllTopicsByCategory(@PathVariable Long id){
-        List<Topic> topics= topicService.fetchAllTopicByCategory(id);
-        return new ResponseEntity<>(topics, HttpStatus.OK);
-    }
-
-    @PostMapping(value = "/topic")
-    public ResponseEntity<List<Topic>> saveTopic(@Valid @RequestBody List<Topic> topics){
-        if(!topicService.saveTopics(topics))
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
-    }
-
     @PostMapping(value = "/save")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public  ResponseEntity<String> saveCategory(@Valid @RequestBody CategoryViewModel vm){
         Pair<String, Category> result = categoryService.saveCategory(vm);
         if(result.getSecond() == null)
@@ -86,6 +76,7 @@ public class CategoryController {
     }
 
     @DeleteMapping(value = "/delete/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<String> deleteCategory(@PathVariable Long id ){
         if(id<0)
             return ResponseEntity.badRequest().build();

@@ -1,8 +1,8 @@
 import { Routes, RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
-import { AuthGuard } from '../shared/auth/auth-guard.service';
 import { CommonModule } from '@angular/common';
 import { CategoryInfoComponent } from './category-info/category-info.component';
+import { AuthGuard } from '../../shared/auth/auth-guard.service';
 
 export const CategoryRoutes: Routes = [
   {

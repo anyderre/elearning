@@ -7,8 +7,6 @@ import { CategorySelectService } from '../shared/category-select.service';
 @Component({
   selector: 'app-courses-category-form',
   templateUrl: 'category-form.component.html',
-  styleUrls: ['category-form.component.css'],
-  encapsulation: ViewEncapsulation.None
 })
 export class CategoryFormComponent implements OnInit {
   @Output() goBack = new EventEmitter();
@@ -35,7 +33,6 @@ export class CategoryFormComponent implements OnInit {
       return;
     }
 
-    this.updateVm();
     this.saving = true;
     this.categoryService.saveOrEditCategory(this.vm)
     .subscribe(() => {
@@ -48,12 +45,6 @@ export class CategoryFormComponent implements OnInit {
         alert('Registration failed');
       }
     );
-  }
-
-  private updateVm(): void {
-    // if (this.parentCategoryId) {
-    //   this.vm.parentCategory = new Category(this.parentCategoryId, '', '', null, []);
-    // }
   }
 
   public back(isBack: boolean): void {

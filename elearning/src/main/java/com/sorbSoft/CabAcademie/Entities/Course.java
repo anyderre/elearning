@@ -56,6 +56,9 @@ public class Course implements Serializable {
     @JoinColumn(name = "category_id")
     private Category category;
     @ManyToOne(optional = false)
+    @JoinColumn(name = "sub_category_id")
+    private SubCategory subCategory;
+    @ManyToOne(optional = false)
     @JoinColumn(name = "section_id")
     private Section section;
     @OneToOne(cascade = CascadeType.ALL, mappedBy="course", optional = false)

@@ -1,9 +1,11 @@
 package com.sorbSoft.CabAcademie.Controllers;
 
+import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.JwtRequest;
 import com.sorbSoft.CabAcademie.Entities.JwtResponse;
 import com.sorbSoft.CabAcademie.config.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,8 +36,10 @@ public class JwtAuthenticationController {
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-
+       String authentication = authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+       if (!authentication.equals("")){
+           return new ResponseEntity<>(MessageResponse.of(authentication), HttpStatus.OK);
+       }
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
 
@@ -44,13 +48,16 @@ public class JwtAuthenticationController {
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
-    private void authenticate(String username, String password) throws Exception {
+    private String authenticate(String username, String password) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
         } catch (DisabledException e) {
-            throw new Exception("USER_DISABLED", e);
+//            throw new Exception("USER_DISABLED", e);
+            return "USER_DISABLED";
         } catch (BadCredentialsException e) {
-            throw new Exception("INVALID_CREDENTIALS", e);
+            return "INVALID_CREDENTIALS";
+//            throw new Exception("INVALID_CREDENTIALS", e);
         }
+        return "";
     }
 }

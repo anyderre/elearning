@@ -7,5 +7,4 @@ public class CategoryInfo {
     private Long id;
     private String name;
     private String description;
-    private String parentCategoryDescription;
 }

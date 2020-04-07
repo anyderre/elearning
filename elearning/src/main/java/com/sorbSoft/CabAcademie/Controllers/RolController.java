@@ -9,6 +9,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -25,6 +26,7 @@ public class RolController {
     private RolServices roleService;
 
     @GetMapping(value = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<RolViewModel> getRole(@PathVariable Long id){
         if(id<0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -37,6 +39,7 @@ public class RolController {
     }
 
     @GetMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<RolViewModel> getRoleViewModel(){
         RolViewModel vm= roleService.getRoleViewModel(null);
         if(vm==null)
@@ -61,6 +64,7 @@ public class RolController {
     }
 
     @PostMapping(value= "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public  ResponseEntity<String> saveRole(@Valid @RequestBody RolViewModel role){
         Pair<String, Rol> result = roleService.saveRole(role);
         if(result.getSecond() == null)
@@ -69,6 +73,7 @@ public class RolController {
     }
 
     @DeleteMapping(value = "/delete/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<String> deleteRole(@PathVariable Long id ){
         if(id<0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);

@@ -154,7 +154,8 @@
                     id="xUser" 
                     allowClear="true" 
                     [placeholder]="'Search for a user'" 
-                    [(ngModel)]="courseObj.userId"
+                    (remove)="vm.user.id = 0"
+                    [(ngModel)]="vm.user.id"
                     autoClearSearch="true" 
                     #xUser="ngModel">
                   </ngx-select>
@@ -174,7 +175,8 @@
                     id="xSection" 
                     allowClear="true" 
                     [placeholder]="'Search for a section'" 
-                    [(ngModel)]="courseObj.sectionId"
+                    (remove)="vm.section.id = 0"
+                    [(ngModel)]="vm.section.id"
                     autoClearSearch="true" 
                     #xSection="ngModel">
                   </ngx-select>
@@ -193,8 +195,30 @@
                     name="xCategory"
                     id="xCategory" 
                     allowClear="true" 
+                    (remove)="vm.category.id = 0"
+                    [(ngModel)]="vm.category.id"
                     [placeholder]="'Search for a category'" 
-                    [(ngModel)]="courseObj.categoryId"
+                    autoClearSearch="true" 
+                    #xCategory="ngModel">
+                  </ngx-select>
+                </div>
+              </div>
+            </div>
+
+            <div class="justify-content-md-center row" *ngIf="vm.subCategories">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label>Sub-Category</label>
+                  <ngx-select 
+                    [items]="vm.subCategories" 
+                    optionValueField="id" 
+                    optionTextField="name" 
+                    name="xSubCategory"
+                    id="xSubCategory" 
+                    allowClear="true" 
+                    (remove)="vm.subCategory.id = 0"
+                    [(ngModel)]="vm.subCategory.id"
+                    [placeholder]="'Search for a sub-category'" 
                     autoClearSearch="true" 
                     #xCategory="ngModel">
                   </ngx-select>

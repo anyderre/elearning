@@ -1,6 +1,8 @@
 package com.sorbSoft.CabAcademie.Controllers;
 
+import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.User;
+import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
@@ -9,6 +11,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -24,12 +27,15 @@ public class UserController {
     @Autowired
     private UserServices userService;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @GetMapping(value = "/{id}")
-    public ResponseEntity<UserViewModel> getUser(@PathVariable Long id){
+    public ResponseEntity<UserViewModel> getUser(@PathVariable Long id, @RequestParam (value = "filterRoles", defaultValue = "1") String filterRoles){
         if(id<0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        UserViewModel vm= userService.getUserViewModel(id);
+        UserViewModel vm= userService.getUserViewModel(id, filterRoles);
         if(vm==null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -37,8 +43,8 @@ public class UserController {
     }
 
     @GetMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserViewModel> getCourseViewModel(){
-        UserViewModel vm= userService.getUserViewModel(null);
+    public ResponseEntity<UserViewModel> getCourseViewModel(@RequestParam (value = "filterRoles", defaultValue = "1")  String filterRoles){
+        UserViewModel vm = userService.getUserViewModel(null, filterRoles);
         if(vm==null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(vm, HttpStatus.OK);
@@ -67,11 +73,23 @@ public class UserController {
     }
 
     @PostMapping("/save")
-    public  ResponseEntity<String> saveUser(@Valid @RequestBody UserViewModel user){
+    public  ResponseEntity<MessageResponse> saveUser(@Valid @RequestBody UserViewModel user){
+        if (userRepository.existsByUsername(user.getUsername())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(MessageResponse.of("Error: Username is already taken!"));
+        }
+
+        if (userRepository.existsByEmail(user.getEmail())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(MessageResponse.of("Error: Email is already in use!"));
+        }
+
         Pair<String, User> result = userService.saveUser(user);
         if(result.getSecond() == null)
-            return new ResponseEntity<>(result.getFirst(), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(result.getFirst(), HttpStatus.CREATED);
+            return new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CREATED);
     }
 
 

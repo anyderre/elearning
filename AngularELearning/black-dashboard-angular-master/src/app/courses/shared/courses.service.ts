@@ -80,6 +80,7 @@ export class CoursesService {
       response.section,
       response.syllabus,
       response.category,
+      response.subCategory,
       response.user,
       response.overview,
       response.objectives,

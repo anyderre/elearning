@@ -156,9 +156,40 @@
                       id="xSection" 
                       allowClear="true" 
                       [placeholder]="'Search for a section'" 
+                      (remove)="vm.section.id = 0"
                       [(ngModel)]="vm.section.id"
-                      autoClearSearch="true" 
+                      autoClearSearch="true"
+                      [noResultsFound]="'No section found'"
                       #xSection="ngModel">
+                    </ngx-select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="justify-content-md-center row" *ngIf="vm.allCourses">
+                <div class="col-md-8">
+                  <div class=" form-group">
+                    <label>Courses</label>
+                    <ngx-select 
+                      [items]="vm.allCourses" 
+                      optionValueField="id" 
+                      optionTextField="name" 
+                      name="xCourse"
+                      id="xCourse" 
+                      allowClear="true" 
+                      [multiple]="true"
+                      [noResultsFound]="'No courses found'"
+                      [placeholder]="'Select all courses'" 
+                      [(ngModel)]="vm.courses"
+                      autoClearSearch="true"
+                      (ngModelChange)="courseValueChage($event)"
+                      (selectionChanges)="courseValueChage($event)"
+                      #xSection="ngModel">
+                      <ng-template ngx-select-option-selected let-option let-text="text">
+                        <span class="color-box text-white"></span>
+                        <span [innerHtml]="text"></span>
+                        ({{option.data | json}})
+                    </ng-template>
                     </ngx-select>
                   </div>
                 </div>

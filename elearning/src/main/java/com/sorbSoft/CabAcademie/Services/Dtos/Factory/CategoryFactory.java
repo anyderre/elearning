@@ -1,9 +1,6 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.Factory;
 
-import com.sorbSoft.CabAcademie.Entities.Category;
-import com.sorbSoft.CabAcademie.Entities.Section;
-import com.sorbSoft.CabAcademie.Entities.Syllabus;
-import com.sorbSoft.CabAcademie.Entities.User;
+import com.sorbSoft.CabAcademie.Entities.*;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 
@@ -20,10 +17,6 @@ public class CategoryFactory {
             public Long getId() {
                 return 0L;
             }
-            @Override
-            public boolean isDeleted() {
-                return false;
-            }
 
             @Override
             public String getName() {
@@ -35,15 +28,6 @@ public class CategoryFactory {
                 return "";
             }
 
-            @Override
-            public Category getParentCategory() {
-                return new Category() {
-                    @Override
-                    public Long getId() {
-                        return 0L;
-                    }
-                };
-            }
         };
     }
 }

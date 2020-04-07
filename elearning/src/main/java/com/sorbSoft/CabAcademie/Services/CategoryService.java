@@ -2,13 +2,11 @@ package com.sorbSoft.CabAcademie.Services;
 
 
 import com.sorbSoft.CabAcademie.Entities.Category;
-import com.sorbSoft.CabAcademie.Entities.Section;
 import com.sorbSoft.CabAcademie.Repository.CategoryRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CategoryFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.CategoryInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CategoryMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
-import lombok.experimental.var;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -87,13 +85,6 @@ public class CategoryService {
         if (category == null) {
             return "The category you want to delete doesn't exist";
         }
-        if (category.getParentCategory()!= null){
-            List<Category> categories = categoryRepository.findAllByParentCategory(category.getParentCategory().getId());
-            categories.forEach(cat -> {
-                cat.setParentCategory(null);
-                categoryRepository.save(cat);
-            });
-        }
         category.setDeleted(true);
         categoryRepository.save(category);
         return "Section successfully deleted";
@@ -109,11 +100,6 @@ public class CategoryService {
                 vm = mapper.mapToViewModel(category);
             }
         }
-        vm.setCategories(getAllFiltered(categoryId));
-        if (vm.getParentCategory() == null) {
-            Category category = new Category();
-            vm.setParentCategory(category);
-        }
         return vm;
     }
 
@@ -125,7 +111,7 @@ public class CategoryService {
         if (categoriesFiltered == null) {
             return new ArrayList<>();
         }
-        return categoriesFiltered.stream().filter(o -> o.getParentCategory() == null || !o.getParentCategory().getId().equals(categoryId)).collect(Collectors.toList());
+        return categoriesFiltered;
     }
 
     public List <CategoryInfo> getUserInfo(){
@@ -139,17 +125,12 @@ public class CategoryService {
             cInfo.setId(category.getId());
             cInfo.setName(category.getName());
             cInfo.setDescription(category.getDescription());
-            cInfo.setParentCategoryDescription(category.getParentCategory() != null ? category.getParentCategory().getName(): "");
             info.add(cInfo);
         }
         return info;
     }
 
     private Category getEntity(CategoryViewModel vm){
-        Category resultCategory = mapper.mapToEntity(vm);
-        if (vm.getParentCategory()!= null && vm.getParentCategory().getId() != null && vm.getParentCategory().getId() > 0){
-            resultCategory.setParentCategory(categoryRepository.findOne(vm.getParentCategory().getId()));
-        }
-        return  resultCategory;
+        return mapper.mapToEntity(vm);
     }
 }

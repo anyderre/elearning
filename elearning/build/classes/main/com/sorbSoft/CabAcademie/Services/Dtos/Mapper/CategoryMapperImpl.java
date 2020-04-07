@@ -2,14 +2,12 @@ package com.sorbSoft.CabAcademie.Services.Dtos.Mapper;
 
 import com.sorbSoft.CabAcademie.Entities.Category;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
-import java.util.ArrayList;
-import java.util.List;
 import javax.annotation.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2020-04-03T00:34:16-0400",
+    date = "2020-04-07T01:20:06-0400",
     comments = "version: 1.3.1.Final, compiler: javac, environment: Java 1.8.0_111 (Oracle Corporation)"
 )
 @Component
@@ -26,12 +24,6 @@ public class CategoryMapperImpl implements CategoryMapper {
         categoryViewModel.setId( category.getId() );
         categoryViewModel.setName( category.getName() );
         categoryViewModel.setDescription( category.getDescription() );
-        categoryViewModel.setParentCategory( mapEntityToEntity( category.getParentCategory() ) );
-        List<Category> list = category.getChildrenCategory();
-        if ( list != null ) {
-            categoryViewModel.setChildrenCategory( new ArrayList<Category>( list ) );
-        }
-        categoryViewModel.setDeleted( category.isDeleted() );
 
         return categoryViewModel;
     }
@@ -47,11 +39,6 @@ public class CategoryMapperImpl implements CategoryMapper {
         category.setId( vm.getId() );
         category.setName( vm.getName() );
         category.setDescription( vm.getDescription() );
-        List<Category> list = vm.getChildrenCategory();
-        if ( list != null ) {
-            category.setChildrenCategory( new ArrayList<Category>( list ) );
-        }
-        category.setDeleted( vm.isDeleted() );
 
         return category;
     }
@@ -66,12 +53,6 @@ public class CategoryMapperImpl implements CategoryMapper {
 
         category1.setName( category.getName() );
         category1.setDescription( category.getDescription() );
-        category1.setParentCategory( mapEntityToEntity( category.getParentCategory() ) );
-        List<Category> list = category.getChildrenCategory();
-        if ( list != null ) {
-            category1.setChildrenCategory( new ArrayList<Category>( list ) );
-        }
-        category1.setDeleted( category.isDeleted() );
 
         return category1;
     }

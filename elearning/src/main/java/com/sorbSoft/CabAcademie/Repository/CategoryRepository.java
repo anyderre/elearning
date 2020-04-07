@@ -10,7 +10,6 @@ import java.util.List;
  * Created by Dany on 15/05/2018.
  */
 public interface CategoryRepository extends JpaRepository<Category, Long> {
-    List<Category> findAllByParentCategory(Long parentCategory);
     Category findCategoryByNameAndIdIsNot(String name, Long id);
     Category findCategoryByName(String name);
 }

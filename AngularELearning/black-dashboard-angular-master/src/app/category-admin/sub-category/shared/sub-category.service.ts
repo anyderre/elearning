@@ -1,28 +1,29 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { Category } from './category.model';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { SubCategory } from './sub-category.model';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CategoryService {
+export class SubCategoryService {
     private apiUrl = environment.baseUrl;
 
     constructor(private http: HttpClient) {}
 
-  public saveOrEditCategory(vm: Category): Observable<any> {
-    const url = `${this.apiUrl}/category/save`;
-    return this.http.post(url, JSON.stringify(vm), {responseType: 'text'})
-      .pipe(
-        map(response => response),
-        catchError(this.handleError)
-      );
-  }
-  public getCategoryViewModel(): Observable<any> {
-    const url = `${this.apiUrl}/category`;
+    public saveOrEditSubCategory(vm: SubCategory): Observable<any> {
+      const url = `${this.apiUrl}/subCategory/save`;
+      return this.http.post(url, JSON.stringify(vm), {responseType: 'text'})
+        .pipe(
+          map(response => response),
+          catchError(this.handleError)
+        );
+    }
+
+  public getSubCategoryViewModel(): Observable<any> {
+    const url = `${this.apiUrl}/subCategory`;
     return this.http.get(url)
       .pipe(
         map(result => {
@@ -32,8 +33,8 @@ export class CategoryService {
       );
   }
 
-  public getCategoryById(categoryId: number): Observable<any> {
-    const url = `${this.apiUrl}/category/${categoryId}`;
+  public getSubCategoryById(subCategoryId: number): Observable<any> {
+    const url = `${this.apiUrl}/subCategory/${subCategoryId}`;
     return this.http.get(url)
       .pipe(
         map(result => {
@@ -44,7 +45,7 @@ export class CategoryService {
   }
 
   public getAll(): Observable<any> {
-    const url = `${this.apiUrl}/category/all`;
+    const url = `${this.apiUrl}/subCategory/all`;
     return this.http.get(url)
       .pipe(
         map(result => result),
@@ -52,8 +53,17 @@ export class CategoryService {
       );
   }
 
-  public deleteCategory(categoryId: number): Observable<any> {
-    const url = `${this.apiUrl}/category/delete/${categoryId}`;
+  public getInfo(): Observable<any> {
+    const url = `${this.apiUrl}/subCategory/info`;
+    return this.http.get(url)
+      .pipe(
+        map(result => result),
+        catchError(this.handleError)
+      );
+  }
+
+  public deleteSubCategory(subCategoryId: number): Observable<any> {
+    const url = `${this.apiUrl}/subCategory/delete/${subCategoryId}`;
     return this.http.delete(url, {responseType: 'text'})
       .pipe(
         map(result => {
@@ -63,14 +73,16 @@ export class CategoryService {
       );
   }
 
-    public mapResult(response: any): Category {
-      return new Category(
-          response.id,
-          response.name,
-          response.description,
-          response.parentCategory,
-          response.categories,
-          response.selected,
+    public mapResult(response: any): SubCategory {
+      return new SubCategory(
+        response.id,
+        response.name,
+        response.description,
+        response.selected,
+        response.subCategories,
+        response.category,
+        response.allCategories,
+        response.allSubCategories,
       );
     }
 

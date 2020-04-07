@@ -20,8 +20,13 @@ public class MyCorsFilter implements Filter {
     @Override
     public final void doFilter(final ServletRequest req, final ServletResponse res, final FilterChain chain) throws IOException, ServletException {
         final HttpServletResponse response = (HttpServletResponse) res;
-        response.setHeader("Access-Control-Allow-Origin", "http://localhost:4200");
+        HttpServletRequest httpRequest = (HttpServletRequest) req;
 
+        if (httpRequest.getHeaders("Origin").nextElement().equals("http://localhost:4200") ||
+                httpRequest.getHeaders("Origin").nextElement().equals("http://localhost:3000")) {
+            response.setHeader("Access-Control-Allow-Origin",  httpRequest.getHeader("Origin"));
+        }
+//        response.se
         // without this header jquery.ajax calls returns 401 even after successful login and SSESSIONID being succesfully stored.
         response.setHeader("Access-Control-Allow-Credentials", "true");
 

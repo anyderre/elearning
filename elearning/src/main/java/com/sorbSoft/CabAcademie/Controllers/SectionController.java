@@ -8,6 +8,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -23,6 +24,7 @@ public class SectionController {
     private SectionService sectionService;
 
     @GetMapping(value = "/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<SectionViewModel> getSection(@PathVariable Long id){
         if(id < 0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -33,6 +35,7 @@ public class SectionController {
     }
 
     @GetMapping(value = "", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<SectionViewModel> getSectionViewModel(){
         SectionViewModel vm = sectionService.getSectionViewModel(null);
         if(vm == null)
@@ -57,6 +60,7 @@ public class SectionController {
     }
 
     @PostMapping("/save")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public  ResponseEntity<String> saveSection(@Valid @RequestBody SectionViewModel vm){
         Pair<String, Section> result = sectionService.saveSection(vm);
         if(result.getSecond() == null)
@@ -65,6 +69,7 @@ public class SectionController {
     }
 
     @DeleteMapping(value = "/delete/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<String> deleteSection(@PathVariable Long id ){
         if(id<0)
             return ResponseEntity.badRequest().build();

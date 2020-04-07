@@ -15,7 +15,11 @@ import java.util.List;
  */
 @Data
 @Entity
-@Table(name = "user")
+@Table(	name = "user",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = "username"),
+                @UniqueConstraint(columnNames = "email")
+        })
 @Where(clause = "deleted=false")
 public class User {
     @Id

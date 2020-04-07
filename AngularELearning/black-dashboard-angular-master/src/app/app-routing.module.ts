@@ -36,8 +36,8 @@ const routes: Routes = [
         loadChildren: () => import('./section/section-module').then(m => m.SectionModule)
       },
       {
-        path: 'category',
-        loadChildren: () => import('./category/category-module').then(m => m.CategoryModule)
+        path: 'category-admin',
+        loadChildren: () => import('./category-admin/category-admin-module').then(m => m.CategoryAdminModule)
       },
       {
         path: 'admin',

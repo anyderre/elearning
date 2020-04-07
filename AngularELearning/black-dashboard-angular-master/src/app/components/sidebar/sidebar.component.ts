@@ -17,7 +17,7 @@ export const ROUTES: RouteInfo[] = [
     class: '',
   },
   {
-    path: '/category',
+    path: '/category-admin',
     title: 'Category',
     rtlTitle: 'لوحة القيادة',
     icon: 'icon-components',

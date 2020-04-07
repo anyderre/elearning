@@ -10,18 +10,16 @@ import org.mapstruct.Mappings;
 
 @Mapper(componentModel="spring")
 public interface CategoryMapper {
-    @Mappings({
-            @Mapping(target = "categories", ignore = true),
-    })
     CategoryViewModel mapToViewModel(Category category);
 
     @Mappings({
-            @Mapping(target = "parentCategory", ignore = true),
+            @Mapping(target = "deleted", ignore = true),
     })
     Category mapToEntity(CategoryViewModel vm);
 
     @Mappings({
             @Mapping(target = "id", ignore = true),
+            @Mapping(target = "deleted", ignore = true),
     })
     Category mapEntityToEntity(Category category);
 }

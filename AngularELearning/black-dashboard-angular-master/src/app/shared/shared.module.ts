@@ -2,13 +2,13 @@ import { RouterModule } from '@angular/router';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 import { NgxSelectModule } from 'ngx-select-ex';
-import { CategorySelectService } from '../category/shared/category-select.service';
 import { SectionSelectService } from '../section/shared/section-select.service';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { CustomModalComponent } from './component/modal.component';
+import { CategorySelectService } from '../category-admin/category/shared/category-select.service';
 
 @NgModule({
   imports: [

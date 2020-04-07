@@ -23,11 +23,5 @@ public class Category implements Serializable {
     private String name;
     @Lob
     private String description;
-//    private Long parentCategoryId;
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Category parentCategory;
-    @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Category> childrenCategory;
     private boolean deleted = false;
 }

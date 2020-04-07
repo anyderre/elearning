@@ -1,5 +1,6 @@
 package com.sorbSoft.CabAcademie.Services;
 
+import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Repository.RolRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.RolFactory;
@@ -30,6 +31,11 @@ public class RolServices {
 
     public List<Rol> fetchAllRole(){
         return rolRepository.findAll();
+    }
+
+    public List<Rol> findAllRoleFiltered(){
+        return rolRepository.findAll().stream().filter(role ->
+                !role.getDescription().equals(Roles.ROLE_ADMIN.name()) && !role.getDescription().equals(Roles.ROLE_SUPER_ADMIN.name())).collect(Collectors.toList());
     }
 
     public Rol fetchRole(Long id){

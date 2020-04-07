@@ -88,6 +88,16 @@ public class CourseFactory {
             }
 
             @Override
+            public SubCategory getSubCategory() {
+                return new SubCategory(){
+                    @Override
+                    public Long getId() {
+                        return 0L;
+                    }
+                };
+            }
+
+            @Override
             public User getUser() {
 
                 return new User() {

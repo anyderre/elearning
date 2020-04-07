@@ -74,7 +74,6 @@ public class UserServices {
         }
 
         User resultUser = mapper.mapToEntity(vm);
-//        resultUser.setRoles(rolServices.getUserRoles(vm));
         resultUser.setName(resultUser.getFirstName() + ' ' + resultUser.getLastName());
         User result = userRepository.save(resultUser);
 
@@ -95,7 +94,7 @@ public class UserServices {
 
     public List<User> findAllUsersFiltered(){
         return UserRepository.findAll().stream().filter(user ->
-                !user.getRole().getDescription().equals(Roles.ROLE_ADMIN.name()) && !user.getRole().getDescription().equals(Roles.ROLE_ADMIN.name())).collect(Collectors.toList());
+                !user.getRole().getDescription().equals(Roles.ROLE_SUPER_ADMIN.name()) && !user.getRole().getDescription().equals(Roles.ROLE_ADMIN.name())).collect(Collectors.toList());
     }
 
     public String deleteUser(Long id){
@@ -114,7 +113,7 @@ public class UserServices {
         return UserRepository.findById(id);
     }
 
-    public UserViewModel getUserViewModel(Long userId){
+    public UserViewModel getUserViewModel(Long userId, String filterRoles){
         UserViewModel vm = UserFactory.getUserViewModel();
         if (userId != null && userId > 0) {
             User user = this.findAUser(userId);
@@ -124,7 +123,11 @@ public class UserServices {
                 vm = mapper.mapToViewModel(user);
             }
         }
-        vm.setAllRoles(rolServices.fetchAllRole());
+        if (filterRoles.equals("1")) {
+            vm.setAllRoles(rolServices.findAllRoleFiltered());
+        } else {
+            vm.setAllRoles(rolServices.fetchAllRole());
+        }
         vm.setSections(sectionService.fetchAllSection());
         vm.setAllCourses(courseService.fetchAllCourses());
         vm.setName(vm.getFirstName() + ' ' + vm.getLastName());

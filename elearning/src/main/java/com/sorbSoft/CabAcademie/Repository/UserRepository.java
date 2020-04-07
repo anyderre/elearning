@@ -1,7 +1,6 @@
 package com.sorbSoft.CabAcademie.Repository;
 
 import com.sorbSoft.CabAcademie.Entities.User;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -21,4 +20,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findById(Long id);
 
     List<User>findAll();
+
+    Boolean existsByUsername(String username);
+
+    Boolean existsByEmail(String email);
 }

@@ -1,9 +1,8 @@
-
 export class Category {
     constructor(
         public id: number,
         public name: string,
         public description: string,
-        public parentCategory: Category | null,
+        public selected: boolean | false,
     ) { }
 }

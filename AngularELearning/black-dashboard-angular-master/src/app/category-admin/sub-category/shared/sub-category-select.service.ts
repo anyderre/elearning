@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
-export class CategorySelectService {
+export class SubCategorySelectService {
   private apiUrl = environment.baseUrl;
 
   constructor(private http: HttpClient) {}
 
   public getAllFiltered(filter: any = null): Observable<any> {
-    const url = `${this.apiUrl}/category/all/filtered`;
-    return this.http.get(url, {params: filter})
+    const url = `${this.apiUrl}/subCategory/all/filtered`;
+    return this.http.get(url)
       .pipe(
         map(result => result),
         catchError(this.handleError)

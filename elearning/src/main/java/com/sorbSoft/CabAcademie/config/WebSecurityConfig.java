@@ -80,9 +80,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .cors().and()
                 // dont authenticate this particular request
                 .authorizeRequests()
+                .antMatchers("/authenticate").permitAll()
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
                 .antMatchers(HttpMethod.GET, PRE_SIGN_UP_URL).permitAll()
-                .antMatchers("/authenticate").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 // all other requests need to be authenticated
