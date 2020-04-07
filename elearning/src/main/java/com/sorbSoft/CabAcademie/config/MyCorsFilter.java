@@ -22,10 +22,12 @@ public class MyCorsFilter implements Filter {
         final HttpServletResponse response = (HttpServletResponse) res;
         HttpServletRequest httpRequest = (HttpServletRequest) req;
 
-        if (httpRequest.getHeaders("Origin").nextElement().equals("http://localhost:4200") ||
-                httpRequest.getHeaders("Origin").nextElement().equals("http://localhost:3000")) {
-            response.setHeader("Access-Control-Allow-Origin",  httpRequest.getHeader("Origin"));
-        }
+//        String url = httpRequest.getHeader("Origin");
+//        if (httpRequest.getHeader("Origin").equals("http://localhost:4200") ||
+//                httpRequest.getHeader("Origin").equals("http://localhost:3000")) {
+//            response.setHeader("Access-Control-Allow-Origin",  httpRequest.getHeader("Origin"));
+//        }
+        response.setHeader("Access-Control-Allow-Origin",  "*");
 //        response.se
         // without this header jquery.ajax calls returns 401 even after successful login and SSESSIONID being succesfully stored.
         response.setHeader("Access-Control-Allow-Credentials", "true");
