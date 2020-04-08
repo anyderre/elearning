@@ -1,6 +1,6 @@
-import { Routes, RouterModule } from "@angular/router";
+import { Routes, RouterModule } from '@angular/router';
 import { NgModule } from '@angular/core';
-import { AuthGuard } from '../shared/auth/auth-guard.service';
+import { AuthGuard } from '../../shared/auth/auth-guard.service';
 import { CommonModule } from '@angular/common';
 import { SectionInfoComponent } from './section-info/section-info.component';
 

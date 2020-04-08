@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../../../environments/environment';
 import { Section } from './section.model';
 import { Observable, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -67,7 +67,8 @@ export class SectionService {
         return new Section(
             response.id,
             response.name,
-            response.description
+            response.description,
+            response.selected,
         );
     }
 

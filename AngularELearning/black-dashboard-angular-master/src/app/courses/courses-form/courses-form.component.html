@@ -177,6 +177,28 @@
                     [placeholder]="'Search for a section'" 
                     (remove)="vm.section.id = 0"
                     [(ngModel)]="vm.section.id"
+                    (ngModelChange)="sectionValueChange($event)"
+                    autoClearSearch="true" 
+                    #xSection="ngModel">
+                  </ngx-select>
+                </div>
+              </div>
+            </div>
+
+            <div class="justify-content-md-center row" *ngIf="vm.subSections">
+              <div class="col-md-8">
+                <div class=" form-group">
+                  <label>Sub-Section</label>
+                  <ngx-select 
+                    [items]="vm.subSections" 
+                    optionValueField="id" 
+                    optionTextField="name" 
+                    name="xSubSection"
+                    id="xSubSection" 
+                    allowClear="true" 
+                    [placeholder]="'Search for a subSection'" 
+                    (remove)="vm.subSection.id = 0"
+                    [(ngModel)]="vm.subSection.id"
                     autoClearSearch="true" 
                     #xSection="ngModel">
                   </ngx-select>
@@ -197,6 +219,7 @@
                     allowClear="true" 
                     (remove)="vm.category.id = 0"
                     [(ngModel)]="vm.category.id"
+                    (ngModelChange)="categoryValueChange($event)"
                     [placeholder]="'Search for a category'" 
                     autoClearSearch="true" 
                     #xCategory="ngModel">

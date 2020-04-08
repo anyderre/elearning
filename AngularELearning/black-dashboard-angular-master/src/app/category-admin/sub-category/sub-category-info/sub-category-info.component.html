@@ -50,7 +50,7 @@
                           type="checkbox"
                           [(ngModel)]="item.selected"
                           [checked]="item.selected"
-                          (ngModelChange)="subCategorySelect(subCategoryList.indexOf(item))"/>
+                          (ngModelChange)="subCategorySelect()"/>
                         <span class=" form-check-sign">
                           <span class=" check"></span>
                         </span>
@@ -71,19 +71,7 @@
                       {{item.description}}
                     </p>
                   </td>
-                  <!-- <td class="text-center">
-                    <i style="color: red;" class="fa fa-times" *ngIf="!item.admin"></i>
-                    <i style="color: green;" class="fa fa-check" *ngIf="item.admin"></i>
-                  </td> 
-                  <td class="text-center">
-                    <i style="color: red;" class="fa fa-times" *ngIf="!item.professor"></i>
-                    <i style="color: green;" class="fa fa-check" *ngIf="item.professor"></i>
-                     <span *ngIf="item.isProfessor" class="label label-success">Yes</span>
-                    <span *ngIf="!item.isProfessor" class="label label-danger">No</span> -->
-                    <!-- <ng-container *ngIf="item.roles && item.roles.length > 0"> 
-                      <p class="b-r-default" *ngFor="let itemSub of item.roles">{{itemSub.rol}}</p>
-                    </ng-container> 
-                  </td>-->
+
                   <td class=" td-actions text-right">
                     <button class=" btn btn-link" *ngIf="item.roleName !== 'Admin' && item.roleName !== 'Super Admin'" type="button" placement="left" (click)="edit(subCategoryList.indexOf(item))" ngbTooltip="Edit Sub-Category" container="body" >
                       <i class=" tim-icons icon-pencil"> </i>
@@ -95,6 +83,9 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="row" *ngIf="subCategorySelected">
+            <div class="col"><a href="javascript:;" (click)="deleteSelected()">Delete selected sub-category(ies): ({{subCategorySelected}})</a></div>
           </div>
         </div>
       </div>

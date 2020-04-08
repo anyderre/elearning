@@ -61,6 +61,9 @@ public class Course implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(name = "section_id")
     private Section section;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "sub_section_id")
+    private SubSection subSection;
     @OneToOne(cascade = CascadeType.ALL, mappedBy="course", optional = false)
     private Overview overview;
 //    @ElementCollection

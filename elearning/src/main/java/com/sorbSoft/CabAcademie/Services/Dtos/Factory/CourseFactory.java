@@ -78,6 +78,16 @@ public class CourseFactory {
             }
 
             @Override
+            public SubSection getSubSection() {
+                return new SubSection(){
+                    @Override
+                    public Long getId() {
+                        return 0L;
+                    }
+                };
+            }
+
+            @Override
             public Category getCategory() {
                 return new Category(){
                     @Override
@@ -136,6 +146,26 @@ public class CourseFactory {
             @Override
             public List<Syllabus> getSyllabus() {
                 return new  ArrayList<>();
+            }
+
+            @Override
+            public List<Section> getSections() {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public List<Category> getCategories() {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public List<SubCategory> getSubCategories() {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public List<SubSection> getSubSections() {
+                return new ArrayList<>();
             }
         };
     }

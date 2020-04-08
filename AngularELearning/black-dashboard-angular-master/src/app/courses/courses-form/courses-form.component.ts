@@ -91,7 +91,7 @@ export class CoursesFormComponent implements OnInit {
     .subscribe(
       data => {
         this.vm = data;
-        this.cleanVm = this.vm;
+        this.cleanVm = JSON.parse(JSON.stringify(this.vm));
       }, () => {
         this.saving = false;
         alert('Failed to load Course');
@@ -103,7 +103,7 @@ export class CoursesFormComponent implements OnInit {
     .subscribe(
       data => {
         this.vm = data;
-        this.cleanVm = this.vm;
+        this.cleanVm = JSON.parse(JSON.stringify(this.vm));
         this.fill();
       },
       () => {
@@ -166,5 +166,18 @@ export class CoursesFormComponent implements OnInit {
     }
 
     return true;
+  }
+
+  // Category
+  public categoryValueChange(data: any): void {
+    if (data > 0) {
+      // filter Categories
+    }
+  }
+  // Section
+  public sectionValueChange(data: any): void {
+    if (data > 0) {
+       // filter Sections
+    }
   }
 }

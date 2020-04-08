@@ -62,8 +62,8 @@ public class SubCategoryController {
     }
 
     @GetMapping(value = "/all/filtered")
-    public ResponseEntity<List<SubCategory>> getAllSubCategoriesFiltered(@RequestParam(value = "subCategoryId",  required = false) Long categoryId){
-        List <SubCategory> subCategories = subCategoryService.getAllFiltered(categoryId);
+    public ResponseEntity<List<SubCategory>> getAllSubCategoriesFiltered(@RequestParam(value = "subCategoryId",  required = false) Long subCategoryId){
+        List <SubCategory> subCategories = subCategoryService.getAllFiltered(subCategoryId);
         if(subCategories == null)
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(subCategories, HttpStatus.OK);

@@ -20,7 +20,7 @@ public class Section implements Serializable {
     private Long id;
     @Lob
     private String description;
-    @Size(min = 1 )
+    @Size(min = 1)
     private String name;
     private boolean deleted = false;
 }

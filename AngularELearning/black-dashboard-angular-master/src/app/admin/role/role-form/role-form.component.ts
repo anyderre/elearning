@@ -36,7 +36,7 @@ export class RoleFormComponent implements OnInit {
     .subscribe(
       data => {
         this.vm = data;
-        this.cleanVm = this.vm;
+        this.cleanVm = JSON.parse(JSON.stringify(this.vm));
       }, () => {
         this.saving = false;
         alert('Failed to load the role');
@@ -48,7 +48,7 @@ export class RoleFormComponent implements OnInit {
     .subscribe(
       data => {
         this.vm = data;
-        this.cleanVm = this.vm;
+        this.cleanVm = JSON.parse(JSON.stringify(this.vm));
       },
       () => {
         this.saving = false;

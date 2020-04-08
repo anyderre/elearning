@@ -14,6 +14,7 @@ export class SubCategoryInfoComponent implements OnInit, OnDestroy {
   public subCategoryList: SubCategory[];
   public vm: SubCategory;
   public isSuperAdmin = false;
+  public subCategorySelected = 0;
 
   constructor(private subCategoryService: SubCategoryService, private router: Router) { }
 
@@ -34,7 +35,7 @@ export class SubCategoryInfoComponent implements OnInit, OnDestroy {
   }
 
   public add(): void {
-    this.router.navigate(['/admin/subCategory/form']);
+    this.router.navigate(['/category-admin/sub-category/form']);
   }
 
   ngOnDestroy() {
@@ -42,7 +43,7 @@ export class SubCategoryInfoComponent implements OnInit, OnDestroy {
   }
 
   public edit(index: number): void {
-    this.router.navigate([`/admin/subCategory/${this.subCategoryList[index].id}/form`]);
+    this.router.navigate([`/category-admin/sub-category/${this.subCategoryList[index].id}/form`]);
   }
 
   public back(data: boolean): void {
@@ -50,10 +51,6 @@ export class SubCategoryInfoComponent implements OnInit, OnDestroy {
       this.loadVm();
     }
     this.vm = null;
-  }
-
-  public vmChanged(data: any): void {
-    this.loadVm();
   }
 
   public delete(subCategoryId: number): void {
@@ -75,4 +72,18 @@ export class SubCategoryInfoComponent implements OnInit, OnDestroy {
         });
     }
   }
+
+  public subCategorySelect(): void {
+    setTimeout(() => {
+      this.subCategorySelected = 0;
+      const subCategories = this.subCategoryList.filter(o => o.selected);
+      if (subCategories && subCategories.length > 0) {
+        this.subCategorySelected = subCategories.length;
+      }
+    }, 0);
+  }
+  public deleteSelected(): void {
+    // TODO: endpoint to delete selected sub-categories
+  }
+
 }

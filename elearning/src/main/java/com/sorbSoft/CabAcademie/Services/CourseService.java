@@ -32,6 +32,9 @@ public class CourseService {
     private SectionService sectionService;
 
     @Autowired
+    private SubSectionService subSectionService;
+
+    @Autowired
     private SubCategoryService subCategoryService;
 
     @Autowired
@@ -103,6 +106,7 @@ public class CourseService {
             }
         }
         vm.setSections(sectionService.fetchAllSection()); // TODO: could be filtered
+        vm.setSubSections(subSectionService.fetchAllSubSections()); // TODO: could be filtered
         vm.setSubCategories(subCategoryService.fetchAllSubCategories()); // TODO: could be filtered
         vm.setCategories(categoryService.fetchAllCategories());// TODO: could be filtered
         vm.setUsers(userServices.findAllUser()); // Filtered // TODO: could have more filters

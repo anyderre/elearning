@@ -12,7 +12,7 @@ public interface SubCategoryMapper {
             @Mapping(target = "allSubCategories", ignore = true),
             @Mapping(target = "allCategories", ignore = true),
     })
-    SubCategoryViewModel mapToViewModel(SubCategory category);
+    SubCategoryViewModel mapToViewModel(SubCategory subCategory);
 
     @Mappings({
             @Mapping(target = "category", ignore = true),
@@ -23,5 +23,5 @@ public interface SubCategoryMapper {
     @Mappings({
             @Mapping(target = "id", ignore = true),
     })
-    SubCategory mapEntityToEntity(SubCategory category);
+    SubCategory mapEntityToEntity(SubCategory subCategory);
 }

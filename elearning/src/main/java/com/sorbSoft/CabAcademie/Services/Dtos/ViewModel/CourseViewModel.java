@@ -24,9 +24,10 @@ public class CourseViewModel {
     private Date startDate;
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private Date endDate;
-    private Section section;
     private Category category;
     private SubCategory subCategory;
+    private Section section;
+    private SubSection subSection;
     private User user;
     private Overview overview;
     private List<Syllabus> syllabus;
@@ -37,6 +38,8 @@ public class CourseViewModel {
     private List<SubCategory> subCategories;
     // for select purpose
     private List<Section> sections;
+    // for select purpose
+    private List<SubSection> subSections;
     // for select purpose
     private List<User> users;
 }

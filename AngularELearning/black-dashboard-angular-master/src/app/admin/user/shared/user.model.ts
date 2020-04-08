@@ -1,5 +1,5 @@
 import { Rol } from '../../role/shared/role.model';
-import { Section } from 'src/app/section/shared/section.model';
+import { Section } from 'src/app/section-admin/section/shared/section.model';
 import { Courses } from 'src/app/courses/shared/courses.model';
 
 export class User {

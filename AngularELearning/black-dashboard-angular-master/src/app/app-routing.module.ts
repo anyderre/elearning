@@ -33,11 +33,15 @@ const routes: Routes = [
       },
       {
         path: 'section',
-        loadChildren: () => import('./section/section-module').then(m => m.SectionModule)
+        loadChildren: () => import('./section-admin/section/section-module').then(m => m.SectionModule)
       },
       {
         path: 'category-admin',
         loadChildren: () => import('./category-admin/category-admin-module').then(m => m.CategoryAdminModule)
+      },
+      {
+        path: 'section-admin',
+        loadChildren: () => import('./section-admin/section-admin-module').then(m => m.SectionAdminModule)
       },
       {
         path: 'admin',

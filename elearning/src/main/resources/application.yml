@@ -7,3 +7,7 @@
 jwt:
   secret: 0oa216mnz7qWmF98G357
 
+spring:
+  jackson:
+    serialization:
+      fail-on-empty-beans: false

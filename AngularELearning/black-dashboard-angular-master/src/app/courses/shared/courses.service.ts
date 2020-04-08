@@ -78,14 +78,17 @@ export class CoursesService {
       response.startDate,
       response.endDate,
       response.section,
-      response.syllabus,
+      response.subSection,
       response.category,
       response.subCategory,
       response.user,
       response.overview,
+      response.syllabus,
       response.objectives,
       response.categories,
+      response.subCategories,
       response.sections,
+      response.subSections,
       response.users,
     );
   }

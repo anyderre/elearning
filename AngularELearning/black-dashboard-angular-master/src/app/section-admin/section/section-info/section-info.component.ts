@@ -14,6 +14,7 @@ export class SectionInfoComponent implements OnInit, OnDestroy {
    public subscription: Subscription;
    public sectionList: Section[];
    public vm: Section;
+   public sectionSelected = 0;
 
    constructor(private sectionService: SectionService) { }
 
@@ -121,5 +122,17 @@ export class SectionInfoComponent implements OnInit, OnDestroy {
           alert('Failed to delete that section');
         });
     }
+  }
+  public sectionSelect(): void {
+    setTimeout(() => {
+      this.sectionSelected = 0;
+      const sections = this.sectionList.filter(o => o.selected);
+      if (sections && sections.length > 0) {
+        this.sectionSelected = sections.length;
+      }
+    }, 0);
+  }
+  public deleteSelected(): void {
+    // TODO: endpoint to delete selected sections
   }
 }

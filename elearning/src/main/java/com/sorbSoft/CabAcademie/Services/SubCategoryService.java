@@ -1,6 +1,5 @@
 package com.sorbSoft.CabAcademie.Services;
 
-
 import com.sorbSoft.CabAcademie.Entities.SubCategory;
 import com.sorbSoft.CabAcademie.Repository.CategoryRepository;
 import com.sorbSoft.CabAcademie.Repository.SubCategoryRepository;
@@ -90,8 +89,8 @@ public class SubCategoryService {
             return "The subCategory you want to delete doesn't exist";
         }
 //        if (subCategory.getCategory()!= null){
-//            List<SubCategory> categories = subCategoryRepository.findAllByCategory(subCategory.getParentSubCategory().getId());
-//            categories.forEach(cat -> {
+//            List<SubCategory> subCategories = subCategoryRepository.findAllByCategory(subCategory.getParentSubCategory().getId());
+//            subCategories.forEach(cat -> {
 //                cat.setParentSubCategory(null);
 //                subCategoryRepository.save(cat);
 //            });
@@ -113,31 +112,27 @@ public class SubCategoryService {
         }
         vm.setAllSubCategories(getAllFiltered(subCategoryId));
         vm.setAllCategories(categoryRepository.findAll());
-//        if (vm.getParentSubCategory() == null) {
-//            SubCategory subCategory = new SubCategory();
-//            vm.setParentSubCategory(subCategory);
-//        }
         return vm;
     }
 
     public List<SubCategory> getAllFiltered(Long subCategoryId){
-        List<SubCategory> categories = fetchAllSubCategories();
+        List<SubCategory> subCategories = fetchAllSubCategories();
         if (subCategoryId == null)
-            return categories;
-        List<SubCategory> categoriesFiltered = categories.isEmpty() ? null :  categories.stream().filter(o -> !o.getId().equals(subCategoryId)).collect(Collectors.toList());
-        if (categoriesFiltered == null) {
+            return subCategories;
+        List<SubCategory> subCategoriesFiltered = subCategories.isEmpty() ? null :  subCategories.stream().filter(o -> !o.getId().equals(subCategoryId)).collect(Collectors.toList());
+        if (subCategoriesFiltered == null) {
             return new ArrayList<>();
         }
-        return categoriesFiltered;  //.stream().filter(o -> o.getParentSubCategory() == null || !o.getParentSubCategory().getId().equals(subCategoryId)).collect(Collectors.toList());
+        return subCategoriesFiltered;  //.stream().filter(o -> o.getParentSubCategory() == null || !o.getParentSubCategory().getId().equals(subCategoryId)).collect(Collectors.toList());
     }
 
     public List <SubCategoryInfo> getSubCategoryInfo(){
-        List<SubCategory> categories = this.fetchAllSubCategories();
-        if (categories.isEmpty()) {
+        List<SubCategory> subCategories = this.fetchAllSubCategories();
+        if (subCategories.isEmpty()) {
             return new ArrayList<>();
         }
         List<SubCategoryInfo> info = new ArrayList<>();
-        for (SubCategory subCategory : categories) {
+        for (SubCategory subCategory : subCategories) {
             SubCategoryInfo cInfo = new SubCategoryInfo();
             cInfo.setId(subCategory.getId());
             cInfo.setName(subCategory.getName());

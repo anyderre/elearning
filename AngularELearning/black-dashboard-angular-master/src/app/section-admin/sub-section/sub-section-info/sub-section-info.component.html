@@ -1,45 +1,47 @@
 
 
 <div class="content">
-  <div class="row">
-    <div class="col-lg-8 col-md-12">
+  <div class="row justify-content-md-center">
+    <div class="col-md-8 col-md-offset-4">
       <div class=" card card-tasks pb-3">
         <div class="card-header">
-          <h6 class=" title d-inline">Sections</h6>
+          <h6 class=" title d-inline">Sub-Categories</h6>
         </div>
         <div class=" card-body ">
-          <p class=" text-muted" *ngIf="!sectionList || (sectionList && sectionList.length <= 0)">
+          <p class=" text-muted" *ngIf="!subSectionList || (subSectionList && subSectionList.length <= 0)">
             Nothing to show  
-            <button class=" btn btn-icon btn-round" title="Add New Section" (click)="getVm()" href="javascript:void(0)">
+            <button class=" btn btn-icon btn-round" title="Add new subSection" (click)="add()" href="javascript:void(0)">
               <i class=" tim-icons icon-simple-add"></i>
             </button>
           </p>
-          <div class="table-responsive  table-full-width "  *ngIf="sectionList && sectionList.length > 0">
+          <div class="table-responsive table-full-width" *ngIf="subSectionList && subSectionList.length > 0">
             <table class=" table">
               <colgroup>
                 <col style="width: 5%;">
-                <col style="width: 20%;">
-                <col style="width: 60%;">
                 <col style="width: 15%;">
+                <col style="width: 20%;">
+                <col style="width: 40%;">
+                <col style="width: 20%;">
               </colgroup>
               <thead class=" text-primary">
                 <tr>
                   <th></th>
                   <th>Name</th>
+                  <th>Section</th>
                   <th>Description</th>
                   <th>  
                     <button
-                    *ngIf="sectionList && sectionList.length > 0"
+                    *ngIf="subSectionList && subSectionList.length > 0"
                     class=" btn btn-icon float-right btn-round mr-3"
-                    title="Add a Section"
-                    (click)="getVm()"
+                    title="Add a subSection"
+                    (click)="add()"
                     type="button">
                     <i class=" tim-icons icon-simple-add"> </i>
                   </button></th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let item of sectionList">
+                <tr *ngFor="let item of subSectionList">
                   <td>
                     <div class=" form-check">
                       <label class=" form-check-label">
@@ -48,9 +50,9 @@
                           type="checkbox"
                           [(ngModel)]="item.selected"
                           [checked]="item.selected"
-                          (ngModelChange)="sectionSelect(sectionList.indexOf(item))"/>
+                          (ngModelChange)="subSectionSelect()"/>
                         <span class=" form-check-sign">
-                          <span class=" check"> </span>
+                          <span class=" check"></span>
                         </span>
                       </label>
                     </div>
@@ -61,14 +63,19 @@
                   </td>
                   <td>
                     <p class=" text-muted text-justify" style="white-space: normal">
+                      {{item.sectionName}}
+                    </p>
+                  </td>
+                  <td>
+                    <p class=" text-muted text-justify" style="white-space: normal">
                       {{item.description}}
                     </p>
                   </td>
                   <td class=" td-actions text-right">
-                    <button class=" btn btn-link" type="button" placement="left" (click)="edit(sectionList.indexOf(item))" ngbTooltip="Edit Section" container="body" >
+                    <button class=" btn btn-link" type="button" placement="left" (click)="edit(subSectionList.indexOf(item))" ngbTooltip="Edit Sub-Section" container="body" >
                       <i class=" tim-icons icon-pencil"> </i>
                     </button>
-                    <button class=" btn btn-link" type="button" placement="left" (click)="delete(item.id)" ngbTooltip="Delete Section" container="body" >
+                    <button class=" btn btn-link" type="button" placement="left" (click)="delete(item.id)" ngbTooltip="Delete Sub-Section" container="body" >
                       <i class=" tim-icons icon-trash-simple"> </i>
                     </button>
                   </td>
@@ -76,15 +83,11 @@
               </tbody>
             </table>
           </div>
+          <div class="row" *ngIf="subSectionSelected">
+            <div class="col"><a href="javascript:;" (click)="deleteSelected()">Delete selected sub-section(s): ({{subSectionSelected}})</a></div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="col-lg-4 col-md-12">
-      <app-courses-section-form
-        *ngIf="vm"
-        (goBack)="back($event)"
-        [vm]="vm">
-      </app-courses-section-form>
     </div>
   </div>
 </div>

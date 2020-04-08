@@ -1,6 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Location } from '@angular/common';
 import { Helper } from 'src/app/shared/helper/helper';
@@ -22,6 +22,7 @@ export class SubCategoryFormComponent implements OnInit {
   constructor(
     private subCategoryService: SubCategoryService,
     private location: Location,
+    private router: Router,
     private route: ActivatedRoute) {}
 
   ngOnInit() {
@@ -38,10 +39,10 @@ export class SubCategoryFormComponent implements OnInit {
     .subscribe(
       data => {
         this.vm = data;
-        this.cleanVm = this.vm;
+        this.cleanVm = JSON.parse(JSON.stringify(this.vm));
       }, () => {
         this.saving = false;
-        alert('Failed to load the subCategory');
+        alert('Failed to load the sub-Category');
       });
   }
 
@@ -50,11 +51,11 @@ export class SubCategoryFormComponent implements OnInit {
     .subscribe(
       data => {
         this.vm = data;
-        this.cleanVm = this.vm;
+        this.cleanVm = JSON.parse(JSON.stringify(this.vm));
       },
       () => {
         this.saving = false;
-        alert('Failed to load the subCategory');
+        alert('Failed to load the sub-Category');
       });
   }
 
@@ -71,7 +72,7 @@ export class SubCategoryFormComponent implements OnInit {
     this.subCategoryService.saveOrEditSubCategory(this.vm)
     .subscribe(() => {
       this.saving = false;
-      this.back();
+      this.router.navigate(['/category-admin/sub-category/info']);
       alert('Registration correct');
       },
       () => {

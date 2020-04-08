@@ -38,7 +38,7 @@ export class UserFormComponent implements OnInit {
     .subscribe(
       data => {
         this.vm = data;
-        this.cleanVm = this.vm;
+        this.cleanVm = JSON.parse(JSON.stringify(this.vm));
       }, () => {
         this.saving = false;
         alert('Failed to load the user');
@@ -50,7 +50,7 @@ export class UserFormComponent implements OnInit {
     .subscribe(
       data => {
         this.vm = data;
-        this.cleanVm = this.vm;
+        this.cleanVm = JSON.parse(JSON.stringify(this.vm));
       },
       () => {
         this.saving = false;
