@@ -46,6 +46,10 @@ public class RolServices {
         return rolRepository.findByName(role);
     }
 
+    public Rol findRoleByDescription(String description){
+        return rolRepository.findByDescription(description);
+    }
+
     public Pair<String, Rol> updateRol(RolViewModel vm){
         Rol savedRol = rolRepository.findRolByNameAndIdIsNot(vm.getName(), vm.getId());
         if (savedRol != null) {
@@ -75,7 +79,7 @@ public class RolServices {
             }
             Rol resultRol = mapper.mapToEntity(vm);
             // TODO Devide by every word
-            resultRol.setDescription("ROLE_"+ String.join("_", resultRol.getName().toUpperCase().split(" ")));
+            resultRol.setDescription("ROLE_"+ String.join("_", resultRol.getName().trim().toUpperCase().split(" ")));
             Rol result = rolRepository.save(resultRol);
             if (result == null){
                 return Pair.of("Couldn't save the role", null);

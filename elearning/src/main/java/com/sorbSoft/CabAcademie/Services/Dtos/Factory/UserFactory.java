@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Services.Dtos.Factory;
 import com.sorbSoft.CabAcademie.Entities.Course;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.Section;
+import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 
 import java.util.ArrayList;
@@ -62,11 +63,6 @@ public class UserFactory {
             }
 
             @Override
-            public List<Course> getCourses() {
-                return new ArrayList<>();
-            }
-
-            @Override
             public Rol getRole() {
                 return new Rol() {
                     @Override
@@ -90,6 +86,36 @@ public class UserFactory {
             public boolean isAgreeWithTerms() {
                 return false;
             }
+
+            @Override
+            public List<Course> getCourses() {
+                return new ArrayList<>();
+            }
+
+//            @Override
+//            public List<Course> getAllCourses() {
+//                return new ArrayList<>();
+//            }
+
+//            @Override
+//            public List<User> getSchools() {
+//                return new ArrayList<>();
+//            }
+
+//            @Override
+//            public List<Section> getSections() {
+//                return new ArrayList<>();
+//            }
+//
+//            @Override
+//            public List<Rol> getAllRoles() {
+//                return new ArrayList<>();
+//            }
+//
+//            @Override
+//            public List<User> getAllSchools() {
+//                return new ArrayList<>();
+//            }
         };
     }
 }

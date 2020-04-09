@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,21 +37,21 @@ public class FeedbackController {
     public ResponseEntity<List<Feedback>> getAllFeedbacksByEnrollementId(@PathVariable Long id){
         List<Feedback> feedbacks= feedbackService.fetchAllFeedbackByEnrollementId(id);
         if(feedbacks.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(feedbacks, HttpStatus.OK);
     }
     @GetMapping("/course/{id}")
     public ResponseEntity<List<Feedback>> getAllFeedbacksByCourse(@PathVariable Long id){
         List<Feedback> feedbacks= feedbackService.fetchAllFeedbackByCourseId(id);
         if(feedbacks.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(feedbacks, HttpStatus.OK);
     }
     @PostMapping()
     public  ResponseEntity<Feedback> saveFeedback(@Valid @RequestBody Feedback feedback){
         Feedback currentFeedbck= feedbackService.saveFeedback(feedback);
         if(currentFeedbck==null)
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new Feedback(), HttpStatus.OK);
         return  new ResponseEntity<>(HttpStatus.CREATED);
     }
 

@@ -148,25 +148,6 @@ public class CourseFactory {
                 return new  ArrayList<>();
             }
 
-            @Override
-            public List<Section> getSections() {
-                return new ArrayList<>();
-            }
-
-            @Override
-            public List<Category> getCategories() {
-                return new ArrayList<>();
-            }
-
-            @Override
-            public List<SubCategory> getSubCategories() {
-                return new ArrayList<>();
-            }
-
-            @Override
-            public List<SubSection> getSubSections() {
-                return new ArrayList<>();
-            }
         };
     }
 }

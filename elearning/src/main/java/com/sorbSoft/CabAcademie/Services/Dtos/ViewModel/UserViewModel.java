@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Services.Dtos.ViewModel;
 import com.sorbSoft.CabAcademie.Entities.Course;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.Section;
+import com.sorbSoft.CabAcademie.Entities.User;
 import lombok.Data;
 
 import javax.persistence.CascadeType;
@@ -35,10 +36,13 @@ public class UserViewModel {
     private Section section;
     private Rol role;
     private List<Course> courses;
+    private List<User> schools;
     // for select purpose
     private List<Section> sections;
     // for select purpose
     private List<Rol> allRoles;
+    // for select purpose
+    private List<User> allSchools;
     // for select purpose
     private List<Course> allCourses;
 }

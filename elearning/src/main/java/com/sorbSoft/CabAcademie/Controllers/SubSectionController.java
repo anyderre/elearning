@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,7 +50,7 @@ public class SubSectionController {
     public ResponseEntity<List<SubSectionInfo>> getAllSubSectionsInfo(){
         List<SubSectionInfo> subSections= subSectionService.getSubSectionInfo();
         if(subSections.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(subSections, HttpStatus.OK);
     }
 
@@ -57,7 +58,7 @@ public class SubSectionController {
     public ResponseEntity<List<SubSection>> getAllSubSections(){
         List<SubSection> subSections= subSectionService.fetchAllSubSections();
         if(subSections.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(subSections, HttpStatus.OK);
     }
 
@@ -65,7 +66,7 @@ public class SubSectionController {
     public ResponseEntity<List<SubSection>> getAllSubSectionsFiltered(@RequestParam(value = "subSectionId",  required = false) Long subSectionId){
         List <SubSection> subSections = subSectionService.getAllFiltered(subSectionId);
         if(subSections == null)
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(subSections, HttpStatus.OK);
     }
 

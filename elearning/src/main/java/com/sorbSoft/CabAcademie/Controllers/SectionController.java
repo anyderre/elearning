@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,7 +48,7 @@ public class SectionController {
     public ResponseEntity<List<Section>> getAllFiltered(@RequestParam(value = "sectionId", required = false) Long sectionId){
         List <Section> categories = sectionService.getAllFiltered(sectionId);
         if(categories == null)
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 
@@ -55,7 +56,7 @@ public class SectionController {
     public ResponseEntity<List<Section>> getAllSection(){
         List<Section> sections= sectionService.fetchAllSection();
         if(sections.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(sections, HttpStatus.OK);
     }
 

@@ -5,7 +5,11 @@ import com.sorbSoft.CabAcademie.Entities.Course;
 import com.sorbSoft.CabAcademie.Services.CourseService;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -14,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -50,7 +56,7 @@ public class CourseController {
     public ResponseEntity<List<Course>> getAllCourses(){
         List<Course> courses = courseService.fetchAllCourses();
         if(courses.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
@@ -73,7 +79,87 @@ public class CourseController {
                                                                          @RequestParam(value = "page", defaultValue = "1") String page){
         Page<Course> courses = courseService.fetchAllCoursesByPage(Integer.valueOf(page), Integer.valueOf(count));
         if (courses.getContent().isEmpty())
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new Page<Course>() {
+                @Override
+                public int getTotalPages() {
+                    return 0;
+                }
+
+                @Override
+                public long getTotalElements() {
+                    return 0;
+                }
+
+                @Override
+                public <S> Page<S> map(Converter<? super Course, ? extends S> converter) {
+                    return null;
+                }
+
+                @Override
+                public int getNumber() {
+                    return 0;
+                }
+
+                @Override
+                public int getSize() {
+                    return 0;
+                }
+
+                @Override
+                public int getNumberOfElements() {
+                    return 0;
+                }
+
+                @Override
+                public List<Course> getContent() {
+                    return new ArrayList<>();
+                }
+
+                @Override
+                public boolean hasContent() {
+                    return false;
+                }
+
+                @Override
+                public Sort getSort() {
+                    return null;
+                }
+
+                @Override
+                public boolean isFirst() {
+                    return false;
+                }
+
+                @Override
+                public boolean isLast() {
+                    return false;
+                }
+
+                @Override
+                public boolean hasNext() {
+                    return false;
+                }
+
+                @Override
+                public boolean hasPrevious() {
+                    return false;
+                }
+
+                @Override
+                public Pageable nextPageable() {
+                    return null;
+                }
+
+                @Override
+                public Pageable previousPageable() {
+                    return null;
+                }
+
+                @Override
+                public Iterator<Course> iterator() {
+                    return null;
+                }
+            }, HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,7 +52,7 @@ public class RolController {
     public ResponseEntity<List<Rol>> findAllRoles(){
         List<Rol> roles= roleService.fetchAllRole();
         if(roles.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
 
@@ -59,7 +60,7 @@ public class RolController {
     public ResponseEntity<List<RolInfo>> findRoleInfo(){
         List<RolInfo> roles= roleService.getRolInfo();
         if(roles.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(roles, HttpStatus.OK);
     }
 

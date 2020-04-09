@@ -23,9 +23,6 @@ export class CoursesFormComponent implements OnInit {
   private fNum = Helper.getNumericValue;
   public coursesList: Courses[];
   public courseObj = {
-    sectionId: 0,
-    userId: 0,
-    categoryId: 0,
     start: null,
     end: null,
   };
@@ -91,6 +88,7 @@ export class CoursesFormComponent implements OnInit {
     .subscribe(
       data => {
         this.vm = data;
+        console.log(this.vm)
         this.cleanVm = JSON.parse(JSON.stringify(this.vm));
       }, () => {
         this.saving = false;

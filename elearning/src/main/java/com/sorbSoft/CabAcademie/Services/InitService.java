@@ -52,6 +52,41 @@ public class InitService {
                     newRole.setName("Admin");
                     newRole.setDescription(role.name());
                     rolRepository.save(newRole);
+                } else if (role.name().equals(Roles.ROLE_PROFESSOR.name())) {
+                    Rol newRole = new Rol();
+                    newRole.setName("Professor");
+                    newRole.setDescription(role.name());
+                    rolRepository.save(newRole);
+                }else if (role.name().equals(Roles.ROLE_EMPLOYEE.name())) {
+                    Rol newRole = new Rol();
+                    newRole.setName("Employee");
+                    newRole.setDescription(role.name());
+                    rolRepository.save(newRole);
+                }else if (role.name().equals(Roles.ROLE_FREE_STUDENT.name())) {
+                    Rol newRole = new Rol();
+                    newRole.setName("Free Student");
+                    newRole.setDescription(role.name());
+                    rolRepository.save(newRole);
+                }else if (role.name().equals(Roles.ROLE_FREELANCER.name())) {
+                    Rol newRole = new Rol();
+                    newRole.setName("Freelancer");
+                    newRole.setDescription(role.name());
+                    rolRepository.save(newRole);
+                }else if (role.name().equals(Roles.ROLE_ORGANIZATION.name())) {
+                    Rol newRole = new Rol();
+                    newRole.setName("Organization");
+                    newRole.setDescription(role.name());
+                    rolRepository.save(newRole);
+                }else if (role.name().equals(Roles.ROLE_SCHOOL.name())) {
+                    Rol newRole = new Rol();
+                    newRole.setName("School");
+                    newRole.setDescription(role.name());
+                    rolRepository.save(newRole);
+                }else if (role.name().equals(Roles.ROLE_STUDENT.name())) {
+                    Rol newRole = new Rol();
+                    newRole.setName("Student");
+                    newRole.setDescription(role.name());
+                    rolRepository.save(newRole);
                 }
             }
         }

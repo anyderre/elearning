@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2020-04-08T01:55:23-0400",
+    date = "2020-04-09T12:14:16-0400",
     comments = "version: 1.3.1.Final, compiler: javac, environment: Java 1.8.0_111 (Oracle Corporation)"
 )
 @Component
@@ -43,6 +43,10 @@ public class UserMapperImpl implements UserMapper {
         if ( list != null ) {
             userViewModel.setCourses( new ArrayList<Course>( list ) );
         }
+        List<User> list1 = user.getSchools();
+        if ( list1 != null ) {
+            userViewModel.setSchools( new ArrayList<User>( list1 ) );
+        }
 
         return userViewModel;
     }
@@ -70,6 +74,10 @@ public class UserMapperImpl implements UserMapper {
         List<Course> list = vm.getCourses();
         if ( list != null ) {
             user.setCourses( new ArrayList<Course>( list ) );
+        }
+        List<User> list1 = vm.getSchools();
+        if ( list1 != null ) {
+            user.setSchools( new ArrayList<User>( list1 ) );
         }
         user.setAgreeWithTerms( vm.isAgreeWithTerms() );
 
@@ -99,6 +107,10 @@ public class UserMapperImpl implements UserMapper {
         List<Course> list = user.getCourses();
         if ( list != null ) {
             user1.setCourses( new ArrayList<Course>( list ) );
+        }
+        List<User> list1 = user.getSchools();
+        if ( list1 != null ) {
+            user1.setSchools( new ArrayList<User>( list1 ) );
         }
         user1.setAgreeWithTerms( user.isAgreeWithTerms() );
         user1.setDeleted( user.isDeleted() );

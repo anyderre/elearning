@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,7 +66,7 @@ public class SubCategoryController {
     public ResponseEntity<List<SubCategory>> getAllSubCategoriesFiltered(@RequestParam(value = "subCategoryId",  required = false) Long subCategoryId){
         List <SubCategory> subCategories = subCategoryService.getAllFiltered(subCategoryId);
         if(subCategories == null)
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(subCategories, HttpStatus.OK);
     }
 

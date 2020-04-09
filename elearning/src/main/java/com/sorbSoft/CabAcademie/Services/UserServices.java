@@ -92,9 +92,14 @@ public class UserServices {
         return UserRepository.findAll();
     }
 
-    public List<User> findAllUsersFiltered(){
+    public List<User> findAllUsersFilteredFromAdmin(){
         return UserRepository.findAll().stream().filter(user ->
                 !user.getRole().getDescription().equals(Roles.ROLE_SUPER_ADMIN.name()) && !user.getRole().getDescription().equals(Roles.ROLE_ADMIN.name())).collect(Collectors.toList());
+    }
+
+    public List<User> filterUserByRole(Long roleId){
+        return UserRepository.findAll().stream().filter(user ->
+                user.getRole().getId().equals(roleId)).collect(Collectors.toList());
     }
 
     public String deleteUser(Long id){
@@ -131,6 +136,11 @@ public class UserServices {
         vm.setSections(sectionService.fetchAllSection());
         vm.setAllCourses(courseService.fetchAllCourses());
         vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
+
+        Rol rol = rolServices.findRoleByDescription(Roles.ROLE_SCHOOL.name());
+        if (rol != null){
+            vm.setAllSchools(filterUserByRole(rol.getId()));
+        }
         return vm;
     }
 
