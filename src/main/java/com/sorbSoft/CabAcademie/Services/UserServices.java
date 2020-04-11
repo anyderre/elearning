@@ -34,7 +34,7 @@ public class UserServices {
     @Autowired
     private CourseService courseService;
     @Autowired
-   private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
     private UserRepository userRepository;
