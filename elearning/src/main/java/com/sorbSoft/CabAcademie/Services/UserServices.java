@@ -137,9 +137,13 @@ public class UserServices {
         vm.setAllCourses(courseService.fetchAllCourses());
         vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
 
-        Rol rol = rolServices.findRoleByDescription(Roles.ROLE_SCHOOL.name());
-        if (rol != null){
-            vm.setAllSchools(filterUserByRole(rol.getId()));
+        Rol rolSchool = rolServices.findRoleByDescription(Roles.ROLE_SCHOOL.name());
+        if (rolSchool != null){
+            vm.setAllSchools(filterUserByRole(rolSchool.getId()));
+        }
+        Rol rolOrganization = rolServices.findRoleByDescription(Roles.ROLE_ORGANIZATION.name());
+        if (rolOrganization != null){
+            vm.setAllOrganizations(filterUserByRole(rolOrganization.getId()));
         }
         return vm;
     }

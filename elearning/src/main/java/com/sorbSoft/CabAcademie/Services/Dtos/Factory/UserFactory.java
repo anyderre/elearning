@@ -92,30 +92,11 @@ public class UserFactory {
                 return new ArrayList<>();
             }
 
-//            @Override
-//            public List<Course> getAllCourses() {
-//                return new ArrayList<>();
-//            }
+            @Override
+            public List<User> getOrganizations() {
+                return new ArrayList<>();
+            }
 
-//            @Override
-//            public List<User> getSchools() {
-//                return new ArrayList<>();
-//            }
-
-//            @Override
-//            public List<Section> getSections() {
-//                return new ArrayList<>();
-//            }
-//
-//            @Override
-//            public List<Rol> getAllRoles() {
-//                return new ArrayList<>();
-//            }
-//
-//            @Override
-//            public List<User> getAllSchools() {
-//                return new ArrayList<>();
-//            }
         };
     }
 }

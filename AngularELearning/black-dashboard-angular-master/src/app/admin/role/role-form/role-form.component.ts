@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { RoleService } from '../shared/Role.service';
 import { FormGroup } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { Location } from '@angular/common';
 import { Rol } from '../shared/role.model';
@@ -20,6 +20,7 @@ export class RoleFormComponent implements OnInit {
   constructor(
     private roleService: RoleService,
     private location: Location,
+    private router: Router,
     private route: ActivatedRoute) {}
 
   ngOnInit() {
@@ -69,7 +70,7 @@ export class RoleFormComponent implements OnInit {
     this.roleService.saveOrEditRole(this.vm)
     .subscribe(() => {
       this.saving = false;
-      this.back();
+      this.router.navigate(['/admin/role/info']);
       alert('Registration correct');
       },
       () => {

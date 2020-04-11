@@ -21,6 +21,8 @@ export class CoursesFormComponent implements OnInit {
 
   public saving = false;
   private fNum = Helper.getNumericValue;
+  private fText = Helper.getStringValue;
+
   public coursesList: Courses[];
   public courseObj = {
     start: null,
@@ -88,7 +90,6 @@ export class CoursesFormComponent implements OnInit {
     .subscribe(
       data => {
         this.vm = data;
-        console.log(this.vm)
         this.cleanVm = JSON.parse(JSON.stringify(this.vm));
       }, () => {
         this.saving = false;
@@ -136,20 +137,24 @@ export class CoursesFormComponent implements OnInit {
   }
 
   public isValid(): boolean {
-    if (this.vm.title === '') {
+    if ((this.vm.title) === '') {
       alert('You should specify the course title.');
       return false;
     }
 
     if (this.vm.premium) {
-      if (+this.vm.price <= 0) {
+      if (this.fNum(this.vm.price) <= 0) {
         alert('You should specify the course price.');
         return false;
       }
     }
-
     if (this.vm.section && this.fNum(this.vm.section.id) <= 0) {
       alert('You should specify the section.');
+      return false;
+    }
+
+    if (this.fNum(this.vm.section.id) > 0 && this.vm.subSection && this.fNum(this.vm.subSection.id) <= 0) {
+      alert('You should specify the sub-section.');
       return false;
     }
 
@@ -158,11 +163,34 @@ export class CoursesFormComponent implements OnInit {
       return false;
     }
 
+    if (this.fNum(this.vm.category.id) > 0 && this.vm.subCategory && this.fNum(this.vm.subCategory.id) <= 0) {
+      alert('You should specify the sub-category.');
+      return false;
+    }
+
     if (this.vm.user && this.fNum(this.vm.user.id) <= 0) {
       alert('You should specify the user.');
       return false;
     }
 
+    if (!this.isDateRangeValid(this.vm.startDate, this.vm.endDate)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  private isDateRangeValid(start: Date , end: Date): boolean {
+    if (!start || !end) {
+      alert('You should specify the start and the end date.');
+      return false;
+    }
+    const startDate = start.setHours(0, 0, 0);
+    const endDate = end.setHours(0, 0, 0);
+    if (startDate > endDate) {
+      alert('The start date cannot be after the end date.');
+      return false;
+    }
     return true;
   }
 

@@ -9,11 +9,13 @@ import com.sorbSoft.CabAcademie.Services.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,7 +56,15 @@ public class CategoryController {
     public ResponseEntity<List<CategoryInfo>> getAllCategories(){
         List<CategoryInfo> categories= categoryService.getUserInfo();
         if(categories.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(categories, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/info" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CategoryInfo>> getAllCategoriesInfo(){
+        List<CategoryInfo> categories = categoryService.getCategoryInfo();
+        if(categories.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(categories, HttpStatus.OK);
     }
 

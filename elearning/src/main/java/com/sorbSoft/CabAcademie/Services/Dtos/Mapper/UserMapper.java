@@ -13,16 +13,14 @@ public interface UserMapper {
             @Mapping(target = "allRoles", ignore = true),
             @Mapping(target = "allCourses", ignore = true),
             @Mapping(target = "allSchools", ignore = true),
+            @Mapping(target = "allOrganizations", ignore = true),
             @Mapping(target = "sections", ignore = true),
     })
     UserViewModel mapToViewModel(User user);
 
     @Mappings({
-//        @Mapping(target="employeeId", source="entity.id"),
-//        @Mapping(target="employeeName", source="entity.name")
         @Mapping(target = "enable", ignore = true),
         @Mapping(target = "deleted", ignore = true),
-//        @Mapping(target = "roles", ignore = true),
     })
     User mapToEntity(UserViewModel vm);
 

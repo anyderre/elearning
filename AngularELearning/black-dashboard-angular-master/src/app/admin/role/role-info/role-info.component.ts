@@ -7,7 +7,6 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-admin-role-info',
   templateUrl: 'role-info.component.html',
-  styleUrls: ['role-info.component.css']
 })
 export class RoleInfoComponent implements OnInit, OnDestroy {
   public saving = false;

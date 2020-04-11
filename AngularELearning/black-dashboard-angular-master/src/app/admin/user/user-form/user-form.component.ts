@@ -2,10 +2,10 @@ import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { UserService } from '../shared/User.service';
 import { FormGroup } from '@angular/forms';
 import { User } from '../shared/user.model';
-import { ActivatedRoute } from '@angular/router';
-import { Subscription } from 'rxjs/internal/Subscription';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { Location } from '@angular/common';
-import { Helper } from 'src/app/shared/helper/helper';
+import { Helper } from '../../../shared/helper/helper';
 
 @Component({
   selector: 'app-admin-user-form',
@@ -22,6 +22,7 @@ export class UserFormComponent implements OnInit {
   constructor(
     private userService: UserService,
     private location: Location,
+    private router: Router,
     private route: ActivatedRoute) {}
 
   ngOnInit() {
@@ -72,7 +73,7 @@ export class UserFormComponent implements OnInit {
     this.userService.saveOrEditUser(this.vm)
     .subscribe(() => {
       this.saving = false;
-      this.back();
+      this.router.navigate(['/admin/user/info']);
       alert('Registration correct');
       },
       () => {

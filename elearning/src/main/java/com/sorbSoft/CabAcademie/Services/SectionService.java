@@ -116,10 +116,7 @@ public class SectionService {
         }
         List<SectionInfo> info = new ArrayList<>();
         for (Section section : sections) {
-            SectionInfo sInfo = new SectionInfo();
-            sInfo.setId(section.getId());
-            sInfo.setName(section.getName());
-            sInfo.setDescription(section.getDescription());
+            SectionInfo sInfo = mapper.mapEntityToInfo(section);
             info.add(sInfo);
         }
         return info;
