@@ -34,6 +34,10 @@ repositories {
 	mavenCentral()
 }
 
+task stage {
+	dependsOn installApp
+}
+
 dependencies {
 	compile('org.springframework.boot:spring-boot-starter-freemarker')
 	runtime('org.springframework.boot:spring-boot-devtools')
