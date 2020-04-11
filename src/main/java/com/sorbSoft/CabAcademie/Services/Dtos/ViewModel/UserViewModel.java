@@ -48,4 +48,6 @@ public class UserViewModel {
     private List<User> allOrganizations;
     // for select purpose
     private List<Course> allCourses;
+
+    private String workspaceName;
 }
