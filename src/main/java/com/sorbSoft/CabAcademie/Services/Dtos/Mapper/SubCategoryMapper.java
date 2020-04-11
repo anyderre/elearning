@@ -27,6 +27,7 @@ public interface SubCategoryMapper {
     SubCategory mapEntityToEntity(SubCategory subCategory);
 
     @Mappings({
+            @Mapping(target = "subCategoryInfoList", ignore = true),
             @Mapping(target = "categoryName",  source = "category.name"),
     })
     SubCategoryInfo mapEntityToInfo(SubCategory subCategory);
