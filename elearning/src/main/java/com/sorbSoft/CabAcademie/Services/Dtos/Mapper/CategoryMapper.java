@@ -2,6 +2,7 @@ package com.sorbSoft.CabAcademie.Services.Dtos.Mapper;
 
 import com.sorbSoft.CabAcademie.Entities.Category;
 import com.sorbSoft.CabAcademie.Entities.User;
+import com.sorbSoft.CabAcademie.Services.Dtos.Info.CategoryInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import org.mapstruct.Mapper;
@@ -22,4 +23,6 @@ public interface CategoryMapper {
             @Mapping(target = "deleted", ignore = true),
     })
     Category mapEntityToEntity(Category category);
+
+    CategoryInfo mapEntityToInfo(Category category);
 }

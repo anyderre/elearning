@@ -1,6 +1,7 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.Mapper;
 
 import com.sorbSoft.CabAcademie.Entities.SubSection;
+import com.sorbSoft.CabAcademie.Services.Dtos.Info.SubSectionInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SubSectionViewModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,4 +24,9 @@ public interface SubSectionMapper {
             @Mapping(target = "id", ignore = true),
     })
     SubSection mapEntityToEntity(SubSection section);
+
+    @Mappings({
+            @Mapping(target = "sectionName",  source = "section.name"),
+    })
+    SubSectionInfo mapEntityToInfo(SubSection subSection);
 }

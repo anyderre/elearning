@@ -1,6 +1,7 @@
 package com.sorbSoft.CabAcademie.Controllers;
 
 import com.sorbSoft.CabAcademie.Entities.Section;
+import com.sorbSoft.CabAcademie.Services.Dtos.Info.SectionInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SectionViewModel;
 import com.sorbSoft.CabAcademie.Services.SectionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,14 @@ public class SectionController {
     @GetMapping(value = "/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Section>> getAllSection(){
         List<Section> sections= sectionService.fetchAllSection();
+        if(sections.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(sections, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/info" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<SectionInfo>> getAllSectionInfo(){
+        List<SectionInfo> sections= sectionService.getSectionInfo();
         if(sections.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(sections, HttpStatus.OK);

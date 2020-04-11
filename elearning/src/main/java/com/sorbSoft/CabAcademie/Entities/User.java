@@ -57,6 +57,9 @@ public class User {
     @Fetch(value = FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     private List<User> schools;
+    @Fetch(value = FetchMode.SUBSELECT)
+    @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    private List<User> organizations;
     private boolean agreeWithTerms;
     private boolean deleted = false;
 }

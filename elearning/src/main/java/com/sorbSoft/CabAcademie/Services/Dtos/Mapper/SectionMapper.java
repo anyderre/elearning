@@ -1,6 +1,7 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.Mapper;
 
 import com.sorbSoft.CabAcademie.Entities.Section;
+import com.sorbSoft.CabAcademie.Services.Dtos.Info.SectionInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SectionViewModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,5 +18,5 @@ public interface SectionMapper {
     })
     Section mapEntityToEntity(Section section);
 
-//    SectionInfo mapEntityToInfo(Section user);
+    SectionInfo mapEntityToInfo(Section section);
 }

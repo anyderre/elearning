@@ -126,13 +126,9 @@ public class SubSectionService {
             return new ArrayList<>();
         }
         List<SubSectionInfo> info = new ArrayList<>();
-        for (SubSection subSection : subSections) {
-            SubSectionInfo cInfo = new SubSectionInfo();
-            cInfo.setId(subSection.getId());
-            cInfo.setName(subSection.getName());
-            cInfo.setDescription(subSection.getDescription());
-            cInfo.setSectionName(subSection.getSection().getName());
-            info.add(cInfo);
+        for (SubSection sub : subSections) {
+            SubSectionInfo sInfo = mapper.mapEntityToInfo(sub);
+            info.add(sInfo);
         }
         return info;
     }

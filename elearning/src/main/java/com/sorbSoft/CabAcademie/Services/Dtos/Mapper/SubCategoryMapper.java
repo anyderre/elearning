@@ -1,6 +1,7 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.Mapper;
 
 import com.sorbSoft.CabAcademie.Entities.SubCategory;
+import com.sorbSoft.CabAcademie.Services.Dtos.Info.SubCategoryInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SubCategoryViewModel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -24,4 +25,10 @@ public interface SubCategoryMapper {
             @Mapping(target = "id", ignore = true),
     })
     SubCategory mapEntityToEntity(SubCategory subCategory);
+
+    @Mappings({
+            @Mapping(target = "categoryName",  source = "category.name"),
+    })
+    SubCategoryInfo mapEntityToInfo(SubCategory subCategory);
+
 }

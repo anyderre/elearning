@@ -132,16 +132,14 @@ public class SubCategoryService {
             return new ArrayList<>();
         }
         List<SubCategoryInfo> info = new ArrayList<>();
-        for (SubCategory subCategory : subCategories) {
-            SubCategoryInfo cInfo = new SubCategoryInfo();
-            cInfo.setId(subCategory.getId());
-            cInfo.setName(subCategory.getName());
-            cInfo.setDescription(subCategory.getDescription());
-            cInfo.setCategoryName(subCategory.getCategory().getName());
-            info.add(cInfo);
+        for (SubCategory sub : subCategories) {
+            SubCategoryInfo sInfo = mapper.mapEntityToInfo(sub);
+            info.add(sInfo);
+            // TODO: Set the subCategory info list
         }
         return info;
     }
+
 
     private SubCategory getEntity(SubCategoryViewModel vm){
         SubCategory resultSubCategory = mapper.mapToEntity(vm);

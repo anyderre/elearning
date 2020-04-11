@@ -2,7 +2,7 @@ package com.sorbSoft.CabAcademie.Services;
 
 
 import com.sorbSoft.CabAcademie.Entities.*;
-import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
+import com.sorbSoft.CabAcademie.Repository.OverviewRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CourseFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CourseMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
@@ -42,6 +42,9 @@ public class CourseService {
 
     @Autowired
     private UserServices userServices;
+
+    @Autowired
+    private OverviewRepository overviewRepository;
 
     private final CourseMapper mapper = Mappers.getMapper(CourseMapper.class);
 
@@ -124,11 +127,18 @@ public class CourseService {
             }
 
             Course course = mapper.mapToEntity(vm);
+            course.getOverview().setCourse(course);
             course.setCreationDate(new Date());
             course.setLastUpdate(new Date());
             course.setCreationDate(new Date());
             course.setLastUpdate(new Date());
+            Overview overviewEntity = course.getOverview();
+            course.setOverview(null);
             Course result = courseRepository.save(course);
+            overviewEntity.setCourse(result);
+            Overview overview = overviewRepository.save(overviewEntity);
+            course.setOverview(overview);
+            result = courseRepository.save(course);
             if (result == null){
                 return Pair.of("Couldn't save the course", null);
             } else {

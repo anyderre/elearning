@@ -66,12 +66,6 @@ public class Course implements Serializable {
     private SubSection subSection;
     @OneToOne(cascade = CascadeType.ALL, mappedBy="course", optional = false)
     private Overview overview;
-//    @ElementCollection
-////    @CollectionTable(
-////            name="objectives",
-////            joinColumns=@JoinColumn(name="objectives_ID")
-////    )
-////    @Column(name="description")
     @Fetch(value = FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Objective> objectives;

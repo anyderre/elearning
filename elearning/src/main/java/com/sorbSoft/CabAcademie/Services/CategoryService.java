@@ -87,7 +87,7 @@ public class CategoryService {
         }
         category.setDeleted(true);
         categoryRepository.save(category);
-        return "Section successfully deleted";
+        return "Category successfully deleted";
     }
 
     public CategoryViewModel getCategoryViewModel(Long categoryId){
@@ -126,6 +126,19 @@ public class CategoryService {
             cInfo.setName(category.getName());
             cInfo.setDescription(category.getDescription());
             info.add(cInfo);
+        }
+        return info;
+    }
+
+    public List <CategoryInfo> getCategoryInfo(){
+        List<Category> sections = this.fetchAllCategories();
+        if (sections.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<CategoryInfo> info = new ArrayList<>();
+        for (Category section : sections) {
+            CategoryInfo sInfo = mapper.mapEntityToInfo(section);
+            info.add(sInfo);
         }
         return info;
     }

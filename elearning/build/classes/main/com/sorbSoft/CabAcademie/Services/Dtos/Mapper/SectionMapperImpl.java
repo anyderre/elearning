@@ -1,13 +1,14 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.Mapper;
 
 import com.sorbSoft.CabAcademie.Entities.Section;
+import com.sorbSoft.CabAcademie.Services.Dtos.Info.SectionInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SectionViewModel;
 import javax.annotation.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2020-04-09T12:14:15-0400",
+    date = "2020-04-10T17:12:12-0400",
     comments = "version: 1.3.1.Final, compiler: javac, environment: Java 1.8.0_111 (Oracle Corporation)"
 )
 @Component
@@ -58,5 +59,20 @@ public class SectionMapperImpl implements SectionMapper {
         section1.setDeleted( section.isDeleted() );
 
         return section1;
+    }
+
+    @Override
+    public SectionInfo mapEntityToInfo(Section section) {
+        if ( section == null ) {
+            return null;
+        }
+
+        SectionInfo sectionInfo = new SectionInfo();
+
+        sectionInfo.setId( section.getId() );
+        sectionInfo.setName( section.getName() );
+        sectionInfo.setDescription( section.getDescription() );
+
+        return sectionInfo;
     }
 }
