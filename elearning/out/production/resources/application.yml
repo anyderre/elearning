@@ -1,9 +1,0 @@
-#okta:
-#  oauth2:
-#    client-id: 0oa216mnz7qWmF98G357
-#    issuer: https://dev-295641.okta.com/oauth2/default
-#debug: true
-
-jwt:
-  secret: 0oa216mnz7qWmF98G357
-

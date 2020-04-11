@@ -1,6 +1,5 @@
-/AngularELearning/black-dashboard-angular-master/node_modules
-#elearning/.gradle/
-
-#elearning/build.gradle
-
-AngularELearning/
+# Created by .ignore support plugin (hsz.mobi)
+.idea
+# build
+classes
+out
