@@ -2,6 +2,7 @@ package com.sorbSoft.CabAcademie.Controllers;
 
 
 import com.sorbSoft.CabAcademie.Entities.Course;
+import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Services.CourseService;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -164,11 +165,11 @@ public class CourseController {
     }
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public  ResponseEntity<String> saveCourse(@Valid @RequestBody CourseViewModel vm){
+    public  ResponseEntity<MessageResponse> saveCourse(@Valid @RequestBody CourseViewModel vm){
         Pair<String, Course> result = courseService.saveCourse(vm);
         if(result.getSecond() == null)
-            return new ResponseEntity<>(result.getFirst(), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(result.getFirst(), HttpStatus.OK);
+            return new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")

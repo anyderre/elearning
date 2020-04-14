@@ -58,6 +58,16 @@ public class CourseFactory {
             }
 
             @Override
+            public boolean isPrivateOnly() {
+                return false;
+            }
+
+            @Override
+            public boolean isValidated() {
+                return false;
+            }
+
+            @Override
             public Date getStartDate() {
                 return new Date();
             }
@@ -146,6 +156,11 @@ public class CourseFactory {
             @Override
             public List<Syllabus> getSyllabus() {
                 return new  ArrayList<>();
+            }
+
+            @Override
+            public List<User> getSchools() {
+                return new ArrayList<>();
             }
 
         };

@@ -11,6 +11,9 @@ import org.mapstruct.Mappings;
 public interface SectionMapper {
     SectionViewModel mapToViewModel(Section section);
 
+    @Mappings({
+            @Mapping(target = "deleted", ignore = true),
+    })
     Section mapToEntity(SectionViewModel vm);
 
     @Mappings({

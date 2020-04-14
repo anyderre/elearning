@@ -37,6 +37,8 @@ public class Course implements Serializable {
     private  String author;
     private double price;
     private boolean isPremium;
+    private boolean validated = false;
+    private boolean privateOnly = false;
     private boolean deleted = false;
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private Date startDate;
@@ -69,4 +71,7 @@ public class Course implements Serializable {
     @Fetch(value = FetchMode.SUBSELECT)
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Objective> objectives;
+    @Fetch(value = FetchMode.SUBSELECT)
+    @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    private List<User> schools;
 }

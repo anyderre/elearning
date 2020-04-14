@@ -1,6 +1,7 @@
 package com.sorbSoft.CabAcademie.Controllers;
 
 import com.sorbSoft.CabAcademie.Entities.Category;
+import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.Topic;
 import com.sorbSoft.CabAcademie.Services.CategoryService;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.CategoryInfo;
@@ -78,11 +79,11 @@ public class CategoryController {
 
     @PostMapping(value = "/save")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
-    public  ResponseEntity<String> saveCategory(@Valid @RequestBody CategoryViewModel vm){
+    public  ResponseEntity<MessageResponse> saveCategory(@Valid @RequestBody CategoryViewModel vm){
         Pair<String, Category> result = categoryService.saveCategory(vm);
         if(result.getSecond() == null)
-            return new ResponseEntity<>(result.getFirst(), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(result.getFirst(), HttpStatus.CREATED);
+            return new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/delete/{id}")

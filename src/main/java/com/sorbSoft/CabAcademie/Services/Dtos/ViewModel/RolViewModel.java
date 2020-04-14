@@ -14,4 +14,5 @@ public class RolViewModel {
     private String name;
     @Size(max = 100)
     private String description;
+    private boolean generated;
 }

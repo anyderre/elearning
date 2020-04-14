@@ -20,6 +20,8 @@ public class CourseViewModel {
     private int enrolled;
     private String author;
     private boolean isPremium;
+    private boolean validated;
+    private boolean privateOnly;
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private Date startDate;
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
@@ -32,6 +34,7 @@ public class CourseViewModel {
     private Overview overview;
     private List<Syllabus> syllabus;
     private List<Objective> objectives;
+    private List<User> schools;
     // for select purpose
     private List<Category> categories;
     // for select purpose
@@ -42,4 +45,6 @@ public class CourseViewModel {
     private List<SubSection> subSections;
     // for select purpose
     private List<User> users;
+    // for select purpose
+    private List<User> allSchools;
 }

@@ -1,11 +1,13 @@
 package com.sorbSoft.CabAcademie.Services;
 
+import com.sorbSoft.CabAcademie.Entities.Category;
 import com.sorbSoft.CabAcademie.Entities.SubCategory;
 import com.sorbSoft.CabAcademie.Repository.CategoryRepository;
 import com.sorbSoft.CabAcademie.Repository.SubCategoryRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.SubCategoryFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.SubCategoryInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.SubCategoryMapper;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SubCategoryViewModel;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +34,26 @@ public class SubCategoryService {
     private SubCategoryMapper mapper
             = Mappers.getMapper(SubCategoryMapper.class);
 
-    @Autowired
     public List<SubCategory> fetchAllSubCategories(){
         return subCategoryRepository.findAll();
     }
 
     public SubCategory fetchSubCategory(Long id){
         return subCategoryRepository.findOne(id);
+    }
+
+    private Result ValidateModel(SubCategoryViewModel vm){
+        Result result = new Result();
+
+        if (vm.getName().isEmpty()) {
+            result.add("You should the name of the sub-category");
+            return result;
+        }
+        if (vm.getCategory()== null || vm.getCategory().getId() <= 0) {
+            result.add("You should specify the category for the sub-category");
+            return result;
+        }
+        return result;
     }
 
     public Pair<String, SubCategory> updateSubCategory (SubCategoryViewModel vm){
@@ -62,6 +77,10 @@ public class SubCategoryService {
     }
 
     public Pair<String, SubCategory>  saveSubCategory (SubCategoryViewModel vm){
+        Result result = ValidateModel(vm);
+        if (!result.isValid()) {
+            return Pair.of(result.lista.get(0).message, null);
+        }
         if (vm.getId() > 0L) {
             return updateSubCategory(vm);
         } else {
@@ -71,11 +90,11 @@ public class SubCategoryService {
                 return Pair.of("The subCategory you are trying to save already exist", null);
             }
 
-            SubCategory result = subCategoryRepository.save(getEntity(vm));
-            if (result == null){
+            SubCategory subCategroyr = subCategoryRepository.save(getEntity(vm));
+            if (subCategroyr == null){
                 return Pair.of("Couldn't save the subCategory", null);
             } else {
-                return  Pair.of("SubCategory saved successfully", result);
+                return  Pair.of("SubCategory saved successfully", subCategroyr);
             }
         }
     }
@@ -108,6 +127,11 @@ public class SubCategoryService {
                 return null;
             } else {
                 vm = mapper.mapToViewModel(subCategory);
+                if (vm.getCategory()== null) {
+                    Category category = new Category();
+                    category.setId(0L);
+                    vm.setCategory(category);
+                }
             }
         }
         vm.setAllSubCategories(getAllFiltered(subCategoryId));

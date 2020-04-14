@@ -14,7 +14,8 @@ public interface UserMapper {
             @Mapping(target = "allCourses", ignore = true),
             @Mapping(target = "allSchools", ignore = true),
             @Mapping(target = "allOrganizations", ignore = true),
-            @Mapping(target = "sections", ignore = true),
+            @Mapping(target = "allCategories", ignore = true),
+            @Mapping(target = "allSubCategories", ignore = true),
     })
     UserViewModel mapToViewModel(User user);
 
@@ -31,6 +32,7 @@ public interface UserMapper {
 
     @Mappings({
             @Mapping(target = "roleName",  source = "role.name"),
+            @Mapping(target = "roleId",  source = "role.id"),
     })
     UserInfo mapEntityToInfo (User user);
 }
