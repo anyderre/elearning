@@ -97,6 +97,11 @@ public class UserFactory {
                 return new ArrayList<>();
             }
 
+            @Override
+            public String getWorkspaceName() {
+                return "";
+            }
+
         };
     }
 }
