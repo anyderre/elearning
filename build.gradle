@@ -63,7 +63,7 @@ dependencies {
 
 
 	compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.762'
-
+	compile group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.9'
 
 
 }
