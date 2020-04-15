@@ -2,6 +2,7 @@ package com.sorbSoft.CabAcademie.Services;
 
 
 import com.sorbSoft.CabAcademie.Entities.*;
+import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Repository.OverviewRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CourseFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CourseMapper;
@@ -42,6 +43,9 @@ public class CourseService {
 
     @Autowired
     private UserServices userServices;
+
+    @Autowired
+    private RolServices rolServices;
 
     @Autowired
     private OverviewRepository overviewRepository;
@@ -108,6 +112,11 @@ public class CourseService {
                 vm = mapper.mapToViewModel(course);
             }
         }
+
+        Rol rolSchool = rolServices.findRoleByDescription(Roles.ROLE_SCHOOL.name());
+        if (rolSchool != null){
+            vm.setAllSchools(userServices.filterUserByRole(rolSchool.getId()));
+        }
         vm.setSections(sectionService.fetchAllSection()); // TODO: could be filtered
         vm.setSubSections(subSectionService.fetchAllSubSections()); // TODO: could be filtered
         vm.setSubCategories(subCategoryService.fetchAllSubCategories()); // TODO: could be filtered
@@ -127,7 +136,6 @@ public class CourseService {
             }
 
             Course course = mapper.mapToEntity(vm);
-            course.getOverview().setCourse(course);
             course.setCreationDate(new Date());
             course.setLastUpdate(new Date());
             course.setCreationDate(new Date());
@@ -135,10 +143,12 @@ public class CourseService {
             Overview overviewEntity = course.getOverview();
             course.setOverview(null);
             Course result = courseRepository.save(course);
-            overviewEntity.setCourse(result);
-            Overview overview = overviewRepository.save(overviewEntity);
-            course.setOverview(overview);
-            result = courseRepository.save(course);
+            if (overviewEntity != null) {
+                overviewEntity.setCourse(result);
+                Overview overview = overviewRepository.save(overviewEntity);
+                course.setOverview(overview);
+                result = courseRepository.save(course);
+            }
             if (result == null){
                 return Pair.of("Couldn't save the course", null);
             } else {

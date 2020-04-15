@@ -1,9 +1,6 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.Factory;
 
-import com.sorbSoft.CabAcademie.Entities.Course;
-import com.sorbSoft.CabAcademie.Entities.Rol;
-import com.sorbSoft.CabAcademie.Entities.Section;
-import com.sorbSoft.CabAcademie.Entities.User;
+import com.sorbSoft.CabAcademie.Entities.*;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 
 import java.util.ArrayList;
@@ -53,13 +50,13 @@ public class UserFactory {
             }
 
             @Override
-            public Section getSection() {
-                return new Section() {
-                    @Override
-                    public Long getId() {
-                        return 0L;
-                    }
-                };
+            public List<Category> getCategories() {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public List<SubCategory> getSubCategories() {
+                return new ArrayList<>();
             }
 
             @Override
@@ -100,6 +97,11 @@ public class UserFactory {
             @Override
             public String getWorkspaceName() {
                 return "";
+            }
+
+            @Override
+            public List<User> getSchools() {
+                return new ArrayList<>();
             }
 
         };

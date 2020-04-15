@@ -23,6 +23,7 @@ public class Rol implements Serializable {
     private Long id;
     private String name;
     private String description;
+    private boolean generated = true;
     private boolean deleted = false;
     private boolean enabled = true;
 }

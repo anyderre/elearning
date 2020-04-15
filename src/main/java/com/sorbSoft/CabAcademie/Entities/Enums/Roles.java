@@ -13,4 +13,5 @@ public enum Roles {
     ROLE_ORGANIZATION,
     ROLE_EMPLOYEE,
     ROLE_SUPER_ADMIN,
+    ROLE_INSTRUCTOR,
 }

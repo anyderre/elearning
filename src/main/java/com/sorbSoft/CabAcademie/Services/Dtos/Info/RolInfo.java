@@ -7,5 +7,6 @@ public class RolInfo {
     private Long id;
     private String name;
     private String description;
+    public boolean generated;
 }
 

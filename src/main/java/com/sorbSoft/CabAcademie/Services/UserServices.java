@@ -1,13 +1,16 @@
 package com.sorbSoft.CabAcademie.Services;
 
 import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
+import com.sorbSoft.CabAcademie.Entities.Error.CustomExceptionHandler;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.UserFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.UserMapper;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
+import org.hibernate.NonUniqueObjectException;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -15,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,7 +38,11 @@ public class UserServices {
     @Autowired
     private CourseService courseService;
     @Autowired
-   private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private  CategoryService categoryService;
+    @Autowired
+    private SubCategoryService subCategoryService;
 
     @Autowired
     private UserRepository userRepository;
@@ -53,6 +61,9 @@ public class UserServices {
             }
             User resultUser = mapper.mapToEntity(vm);
             resultUser.setPassword(bCryptPasswordEncoder.encode(resultUser.getPassword()));
+            if (resultUser.getRole().getId() == Roles.ROLE_STUDENT.ordinal() || resultUser.getRole().getId() == Roles.ROLE_FREE_STUDENT.ordinal()){
+                resultUser.setName(resultUser.getFirstName() + ' ' + resultUser.getLastName());
+            }
             User result = userRepository.save(resultUser);
             if (result == null){
                 return Pair.of("Couldn't save the user", null);
@@ -63,6 +74,11 @@ public class UserServices {
     }
 
     public Pair<String, User> updateUser(UserViewModel vm){
+        vm = prepareEntity(vm);
+        Result result = ValidateModel(vm);
+        if (!result.isValid()) {
+            return Pair.of(result.lista.get(0).message, null);
+        }
         User savedUser = userRepository.findUserByUsernameAndIdIsNot(vm.getUsername(), vm.getId());
         if (savedUser != null) {
             return Pair.of("The user name already exist for another definition", null);
@@ -74,13 +90,15 @@ public class UserServices {
         }
 
         User resultUser = mapper.mapToEntity(vm);
-        resultUser.setName(resultUser.getFirstName() + ' ' + resultUser.getLastName());
-        User result = userRepository.save(resultUser);
+        if (resultUser.getRole().getId() == Roles.ROLE_STUDENT.ordinal() || resultUser.getRole().getId() == Roles.ROLE_FREE_STUDENT.ordinal()){
+            resultUser.setName(resultUser.getFirstName() + ' ' + resultUser.getLastName());
+        }
 
-        if (result == null) {
+        User user = userRepository.save(resultUser);
+        if (user == null) {
             return Pair.of("Couldn't update the user", null);
         } else {
-            return Pair.of("User updated successfully", result);
+            return Pair.of("User updated successfully", user);
         }
     }
 
@@ -133,8 +151,9 @@ public class UserServices {
         } else {
             vm.setAllRoles(rolServices.fetchAllRole());
         }
-        vm.setSections(sectionService.fetchAllSection());
         vm.setAllCourses(courseService.fetchAllCourses());
+        vm.setAllCategories(categoryService.fetchAllCategories());
+        vm.setAllSubCategories(subCategoryService.fetchAllSubCategories());
         vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
 
         Rol rolSchool = rolServices.findRoleByDescription(Roles.ROLE_SCHOOL.name());
@@ -162,6 +181,106 @@ public class UserServices {
             info.add(uInfo);
         }
         return info;
+    }
+
+    private Result ValidateModel(UserViewModel vm){
+        Result result = new Result();
+
+
+        if (Roles.ROLE_SCHOOL.ordinal() ==  vm.getRole().getId().intValue() || Roles.ROLE_ORGANIZATION.ordinal() ==  vm.getRole().getId().intValue()) {
+            if (vm.getName().isEmpty()) {
+                result.add("You should the name of the school");
+                return result;
+            }
+//            if (vm.getWorkspaceName().isEmpty()) {
+//                result.add("You should the workspace name of the school");
+//                return result;
+//            }
+        }
+        if (vm.getRole()== null || vm.getRole().getId() <= 0) {
+            result.add("You should specify the role");
+            return result;
+        }
+        if (vm.getUsername().isEmpty()) {
+            result.add("You should specify the username");
+            return result;
+        }
+        if (vm.getEmail().isEmpty()) {
+            result.add("You should specify the email");
+            return result;
+        }
+        if (vm.getPassword().isEmpty()) {
+            result.add("You should specify the password");
+            return result;
+        }
+        if (!vm.isAgreeWithTerms()) {
+            result.add("You should accept terms and conditions");
+            return result;
+        }
+
+        return result;
+    }
+
+    public UserViewModel prepareEntity(UserViewModel vm) {
+        if (vm.getRole().getId() == Roles.ROLE_SCHOOL.ordinal()){
+            vm.setCategories(new ArrayList<>());
+            vm.setSubCategories(new ArrayList<>());
+            vm.setSchools(new ArrayList<>());
+            vm.setCourses(new ArrayList<>());
+            vm.setOrganizations(new ArrayList<>());
+        }
+         else if (Roles.ROLE_PROFESSOR.ordinal() ==  vm.getRole().getId().intValue()) {
+            vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
+            //            vm.setWorkspaceName("");
+            vm.setOrganizations(new ArrayList<>());
+        } else if (Roles.ROLE_STUDENT.ordinal() ==  vm.getRole().getId().intValue()) {
+            vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
+            //            vm.setWorkspaceName("");
+            vm.setCategories(new ArrayList<>());
+            vm.setSubCategories(new ArrayList<>());
+            vm.setOrganizations(new ArrayList<>());
+            vm.setCourses(new ArrayList<>());
+        } else if (Roles.ROLE_FREELANCER.ordinal() ==  vm.getRole().getId().intValue()) {
+            vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
+            //            vm.setWorkspaceName("");
+            vm.setSchools(new ArrayList<>());
+            vm.setOrganizations(new ArrayList<>());
+        } else if (Roles.ROLE_FREE_STUDENT.ordinal() ==  vm.getRole().getId().intValue()) {
+            vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
+            //            vm.setWorkspaceName("");
+            vm.setCategories(new ArrayList<>());
+            vm.setSubCategories(new ArrayList<>());
+            vm.setSchools(new ArrayList<>());
+            vm.setCourses(new ArrayList<>());
+            vm.setOrganizations(new ArrayList<>());
+        } else if (Roles.ROLE_EMPLOYEE.ordinal() ==  vm.getRole().getId().intValue()) {
+            vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
+            //            vm.setWorkspaceName("");
+            vm.setCategories(new ArrayList<>());
+            vm.setSubCategories(new ArrayList<>());
+            vm.setSchools(new ArrayList<>());
+        } else if (Roles.ROLE_SUPER_ADMIN.ordinal() ==  vm.getRole().getId().intValue()) {
+            vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
+            //            vm.setWorkspaceName("");
+            vm.setCategories(new ArrayList<>());
+            vm.setSubCategories(new ArrayList<>());
+            vm.setSchools(new ArrayList<>());
+            vm.setOrganizations(new ArrayList<>());
+        } else if (Roles.ROLE_ORGANIZATION.ordinal() ==  vm.getRole().getId().intValue()) {
+            vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
+            vm.setCategories(new ArrayList<>());
+            vm.setSubCategories(new ArrayList<>());
+            vm.setOrganizations(new ArrayList<>());
+            vm.setSchools(new ArrayList<>());
+            vm.setCourses(new ArrayList<>());
+        } else if (Roles.ROLE_INSTRUCTOR.ordinal() ==  vm.getRole().getId().intValue()) {
+            vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
+//            vm.setWorkspaceName("");
+            vm.setCategories(new ArrayList<>());
+            vm.setSubCategories(new ArrayList<>());
+            vm.setSchools(new ArrayList<>());
+        }
+         return vm;
     }
 }
 

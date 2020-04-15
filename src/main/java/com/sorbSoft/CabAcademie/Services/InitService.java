@@ -46,10 +46,12 @@ public class InitService {
                     Rol newRole = new Rol();
                     newRole.setName("Super Admin");
                     newRole.setDescription(role.name());
+                    newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 } else if (role.name().equals(Roles.ROLE_ADMIN.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Admin");
+                    newRole.setGenerated(true);
                     newRole.setDescription(role.name());
                     rolRepository.save(newRole);
                 } else if (role.name().equals(Roles.ROLE_PROFESSOR.name())) {
@@ -60,32 +62,38 @@ public class InitService {
                 }else if (role.name().equals(Roles.ROLE_EMPLOYEE.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Employee");
+                    newRole.setGenerated(true);
                     newRole.setDescription(role.name());
                     rolRepository.save(newRole);
                 }else if (role.name().equals(Roles.ROLE_FREE_STUDENT.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Free Student");
                     newRole.setDescription(role.name());
+                    newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 }else if (role.name().equals(Roles.ROLE_FREELANCER.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Freelancer");
                     newRole.setDescription(role.name());
+                    newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 }else if (role.name().equals(Roles.ROLE_ORGANIZATION.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Organization");
                     newRole.setDescription(role.name());
+                    newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 }else if (role.name().equals(Roles.ROLE_SCHOOL.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("School");
                     newRole.setDescription(role.name());
+                    newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 }else if (role.name().equals(Roles.ROLE_STUDENT.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Student");
                     newRole.setDescription(role.name());
+                    newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 }
             }
@@ -111,7 +119,8 @@ public class InitService {
             admin.setBio("");
             admin.setPhotoURL("");
             admin.setCountry("Haiti");
-            admin.setSection(null);
+            admin.setCategories(new ArrayList<>());
+            admin.setSubCategories(new ArrayList<>());
             admin.setCourses(new ArrayList<>());
             admin.setPassword(bCryptPasswordEncoder.encode("admin")); // Todo: Change password
             userRepository.save(admin);

@@ -6,6 +6,7 @@ import com.sorbSoft.CabAcademie.Repository.SubSectionRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.SubSectionFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.SubSectionInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.SubSectionMapper;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SubSectionViewModel;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,19 @@ public class SubSectionService {
     private SubSectionMapper mapper
             = Mappers.getMapper(SubSectionMapper.class);
 
-    @Autowired
+    private Result ValidateModel(SubSectionViewModel vm){
+        Result result = new Result();
+
+        if (vm.getName().isEmpty()) {
+            result.add("You should the name of the sub-section");
+            return result;
+        }
+        if (vm.getSection()== null || vm.getSection().getId() <= 0) {
+            result.add("You should specify the section for the sub-section");
+            return result;
+        }
+        return result;
+    }
     public List<SubSection> fetchAllSubSections(){
         return subSectionRepository.findAll();
     }
@@ -55,13 +68,17 @@ public class SubSectionService {
         }
         SubSection result = subSectionRepository.save(getEntity(vm));
         if (result == null) {
-            return Pair.of("Couldn't update the subSection", null);
+            return Pair.of("Couldn't update the sub-section", null);
         } else {
-            return Pair.of("SubSection updated successfully", result);
+            return Pair.of("Sub-Section updated successfully", result);
         }
     }
 
     public Pair<String, SubSection>  saveSubSection (SubSectionViewModel vm){
+        Result result = ValidateModel(vm);
+        if (!result.isValid()) {
+            return Pair.of(result.lista.get(0).message, null);
+        }
         if (vm.getId() > 0L) {
             return updateSubSection(vm);
         } else {
@@ -71,11 +88,11 @@ public class SubSectionService {
                 return Pair.of("The subSection you are trying to save already exist", null);
             }
 
-            SubSection result = subSectionRepository.save(getEntity(vm));
-            if (result == null){
+            SubSection subSection = subSectionRepository.save(getEntity(vm));
+            if (subSection == null){
                 return Pair.of("Couldn't save the subSection", null);
             } else {
-                return  Pair.of("SubSection saved successfully", result);
+                return  Pair.of("SubSection saved successfully", subSection);
             }
         }
     }

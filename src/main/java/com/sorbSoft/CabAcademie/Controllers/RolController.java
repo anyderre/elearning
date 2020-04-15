@@ -1,5 +1,6 @@
 package com.sorbSoft.CabAcademie.Controllers;
 
+import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.RolInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.RolViewModel;
@@ -66,11 +67,11 @@ public class RolController {
 
     @PostMapping(value= "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
-    public  ResponseEntity<String> saveRole(@Valid @RequestBody RolViewModel role){
+    public  ResponseEntity<MessageResponse> saveRole(@Valid @RequestBody RolViewModel role){
         Pair<String, Rol> result = roleService.saveRole(role);
         if(result.getSecond() == null)
-            return new ResponseEntity<>(result.getFirst(), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(result.getFirst(), HttpStatus.CREATED);
+            return new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/delete/{id}")

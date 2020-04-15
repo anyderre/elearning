@@ -1,5 +1,6 @@
 package com.sorbSoft.CabAcademie.Controllers;
 
+import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.SubSection;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.SubSectionInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SubSectionViewModel;
@@ -72,11 +73,11 @@ public class SubSectionController {
 
     @PostMapping(value = "/save")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
-    public  ResponseEntity<String> saveSubSection(@Valid @RequestBody SubSectionViewModel vm){
+    public  ResponseEntity<MessageResponse> saveSubSection(@Valid @RequestBody SubSectionViewModel vm){
         Pair<String, SubSection> result = subSectionService.saveSubSection(vm);
         if(result.getSecond() == null)
-            return new ResponseEntity<>(result.getFirst(), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(result.getFirst(), HttpStatus.CREATED);
+            return new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/delete/{id}")

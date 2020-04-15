@@ -10,5 +10,4 @@ public class SectionViewModel {
     private String description;
     @Size(max=50, message = "The name can't be longer than 250 characters")
     private String name;
-    private boolean deleted;
 }

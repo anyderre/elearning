@@ -14,6 +14,8 @@ public interface CourseMapper {
             @Mapping(target="users", ignore = true),
             @Mapping(target="subCategories", ignore = true),
             @Mapping(target="subSections", ignore = true),
+            @Mapping(target="schools", ignore = true),
+            @Mapping(target="allSchools", ignore = true),
             @Mapping(target="sections", ignore = true)})
     CourseViewModel mapToViewModel(Course course);
 

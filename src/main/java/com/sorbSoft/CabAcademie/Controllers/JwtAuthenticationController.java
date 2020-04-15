@@ -38,7 +38,7 @@ public class JwtAuthenticationController {
 
        String authentication = authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
        if (!authentication.equals("")){
-           return new ResponseEntity<>(MessageResponse.of(authentication), HttpStatus.OK);
+           return new ResponseEntity<>(MessageResponse.of(authentication), HttpStatus.BAD_REQUEST);
        }
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());

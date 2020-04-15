@@ -19,6 +19,11 @@ public class RolFactory {
             public String getDescription() {
                 return "";
             }
+
+            @Override
+            public boolean isGenerated() {
+                return false;
+            }
         };
     }
 }

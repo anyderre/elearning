@@ -74,13 +74,13 @@ public class UserController {
 
     @PostMapping("/save")
     public  ResponseEntity<MessageResponse> saveUser(@Valid @RequestBody UserViewModel user){
-        if (userRepository.existsByUsername(user.getUsername())) {
+        if (userRepository.existsByUsernameAndIdIsNot(user.getUsername(), user.getId())) {
             return ResponseEntity
                     .badRequest()
                     .body(MessageResponse.of("Error: Username is already taken!"));
         }
 
-        if (userRepository.existsByEmail(user.getEmail())) {
+        if (userRepository.existsByEmailAndIdIsNot(user.getEmail(), user.getId())) {
             return ResponseEntity
                     .badRequest()
                     .body(MessageResponse.of("Error: Email is already in use!"));
@@ -94,13 +94,13 @@ public class UserController {
 
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id ){
+    public ResponseEntity<MessageResponse> deleteUser(@PathVariable Long id ){
         if(id<0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         if(userService.findAUser(id)==null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         userService.deleteUser(id);
-        return new ResponseEntity<>("User with "+ id+" Deleted!", HttpStatus.OK);
+        return new ResponseEntity<>(MessageResponse.of("User with "+ id+" Deleted!"), HttpStatus.OK);
     }
 }
