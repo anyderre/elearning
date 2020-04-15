@@ -62,4 +62,8 @@ dependencies {
 	compile group: 'org.postgresql', name: 'postgresql', version: '42.2.11'
 
 
+	compile group: 'com.amazonaws', name: 'aws-java-sdk', version: '1.11.762'
+
+
+
 }
