@@ -47,4 +47,6 @@ public class CourseViewModel {
     private List<User> users;
     // for select purpose
     private List<User> allSchools;
+
+    private List<Video> videos;
 }

@@ -32,6 +32,9 @@ public class Course implements Serializable {
     private String description;
     @Lob
     private String imageUrl;
+    @Fetch(value = FetchMode.SUBSELECT)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Video> videos;
     private float ratings;
     private int enrolled;
     private  String author;
