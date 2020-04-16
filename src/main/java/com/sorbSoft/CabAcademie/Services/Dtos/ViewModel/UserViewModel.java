@@ -2,6 +2,8 @@ package com.sorbSoft.CabAcademie.Services.Dtos.ViewModel;
 
 import com.sorbSoft.CabAcademie.Entities.*;
 import lombok.Data;
+import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -14,10 +16,23 @@ import java.util.List;
 public class UserViewModel {
     private Long id;
     private String name;
+    @NotEmpty(message = "First name is required")
     private String firstName;
+    @NotEmpty(message = "Last name is required")
     private String lastName;
+    @NotEmpty(message = "Email is required")
+    @Email(message = "Email is invalid")
+    @Column(unique=true)
     private String email;
+    @NotNull
+    @NotEmpty(message = "UserName is required")
+    @Size(min = 4, max = 30)
     private String username;
+    @Column(name="enabled", nullable = false, columnDefinition = "int default 1")
+    private int enable = 1;
+    @NotNull(message="Password invalid")
+    @NotEmpty(message = "Password is required")
+    @Size(max=60)
     private String password;
     public String photoURL;
     public String bio;

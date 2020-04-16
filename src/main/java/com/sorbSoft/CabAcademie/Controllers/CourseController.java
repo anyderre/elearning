@@ -61,9 +61,19 @@ public class CourseController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
-    @GetMapping(value={"/{page}/{itemsPerPage}"})
-    public ResponseEntity<Page<Course>> getAllCoursesByPage(@PathVariable int  page, @PathVariable int itemsPerPage){
-        Page<Course> courses = courseService.fetchAllCoursesByPage(page,itemsPerPage);
+    @GetMapping(value = "/subSection/{id}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getAllCoursesBySubSection(@PathVariable Long id){
+        List<Course> courses = courseService.fetchCourseBySubSection(id);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/subCategory/{id}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getAllCoursesBySubCategory(@PathVariable Long id){
+        List<Course> courses = courseService.fetchCourseBySubCategory(id);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
@@ -76,91 +86,9 @@ public class CourseController {
      */
 
     @GetMapping(value="/paginate", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<Course>> getAllCoursesByPageAndSearchText(@RequestParam(value = "count", defaultValue = "10") String count,
+    public ResponseEntity<Page<Course>> getAllCoursesByPage(@RequestParam(value = "count", defaultValue = "10") String count,
                                                                          @RequestParam(value = "page", defaultValue = "1") String page){
         Page<Course> courses = courseService.fetchAllCoursesByPage(Integer.valueOf(page), Integer.valueOf(count));
-        if (courses.getContent().isEmpty())
-            return new ResponseEntity<>(new Page<Course>() {
-                @Override
-                public int getTotalPages() {
-                    return 0;
-                }
-
-                @Override
-                public long getTotalElements() {
-                    return 0;
-                }
-
-                @Override
-                public <S> Page<S> map(Converter<? super Course, ? extends S> converter) {
-                    return null;
-                }
-
-                @Override
-                public int getNumber() {
-                    return 0;
-                }
-
-                @Override
-                public int getSize() {
-                    return 0;
-                }
-
-                @Override
-                public int getNumberOfElements() {
-                    return 0;
-                }
-
-                @Override
-                public List<Course> getContent() {
-                    return new ArrayList<>();
-                }
-
-                @Override
-                public boolean hasContent() {
-                    return false;
-                }
-
-                @Override
-                public Sort getSort() {
-                    return null;
-                }
-
-                @Override
-                public boolean isFirst() {
-                    return false;
-                }
-
-                @Override
-                public boolean isLast() {
-                    return false;
-                }
-
-                @Override
-                public boolean hasNext() {
-                    return false;
-                }
-
-                @Override
-                public boolean hasPrevious() {
-                    return false;
-                }
-
-                @Override
-                public Pageable nextPageable() {
-                    return null;
-                }
-
-                @Override
-                public Pageable previousPageable() {
-                    return null;
-                }
-
-                @Override
-                public Iterator<Course> iterator() {
-                    return null;
-                }
-            }, HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
