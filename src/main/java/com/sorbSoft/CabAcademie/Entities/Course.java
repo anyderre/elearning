@@ -48,7 +48,7 @@ public class Course implements Serializable {
     private Date lastUpdate;
     @JsonFormat(pattern="yyyy-MM-dd'T'HH:mm:ss")
     private Date creationDate;
-    @ManyToOne()
+    @ManyToOne(optional = false)
     @JoinColumn(name = "user_id")
     private User user;
     @Fetch(value = FetchMode.SUBSELECT)
@@ -72,6 +72,12 @@ public class Course implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Objective> objectives;
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name="course_schools",
+            joinColumns = @JoinColumn(name="course_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn( name="user_id", referencedColumnName = "id")
+    )
     private List<User> schools;
 }
