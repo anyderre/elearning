@@ -56,4 +56,6 @@ public class UserViewModel {
     private List<Category> allCategories;
     // for select purpose
     private List<SubCategory> allSubCategories;
+    private String workspaceName;
+
 }

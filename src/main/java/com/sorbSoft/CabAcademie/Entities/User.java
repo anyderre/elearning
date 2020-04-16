@@ -100,4 +100,6 @@ public class User {
     private List<User> organizations;
     private boolean agreeWithTerms;
     private boolean deleted = false;
+
+    private String workspaceName;
 }

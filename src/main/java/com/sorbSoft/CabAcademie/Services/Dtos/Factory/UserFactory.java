@@ -95,9 +95,15 @@ public class UserFactory {
             }
 
             @Override
+            public String getWorkspaceName() {
+                return "";
+            }
+
+            @Override
             public List<User> getSchools() {
                 return new ArrayList<>();
             }
+
         };
     }
 }
