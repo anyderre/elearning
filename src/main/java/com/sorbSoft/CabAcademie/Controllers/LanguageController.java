@@ -51,7 +51,7 @@ public class LanguageController {
         return new ResponseEntity<>(lang, HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/getAll")
     public ResponseEntity<List<LanguageEntity>> getAllLanguages(){
         List<LanguageEntity> messages = langService.fetchAll();
         if(messages.isEmpty())
@@ -59,7 +59,7 @@ public class LanguageController {
         return new ResponseEntity<>(messages, HttpStatus.OK);
     }
 
-    @PostMapping
+    @PostMapping("/saveOne")
     public  ResponseEntity saveLanguageEntity(@Valid @RequestBody LanguageEntity lang){
 
         if(lang == null
@@ -73,7 +73,7 @@ public class LanguageController {
         return  new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PostMapping
+    @PostMapping("/saveMany")
     public ResponseEntity saveSetOfLanguageEntity(@Valid @RequestBody List<LanguageEntity> langs){
 
         if(langs == null || langs.isEmpty())
@@ -83,7 +83,7 @@ public class LanguageController {
         return  new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    @PutMapping
+    @PutMapping("/updateMany")
     public ResponseEntity<LanguageEntity> updateSetOfLanguages(
             @RequestBody List<LanguageEntity> langs){
 
@@ -95,7 +95,7 @@ public class LanguageController {
     }
 
 
-    @PutMapping(value = "/{id}")
+    @PutMapping(value = "/updateOne/{id}")
     public ResponseEntity<LanguageEntity> updateLanguageEntity(@PathVariable Long id, @RequestBody LanguageEntity langEntity){
         if(id==null
                 || langEntity==null
@@ -119,7 +119,7 @@ public class LanguageController {
         return new ResponseEntity<>(currentLang, HttpStatus.OK);
     }
 
-    @DeleteMapping
+    @DeleteMapping("/deleteMany")
     public ResponseEntity<String> deleteSetOfLangs(@PathVariable List<Long> ids ){
         if(ids==null || ids.isEmpty())
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -128,7 +128,7 @@ public class LanguageController {
         return new ResponseEntity<>("Language Entities have been Deleted!", HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(value = "deleteOne/{id}")
     public ResponseEntity<String> deleteLang(@PathVariable Long id ){
         if(id==null)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
