@@ -61,11 +61,6 @@ public class CourseService {
         return courseRepository.findAll(pageable);
     }
 
-    public Page<Course> fetchAllCoursesByPageAndSerchText(int page, int itemsPerPage, String searchText){
-        Pageable pageable = new PageRequest(page, itemsPerPage);
-        return courseRepository.findByTitleContainsAllIgnoreCase(searchText, pageable);
-    }
-
     public Course fetchCourse(Long id){
         return courseRepository.findOne(id);
     }
@@ -155,5 +150,13 @@ public class CourseService {
                 return  Pair.of("Course saved successfully", result);
             }
         }
+    }
+
+    public List<Course> fetchCourseBySubSection(Long id) {
+        return courseRepository.findAllBySubSectionId(id);
+    }
+
+    public List<Course> fetchCourseBySubCategory(Long subCategoryId) {
+        return courseRepository.findAllBySubSectionId(subCategoryId);
     }
 }
