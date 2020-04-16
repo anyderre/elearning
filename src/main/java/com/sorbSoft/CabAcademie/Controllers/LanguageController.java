@@ -95,14 +95,15 @@ public class LanguageController {
     }
 
 
-    @PutMapping(value = "/updateOne/{id}")
-    public ResponseEntity<LanguageEntity> updateLanguageEntity(@PathVariable Long id, @RequestBody LanguageEntity langEntity){
-        if(id==null
-                || langEntity==null
+    @PutMapping(value = "/updateOne")
+    public ResponseEntity<LanguageEntity> updateLanguageEntity(@RequestBody LanguageEntity langEntity){
+        if(langEntity == null
+                || langEntity.getId()==null
                 || langEntity.getContent().isEmpty()
                 || langEntity.getKey().isEmpty())
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
+        Long id = langEntity.getId();
         if(!langService.exists(id))
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -120,7 +121,7 @@ public class LanguageController {
     }
 
     @DeleteMapping("/deleteMany")
-    public ResponseEntity<String> deleteSetOfLangs(@PathVariable List<Long> ids ){
+    public ResponseEntity<String> deleteSetOfLangs(@RequestBody List<Long> ids ){
         if(ids==null || ids.isEmpty())
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
