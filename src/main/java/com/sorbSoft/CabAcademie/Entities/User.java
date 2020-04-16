@@ -56,9 +56,7 @@ public class User {
     @NotNull
     private Rol role;
     @Fetch(value = FetchMode.SUBSELECT)
-//    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-//    @JoinColumn(name ="user_id")
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name="user_categories",
             joinColumns = @JoinColumn( name="category_id", referencedColumnName = "id"),
@@ -66,7 +64,7 @@ public class User {
     )
     private List<Category> categories;
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name="user_sub_categories",
             joinColumns = @JoinColumn( name="sub_category_id", referencedColumnName = "id"),
@@ -74,7 +72,7 @@ public class User {
     )
     private List<SubCategory> subCategories;
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name="user_courses",
             joinColumns = @JoinColumn( name="course_id", referencedColumnName = "id"),
@@ -82,19 +80,15 @@ public class User {
     )
     private List<Course> courses;
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
-            name="user_schools",
-//            inverseJoinColumns = @JoinColumn( name="user_id", referencedColumnName = "id")
-            uniqueConstraints=@UniqueConstraint(columnNames={"user_id"})
+            name="user_schools"
     )
     private List<User> schools;
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
-            name="user_organizations",
-//            inverseJoinColumns = @JoinColumn( name="user_id", referencedColumnName = "id")
-            uniqueConstraints=@UniqueConstraint(columnNames={"user_id"})
+            name="user_organizations"
     )
     private List<User> organizations;
     private boolean agreeWithTerms;

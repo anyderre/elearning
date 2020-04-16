@@ -52,7 +52,12 @@ public class Course implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name="user_syllabus",
+            joinColumns = @JoinColumn( name="syllabus_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn( name="course_id", referencedColumnName = "id")
+    )
     private List<Syllabus> syllabus;
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_id")
@@ -69,10 +74,14 @@ public class Course implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, mappedBy="course", optional = false)
     private Overview overview;
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            name="course_objectives",
+            joinColumns = @JoinColumn( name="objective_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn( name="course_id", referencedColumnName = "id")
+    )
     private List<Objective> objectives;
     @Fetch(value = FetchMode.SUBSELECT)
-//    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @OneToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="course_schools",
