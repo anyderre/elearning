@@ -52,11 +52,11 @@ public class Course implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name="user_syllabus",
-            joinColumns = @JoinColumn( name="syllabus_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn( name="course_id", referencedColumnName = "id")
+            name="course_syllabus",
+            joinColumns = @JoinColumn( name="course_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn( name="syllabus_id", referencedColumnName = "id")
     )
     private List<Syllabus> syllabus;
     @ManyToOne(optional = false)
@@ -74,19 +74,24 @@ public class Course implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, mappedBy="course", optional = false)
     private Overview overview;
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="course_objectives",
-            joinColumns = @JoinColumn( name="objective_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn( name="course_id", referencedColumnName = "id")
+            joinColumns = @JoinColumn( name="course_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn( name="objective_id", referencedColumnName = "id")
     )
     private List<Objective> objectives;
+//    @Fetch(value = FetchMode.SUBSELECT)
+//    @OneToMany(fetch = FetchType.EAGER)
+//    @JoinTable(
+//            name="course_schools",
+//            joinColumns = @JoinColumn(name="course_id", referencedColumnName = "id"),
+//            inverseJoinColumns = @JoinColumn( name="user_id", referencedColumnName = "id")
+//    )
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name="course_schools",
-            joinColumns = @JoinColumn(name="course_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn( name="user_id", referencedColumnName = "id")
-    )
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "course_schools",
+            joinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     private List<User> schools;
 }

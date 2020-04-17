@@ -55,38 +55,59 @@ public class User {
     @JoinColumn(name = "rol_id")
     @NotNull
     private Rol role;
+
+
+//    @Fetch(value = FetchMode.SUBSELECT)
+////    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+////    @JoinTable(
+////            name="user_categories",
+////            joinColumns = @JoinColumn( name="category_id", referencedColumnName = "id"),
+////            inverseJoinColumns = @JoinColumn( name="user_id", referencedColumnName = "id")
+////    )
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name="user_categories",
-            joinColumns = @JoinColumn( name="category_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn( name="user_id", referencedColumnName = "id")
-    )
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_categories",
+        joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
     private List<Category> categories;
+
+
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="user_sub_categories",
-            joinColumns = @JoinColumn( name="sub_category_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn( name="user_id", referencedColumnName = "id")
+            joinColumns = @JoinColumn( name="user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn( name="sub_category_id", referencedColumnName = "id")
     )
     private List<SubCategory> subCategories;
+
+
+
+//    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    @JoinTable(
+//            name="user_courses",
+//            joinColumns = @JoinColumn( name="course_id", referencedColumnName = "id"),
+//            inverseJoinColumns = @JoinColumn( name="user_id", referencedColumnName = "id")
+//    )
+
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinTable(
-            name="user_courses",
-            joinColumns = @JoinColumn( name="course_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn( name="user_id", referencedColumnName = "id")
-    )
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_courses",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"))
     private List<Course> courses;
+
+
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinTable(
             name="user_schools"
     )
     private List<User> schools;
+
+
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="user_organizations"
     )
