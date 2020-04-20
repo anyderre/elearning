@@ -26,10 +26,16 @@ public class Overview implements Serializable {
     @JoinColumn(name = "course_id", nullable = false)
     private Course course;
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "overview_requirements",
+            joinColumns = @JoinColumn(name = "overview_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "requirement_id", referencedColumnName = "id"))
     private List<Requirement> requirements;
     @Fetch(value = FetchMode.SUBSELECT)
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "overview_features",
+            joinColumns = @JoinColumn(name = "overview_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "feature_id", referencedColumnName = "id"))
     private List<Feature> features;
     private boolean deleted = false;
 }

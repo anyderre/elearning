@@ -6,6 +6,7 @@ import com.sorbSoft.CabAcademie.Repository.RolRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.RolFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.RolInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.RolMapper;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.RolViewModel;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,24 +52,24 @@ public class RolServices {
     }
 
     public Pair<String, Rol> updateRol(RolViewModel vm){
+        Rol current = rolRepository.findOne(vm.getId());
+        if (current == null) {
+            return Pair.of("The role you want to update does not exist", null);
+        }
         Rol savedRol = rolRepository.findRolByNameAndIdIsNot(vm.getName(), vm.getId());
         if (savedRol != null) {
             return Pair.of("The role name already exist for another definition", null);
         }
-        Rol resultRol = mapper.mapToEntity(vm);
-        Rol currentRol= rolRepository.findOne(vm.getId());
-        currentRol.setDescription(resultRol.getDescription());
-        currentRol.setName(resultRol.getName());
 
-        Rol result = rolRepository.save(currentRol);
-        if (result == null) {
-            return Pair.of("Couldn't update the role", null);
-        } else {
-            return Pair.of("Rol updated successfully", result);
-        }
+        return save(vm, "update");
     }
 
     public Pair<String, Rol> saveRole(RolViewModel vm){
+        vm = prepareEntity(vm);
+        Result result = ValidateModel(vm);
+        if (!result.isValid()) {
+            return Pair.of(result.lista.get(0).message, null);
+        }
         if (vm.getId() > 0L) {
             return updateRol(vm);
         } else {
@@ -77,15 +78,8 @@ public class RolServices {
             if (savedRol!= null){
                 return Pair.of("The role you are trying to save already exist", null);
             }
-            Rol resultRol = mapper.mapToEntity(vm);
-            // TODO Devide by every word
-            resultRol.setDescription("ROLE_"+ String.join("_", resultRol.getName().trim().toUpperCase().split(" ")));
-            Rol result = rolRepository.save(resultRol);
-            if (result == null){
-                return Pair.of("Couldn't save the role", null);
-            } else {
-                return  Pair.of("Rol saved successfully", result);
-            }
+
+            return save(vm, "save");
         }
     }
 
@@ -108,6 +102,20 @@ public class RolServices {
         if (roleId <= 0L)
             return new ArrayList<>();
         return roles.size() <= 0 ? new ArrayList<>() : roles.stream().filter(o -> !o.getId().equals(roleId)).collect(Collectors.toList());
+    }
+
+    private  Pair<String, Rol> save (RolViewModel vm, String action) {
+        Rol rol = null;
+        try {
+            rol = rolRepository.save(getEntity(vm));
+        } catch (Exception ex)  {
+            return Pair.of(ex.getMessage(), null);
+        }
+        if (rol == null){
+            return Pair.of(String.format("Couldn't {0} the role", action), null);
+        } else {
+            return  Pair.of(String.format("Role {0}d successfully", action), rol);
+        }
     }
 
     public RolViewModel getRoleViewModel(Long roleId){
@@ -134,5 +142,35 @@ public class RolServices {
             info.add(sInfo);
         }
         return info;
+    }
+
+    private Rol getEntity(RolViewModel vm){
+        Rol resultRol = mapper.mapToEntity(vm);
+        resultRol.setDescription("ROLE_"+ String.join("_", resultRol.getName().trim().toUpperCase().split(" ")));
+        return resultRol;
+    }
+
+    private Result ValidateModel(RolViewModel vm){
+        Result result = new Result();
+
+        if (vm.getName().isEmpty()) {
+            result.add("You should specify the rol name");
+            return result;
+        }
+
+        return result;
+    }
+
+    public RolViewModel prepareEntity(RolViewModel vm) {
+        if (vm.getId()== null)  {
+            vm.setId(0L);
+        }
+        if (vm.getName()== null)  {
+            vm.setName("");
+        }
+        if (vm.getDescription() == null)  {
+            vm.setDescription("");
+        }
+        return vm;
     }
    }

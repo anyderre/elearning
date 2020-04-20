@@ -27,6 +27,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
     private String name;
     @NotEmpty(message = "First name is required")
     private String firstName;
@@ -47,30 +48,26 @@ public class User {
     @Size(max=60)
     private String password;
     @Lob
+    @NotNull
     private String photoURL;
     @Lob
+    @NotNull
     private String bio;
+    @NotNull
     private String country;
+    @NotNull
+    private String workspaceName;
     @ManyToOne(optional = false)
     @JoinColumn(name = "rol_id")
     @NotNull
     private Rol role;
 
-
-//    @Fetch(value = FetchMode.SUBSELECT)
-////    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-////    @JoinTable(
-////            name="user_categories",
-////            joinColumns = @JoinColumn( name="category_id", referencedColumnName = "id"),
-////            inverseJoinColumns = @JoinColumn( name="user_id", referencedColumnName = "id")
-////    )
     @Fetch(value = FetchMode.SUBSELECT)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_categories",
         joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
         inverseJoinColumns = @JoinColumn(name = "category_id", referencedColumnName = "id"))
     private List<Category> categories;
-
 
     @Fetch(value = FetchMode.SUBSELECT)
     @ManyToMany(fetch = FetchType.EAGER)
@@ -81,15 +78,6 @@ public class User {
     )
     private List<SubCategory> subCategories;
 
-
-
-//    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-//    @JoinTable(
-//            name="user_courses",
-//            joinColumns = @JoinColumn( name="course_id", referencedColumnName = "id"),
-//            inverseJoinColumns = @JoinColumn( name="user_id", referencedColumnName = "id")
-//    )
-
     @Fetch(value = FetchMode.SUBSELECT)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_courses",
@@ -97,14 +85,12 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"))
     private List<Course> courses;
 
-
     @Fetch(value = FetchMode.SUBSELECT)
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="user_schools"
     )
     private List<User> schools;
-
 
     @Fetch(value = FetchMode.SUBSELECT)
     @ManyToMany(fetch = FetchType.EAGER)
@@ -112,8 +98,8 @@ public class User {
             name="user_organizations"
     )
     private List<User> organizations;
+    @NotNull
     private boolean agreeWithTerms;
+    @NotNull
     private boolean deleted = false;
-
-    private String workspaceName;
 }

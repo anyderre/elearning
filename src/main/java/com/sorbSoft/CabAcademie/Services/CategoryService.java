@@ -6,7 +6,9 @@ import com.sorbSoft.CabAcademie.Repository.CategoryRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CategoryFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.CategoryInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CategoryMapper;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -39,6 +41,11 @@ public class CategoryService {
     }
 
     public Pair<String, Category> updateCategory (CategoryViewModel vm){
+        Category current = categoryRepository.findOne(vm.getId());
+        if (current == null) {
+            return Pair.of("The category you want to update does not exist", null);
+        }
+
         Category savedCategory = categoryRepository.findCategoryByNameAndIdIsNot(vm.getName(), vm.getId());
 
         if (savedCategory != null) {
@@ -50,15 +57,15 @@ public class CategoryService {
         if (currentCategory == null) {
             return Pair.of("The category you want to update doesn't exist", null);
         }
-        Category result = categoryRepository.save(getEntity(vm));
-        if (result == null) {
-            return Pair.of("Couldn't update the category", null);
-        } else {
-            return Pair.of("Category updated successfully", result);
-        }
+        return save(vm, "update");
     }
 
     public Pair<String, Category>  saveCategory (CategoryViewModel vm){
+        vm = prepareEntity(vm);
+        Result result = ValidateModel(vm);
+        if (!result.isValid()) {
+            return Pair.of(result.lista.get(0).message, null);
+        }
         if (vm.getId() > 0L) {
             return updateCategory(vm);
         } else {
@@ -68,12 +75,21 @@ public class CategoryService {
                 return Pair.of("The category you are trying to save already exist", null);
             }
 
-            Category result = categoryRepository.save(getEntity(vm));
-            if (result == null){
-                return Pair.of("Couldn't save the category", null);
-            } else {
-                return  Pair.of("Category saved successfully", result);
-            }
+            return save(vm, "save");
+        }
+    }
+
+    private  Pair<String, Category> save (CategoryViewModel vm, String action) {
+        Category category = null;
+        try {
+            category = categoryRepository.save(getEntity(vm));
+        } catch (Exception ex)  {
+            return Pair.of(ex.getMessage(), null);
+        }
+        if (category == null){
+            return Pair.of(String.format("Couldn't {0} the category", action), null);
+        } else {
+            return  Pair.of(String.format("Category {0}d successfully", action), category);
         }
     }
 
@@ -145,5 +161,30 @@ public class CategoryService {
 
     private Category getEntity(CategoryViewModel vm){
         return mapper.mapToEntity(vm);
+    }
+
+
+    private Result ValidateModel(CategoryViewModel vm){
+        Result result = new Result();
+
+        if (vm.getName().isEmpty()) {
+            result.add("You should specify the category name");
+            return result;
+        }
+
+        return result;
+    }
+
+    public CategoryViewModel prepareEntity(CategoryViewModel vm) {
+        if (vm.getName()== null)  {
+            vm.setName("");
+        }
+        if (vm.getId()== null)  {
+            vm.setId(0L);
+        }
+        if (vm.getDescription() == null)  {
+            vm.setDescription("");
+        }
+        return vm;
     }
 }

@@ -2,8 +2,10 @@ package com.sorbSoft.CabAcademie.Entities;
 
 import lombok.Data;
 import org.hibernate.annotations.Where;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 
@@ -18,9 +20,10 @@ public class Section implements Serializable {
     @Id()
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotNull
+    @NotEmpty(message = "Section name is required")
+    private String name;
     @Lob
     private String description;
-    @Size(min = 1)
-    private String name;
     private boolean deleted = false;
 }
