@@ -39,23 +39,26 @@ public class SectionService {
         return sectionRepository.findOne(id);
     }
 
-    public Pair<String, Section> updateSection(SectionViewModel vm){
+    public Result updateSection(SectionViewModel vm){
+        Result result = new Result();
         Section current = sectionRepository.findOne(vm.getId());
         if (current == null) {
-            return Pair.of("The section you want to update does not exist", null);
+            result.add("The section you want to update does not exist");
+            return result;
         }
         Section savedSection = sectionRepository.findSectionByNameAndIdIsNot(vm.getName(), vm.getId());
         if (savedSection != null) {
-            return Pair.of("The section name already exist for another definition", null);
+            result.add("The section name already exist for another definition");
+            return result;
         }
-        return save(vm, "update");
+        return save(vm);
     }
 
-    public Pair<String, Section> saveSection(SectionViewModel vm){
+    public Result saveSection(SectionViewModel vm){
         vm = prepareEntity(vm);
         Result result = ValidateModel(vm);
         if (!result.isValid()) {
-            return Pair.of(result.lista.get(0).message, null);
+            return result;
         }
         if (vm.getId() > 0L) {
             return updateSection(vm);
@@ -63,36 +66,40 @@ public class SectionService {
             Section savedSection = sectionRepository.findSectionByName(vm.getName());
 
             if (savedSection!= null){
-                return Pair.of("The section you are trying to save already exist", null);
+                result.add("The section you are trying to save already exist");
+                return result;
             }
-            return save(vm, "save");
+            return save(vm);
         }
     }
 
-    private  Pair<String, Section> save (SectionViewModel vm, String action) {
-        Section section = null;
+    private  Result save (SectionViewModel vm) {
+        Result result = new Result();
         try {
-            section = sectionRepository.save(getEntity(vm));
+            sectionRepository.save(getEntity(vm));
         } catch (Exception ex)  {
-            return Pair.of(ex.getMessage(), null);
+            return result.add(ex.getMessage());
         }
-        if (section == null){
-            return Pair.of(String.format("Couldn't {0} the section", action), null);
-        } else {
-            return  Pair.of(String.format("Section {0}d successfully", action), section);
-        }
-
+        return  result;
     }
-    public String deleteSection(Long id){
+    public Result deleteSection(Long id){
+        Result result = new Result();
         if (id <= 0L) {
-            return "You should indicate the id of the section";
+            result.add("You should indicate the id of the section");
+            return result;
         }
         Section section = fetchSection(id);
         if (section == null) {
-            return "The section you want to delete doesn't exist";
+            result.add("The section you want to delete doesn't exist");
+            return result;
         }
         section.setDeleted(true);
-        return "Section successfully deleted";
+        try {
+            sectionRepository.save(section);
+        } catch (Exception ex)  {
+            return result.add(ex.getMessage());
+        }
+        return result;
     }
 
     public List<Section> getAllFiltered(Long sectionId){

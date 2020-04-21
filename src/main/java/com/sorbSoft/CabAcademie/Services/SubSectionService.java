@@ -44,25 +44,30 @@ public class SubSectionService {
         return subSectionRepository.findOne(id);
     }
 
-    public Pair<String, SubSection> updateSubSection (SubSectionViewModel vm){
+    public Result updateSubSection (SubSectionViewModel vm){
+        Result result = new Result();
+
         SubSection current = subSectionRepository.findOne(vm.getId());
         if (current == null) {
-            return Pair.of("The sub-section you want to update does not exist", null);
+            result.add("The sub-section you want to update does not exist");
+            return result;
         }
         SubSection savedSubSection = subSectionRepository.findSubSectionByNameAndIdIsNot(vm.getName(), vm.getId());
 
         if (savedSubSection != null) {
-            return Pair.of("The subSection name already exist for another definition", null);
+            result.add("The subSection name already exist for another definition");
+            return result;
         }
 
-        return save(vm, "update");
+        return save(vm);
     }
 
-    public Pair<String, SubSection>  saveSubSection (SubSectionViewModel vm){
+    public Result saveSubSection (SubSectionViewModel vm){
         vm = prepareEntity(vm);
         Result result = ValidateModel(vm);
         if (!result.isValid()) {
-            return Pair.of(result.lista.get(0).message, null);
+            result.add(result.lista.get(0).getMessage());
+            return result;
         }
         if (vm.getId() > 0L) {
             return updateSubSection(vm);
@@ -70,40 +75,43 @@ public class SubSectionService {
             SubSection savedSubSection = subSectionRepository.findSubSectionByName(vm.getName());
 
             if ( savedSubSection != null){
-                return Pair.of("The subSection you are trying to save already exist", null);
+                result.add("The subSection you are trying to save already exist");
+                return result;
             }
 
-            return save(vm, "save");
+            return save(vm);
         }
     }
 
-    private  Pair<String, SubSection> save (SubSectionViewModel vm, String action) {
-        SubSection subSection = null;
+    private Result save (SubSectionViewModel vm) {
+        Result result = new Result();
         try {
-            subSection = subSectionRepository.save(getEntity(vm));
+            subSectionRepository.save(getEntity(vm));
         } catch (Exception ex)  {
-            return Pair.of(ex.getMessage(), null);
+            result.add(ex.getMessage());
+            return result;
         }
-        if (subSection == null){
-            return Pair.of(String.format("Couldn't {0} the sub-category", action), null);
-        } else {
-            return  Pair.of(String.format("Sub-Section {0}d successfully", action), subSection);
-        }
-
+        return result;
     }
 
-    public String deleteSubSection(Long id){
+    public Result deleteSubSection(Long id){
+        Result result = new Result();
         if (id <= 0L) {
-            return "You should indicate the id of the subSection";
+            return result.add("You should indicate the id of the subSection");
         }
         SubSection subSection = subSectionRepository.findOne(id);
         if (subSection == null) {
-            return "The subSection you want to delete doesn't exist";
+            return result.add("The subSection you want to delete doesn't exist");
         }
 
         subSection.setDeleted(true);
-        subSectionRepository.save(subSection);
-        return "Section successfully deleted";
+        try {
+            subSectionRepository.save(subSection);
+        } catch (Exception ex)  {
+            result.add(ex.getMessage());
+            return result;
+        }
+        return result;
     }
 
     public SubSectionViewModel getSubSectionViewModel(Long subSectionId){
@@ -147,10 +155,6 @@ public class SubSectionService {
 
     private SubSection getEntity(SubSectionViewModel vm){
         return mapper.mapToEntity(vm);
-//        if (vm.getSection()!= null && vm.getSection().getId() != null && vm.getSection().getId() > 0){
-//            resultSubSection.setSection(sectionRepository.findOne(vm.getSection().getId()));
-//        }
-//        return resultSubSection;
     }
 
     private Result ValidateModel(SubSectionViewModel vm){

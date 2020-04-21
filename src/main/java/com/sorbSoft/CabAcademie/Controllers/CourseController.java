@@ -4,6 +4,7 @@ package com.sorbSoft.CabAcademie.Controllers;
 import com.sorbSoft.CabAcademie.Entities.Course;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Services.CourseService;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
@@ -87,27 +88,25 @@ public class CourseController {
 
     @GetMapping(value="/paginate", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<Course>> getAllCoursesByPage(@RequestParam(value = "count", defaultValue = "10") String count,
-                                                                         @RequestParam(value = "page", defaultValue = "1") String page){
+                                                            @RequestParam(value = "page", defaultValue = "1") String page){
         Page<Course> courses = courseService.fetchAllCoursesByPage(Integer.valueOf(page), Integer.valueOf(count));
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     public  ResponseEntity<MessageResponse> saveCourse(@Valid @RequestBody CourseViewModel vm){
-        Pair<String, Course> result = courseService.saveCourse(vm);
-        if(result.getSecond() == null)
-            return new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.OK);
+        Result result = courseService.saveCourse(vm);
+        if(!result.isValid())
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of("Course successfully saved"), HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Void> deleteCourse(@PathVariable Long id ){
-        if(id<0)
-            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(courseService.fetchCourse(id)==null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        courseService.deleteCourse(id);
-        return new ResponseEntity<>(HttpStatus.OK);
+    public ResponseEntity<MessageResponse> deleteCourse(@PathVariable Long id ){
+        Result result = courseService.deleteCourse(id);
+        if (!result.isValid()){
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        }
+        return  new ResponseEntity<>(MessageResponse.of("Section successfully deleted"), HttpStatus.OK);
     }
 }

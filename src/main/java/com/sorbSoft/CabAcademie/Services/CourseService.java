@@ -8,16 +8,13 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CourseFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CourseMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
-import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.data.domain.Pageable;
-import org.springframework.validation.ObjectError;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -75,7 +72,7 @@ public class CourseService {
     }
 
     public Page<Course> fetchAllCoursesByPage(int page, int itemsPerPage){
-        Pageable pageable = new PageRequest(page, itemsPerPage);
+        Pageable pageable = new PageRequest(page - 1 , itemsPerPage);
         return courseRepository.findAll(pageable);
     }
 
@@ -83,60 +80,72 @@ public class CourseService {
         return courseRepository.findOne(id);
     }
 
-    public Pair<String, Course> updateCourse(CourseViewModel vm){
+    public Result updateCourse(CourseViewModel vm){
+        Result result = new Result();
         Course current = courseRepository.findOne(vm.getId());
 
         if (current == null) {
-            return Pair.of("The course you want to update does not exist", null);
+            result.add("The course you want to update does not exist");
+            return result;
         }
 
         Course savedCourse = courseRepository.findCourseByTitleAndIdIsNot(vm.getTitle(), vm.getId());
         if (savedCourse != null) {
-            return Pair.of("The course name already exist for another definition", null);
+            result.add("The course name already exist for another definition");
+            return result;
         }
         Course currentCourse = courseRepository.findOne(vm.getId());
         if(currentCourse == null) {
-            return Pair.of("The course you are trying to edit does not exist anymore", null);
+            result.add("The course you are trying to edit does not exist anymore");
+            return result;
         }
 
-        return save(vm, "update");
+        return save(vm);
     }
 
-    private  Pair<String, Course> save (CourseViewModel vm, String action) {
+    private  Result save (CourseViewModel vm) {
+        Result result = new Result();
         Course course = null;
         try {
             course = courseRepository.save(getEntity(vm));
             if (vm.getId() > 0) {
                 Overview overviewEntity = course.getOverview();
                 course.setOverview(null);
-                Course result = courseRepository.save(course);
+                Course savedCourse = courseRepository.save(course);
                 if (overviewEntity != null) {
-                    overviewEntity.setCourse(result);
+                    overviewEntity.setCourse(savedCourse);
                     Overview overview = overviewRepository.save(overviewEntity);
                     course.setOverview(overview);
-                    result = courseRepository.save(course);
+                    courseRepository.save(course);
                 }
             }
         } catch (Exception ex)  {
-            return Pair.of(ex.getMessage(), null);
+            result.add(ex.getMessage());
+            return result;
         }
-        if (course == null){
-            return Pair.of(String.format("Couldn't {0} the course", action), null);
-        } else {
-            return  Pair.of(String.format("Course {0}d successfully", action), course);
-        }
+        return result;
     }
 
-    public String deleteCourse(Long id){
+    public Result deleteCourse(Long id){
+        Result result = new Result();
+
         if (id <= 0L) {
-            return "You should indicate the id of the course";
+            result.add("You should indicate the id of the course");
+            return result;
         }
         Course course = fetchCourse(id);
         if (course == null) {
-            return "The course you want to delete doesn't exist";
+            result.add("The course you want to delete doesn't exist");
+            return result;
         }
         course.setDeleted(true);
-        return "Course successfully deleted";
+        try {
+            courseRepository.save(course);
+        } catch (Exception ex)  {
+            result.add(ex.getMessage());
+            return result;
+        }
+        return result;
     }
 
     public CourseViewModel getCourseViewModel(Long courseId){
@@ -162,11 +171,11 @@ public class CourseService {
         return vm;
     }
     
-    public Pair<String, Course> saveCourse(CourseViewModel vm){
+    public Result saveCourse(CourseViewModel vm){
         vm = prepareEntity(vm);
         Result result = ValidateModel(vm);
         if (!result.isValid()) {
-            return Pair.of(result.lista.get(0).message, null);
+            return result;
         }
         if (vm.getId() > 0L) {
             return updateCourse(vm);
@@ -174,10 +183,11 @@ public class CourseService {
             Course savedCourse = courseRepository.findCourseByTitle(vm.getTitle());
 
             if ( savedCourse != null){
-                return Pair.of("The course you are trying to save already exist", null);
+                result.add("The course you are trying to save already exist");
+                return result;
             }
 
-            return save(vm, "save");
+            return save(vm);
         }
     }
 

@@ -69,7 +69,7 @@ public class Course implements Serializable {
     @JoinColumn(name = "user_id")
     private User user;
     @Fetch(value = FetchMode.SUBSELECT)
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
             name="course_syllabus",
             joinColumns = @JoinColumn( name="course_id", referencedColumnName = "id"),
@@ -91,7 +91,7 @@ public class Course implements Serializable {
     @OneToOne(cascade = CascadeType.ALL, mappedBy="course", optional = false)
     private Overview overview;
     @Fetch(value = FetchMode.SUBSELECT)
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
             name="course_objectives",
             joinColumns = @JoinColumn( name="course_id", referencedColumnName = "id"),

@@ -55,11 +55,11 @@ public class UserServices {
     private UserMapper mapper
             = Mappers.getMapper(UserMapper.class);
 
-    public Pair<String, User> saveUser(UserViewModel vm){
+    public Result saveUser (UserViewModel vm){
         vm = prepareEntity(vm);
         Result result = ValidateModel(vm);
         if (!result.isValid()) {
-            return Pair.of(result.lista.get(0).message, null);
+            return result;
         }
         if (vm.getId() > 0L) {
             return updateUser(vm);
@@ -67,45 +67,46 @@ public class UserServices {
             User savedUser = userRepository.findByUsername(vm.getUsername());
 
             if ( savedUser != null){
-                return Pair.of("The user you are trying to save already exist", null);
+                result.add("The user you are trying to save already exist");
+                return result;
             }
-            return save(vm, "save");
+            return save(vm);
         }
     }
 
-    private  Pair<String, User> save (UserViewModel vm, String action) {
-            User user = null;
-            try {
-                user = userRepository.save(getEntity(vm));
-            } catch (Exception ex)  {
-                return Pair.of(ex.getMessage(), null);
-            }
-            if (user == null){
-                return Pair.of(String.format("Couldn't {0} the user", action), null);
-            } else {
-                return  Pair.of(String.format("User {0}d successfully", action), user);
-            }
-
+    private  Result save (UserViewModel vm) {
+        Result result = new Result();
+        try {
+            userRepository.save(getEntity(vm));
+        } catch (Exception ex)  {
+            result.add(ex.getMessage());
+            return result;
+        }
+        return result;
     }
 
-    public Pair<String, User> updateUser(UserViewModel vm){
+    public Result updateUser(UserViewModel vm){
+        Result result = new Result();
         User current = userRepository.findOne(vm.getId());
 
         if (current == null) {
-            return Pair.of("The user you want to update does not exist", null);
+            result.add("The user you want to update does not exist");
+            return result;
         }
 
         User savedUser = userRepository.findUserByUsernameAndIdIsNot(vm.getUsername(), vm.getId());
         if (savedUser != null) {
-            return Pair.of("The user name already exist for another definition", null);
+            result.add("The user name already exist for another definition");
+            return result;
         }
         User currentUser = UserRepository.findById(vm.getId());
 
         if (currentUser == null){
-            return Pair.of("The user you are trying to update does not exist anymore", null);
+            result.add("The user you are trying to update does not exist anymore");
+            return result;
         }
 
-        return save(vm, "update");
+        return save(vm);
     }
 
     public User findUserbyUsername(String username){
@@ -126,16 +127,23 @@ public class UserServices {
                 user.getRole().getId().equals(roleId)).collect(Collectors.toList());
     }
 
-    public String deleteUser(Long id){
+    public Result deleteUser(Long id){
+        Result result = new Result();
         if (id <= 0L) {
-            return "You should indicate the id of the user";
+            return result.add("You should indicate the id of the user");
         }
         User user = userRepository.findById(id);
         if (user == null) {
-            return "The user you want to delete doesn't exist";
+            return result.add("The user you want to delete doesn't exist");
         }
         user.setDeleted(true);
-        return "User successfully deleted";
+        try {
+            userRepository.save(user);
+        } catch (Exception ex)  {
+            result.add(ex.getMessage());
+            return result;
+        }
+        return result;
     }
 
     public User findAUser(Long id){

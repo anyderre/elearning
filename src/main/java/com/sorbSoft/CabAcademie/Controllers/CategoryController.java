@@ -2,13 +2,11 @@ package com.sorbSoft.CabAcademie.Controllers;
 
 import com.sorbSoft.CabAcademie.Entities.Category;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
-import com.sorbSoft.CabAcademie.Entities.Topic;
 import com.sorbSoft.CabAcademie.Services.CategoryService;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.CategoryInfo;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
-import com.sorbSoft.CabAcademie.Services.TopicService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,9 +25,6 @@ import java.util.List;
 public class CategoryController {
     @Autowired
     private CategoryService categoryService;
-
-    @Autowired
-    private TopicService topicService;
 
     @GetMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
@@ -80,20 +75,19 @@ public class CategoryController {
     @PostMapping(value = "/save")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public  ResponseEntity<MessageResponse> saveCategory(@Valid @RequestBody CategoryViewModel vm){
-        Pair<String, Category> result = categoryService.saveCategory(vm);
-        if(result.getSecond() == null)
-            return new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CREATED);
+        Result result = categoryService.saveCategory(vm);
+        if(!result.isValid())
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of("Category successfully added"), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/delete/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<String> deleteCategory(@PathVariable Long id ){
-        if(id<0)
-            return ResponseEntity.badRequest().build();
-        if(categoryService.fetchCategory(id)==null)
-            return ResponseEntity.notFound().build();
-
-        return ResponseEntity.ok(categoryService.deleteCategory(id));
+    public ResponseEntity<MessageResponse> deleteCategory(@PathVariable Long id ){
+        Result result = categoryService.deleteCategory(id);
+        if (!result.isValid()){
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        }
+        return  new ResponseEntity<>(MessageResponse.of("Sub-Category successfully deleted"), HttpStatus.OK);
     }
 }

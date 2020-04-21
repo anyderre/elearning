@@ -8,7 +8,6 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Info.CategoryInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CategoryMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CategoryViewModel;
-import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -40,31 +39,35 @@ public class CategoryService {
         return categoryRepository.findOne(id);
     }
 
-    public Pair<String, Category> updateCategory (CategoryViewModel vm){
+    public Result updateCategory (CategoryViewModel vm){
+        Result result = new Result();
         Category current = categoryRepository.findOne(vm.getId());
         if (current == null) {
-            return Pair.of("The category you want to update does not exist", null);
+            result.add("The category you want to update does not exist");
+            return result;
         }
 
         Category savedCategory = categoryRepository.findCategoryByNameAndIdIsNot(vm.getName(), vm.getId());
 
         if (savedCategory != null) {
-            return Pair.of("The category name already exist for another definition", null);
+            result.add("The category name already exist for another definition");
+            return result;
         }
 
         Category currentCategory= categoryRepository.findOne(vm.getId());
 
         if (currentCategory == null) {
-            return Pair.of("The category you want to update doesn't exist", null);
+            result.add("The category you want to update doesn't exist");
+            return result;
         }
-        return save(vm, "update");
+        return save(vm);
     }
 
-    public Pair<String, Category>  saveCategory (CategoryViewModel vm){
+    public Result  saveCategory (CategoryViewModel vm){
         vm = prepareEntity(vm);
         Result result = ValidateModel(vm);
         if (!result.isValid()) {
-            return Pair.of(result.lista.get(0).message, null);
+            return result;
         }
         if (vm.getId() > 0L) {
             return updateCategory(vm);
@@ -72,38 +75,44 @@ public class CategoryService {
             Category savedCategory = categoryRepository.findCategoryByName(vm.getName());
 
             if ( savedCategory != null){
-                return Pair.of("The category you are trying to save already exist", null);
+                result.add("The category you are trying to save already exist");
+                return result;
             }
 
-            return save(vm, "save");
+            return save(vm);
         }
     }
 
-    private  Pair<String, Category> save (CategoryViewModel vm, String action) {
-        Category category = null;
+    private  Result save (CategoryViewModel vm) {
+        Result result = new Result();
         try {
-            category = categoryRepository.save(getEntity(vm));
+            categoryRepository.save(getEntity(vm));
         } catch (Exception ex)  {
-            return Pair.of(ex.getMessage(), null);
+            result.add(ex.getMessage());
+            return result;
         }
-        if (category == null){
-            return Pair.of(String.format("Couldn't {0} the category", action), null);
-        } else {
-            return  Pair.of(String.format("Category {0}d successfully", action), category);
-        }
+        return result;
     }
 
-    public String deleteCategory(Long id){
+    public Result deleteCategory(Long id){
+        Result result = new Result();
         if (id <= 0L) {
-            return "You should indicate the id of the category";
+            result.add("You should indicate the id of the category");
+            return result;
         }
         Category category = categoryRepository.findOne(id);
         if (category == null) {
-            return "The category you want to delete doesn't exist";
+            result.add("The category you want to delete doesn't exist");
+            return result;
         }
         category.setDeleted(true);
-        categoryRepository.save(category);
-        return "Category successfully deleted";
+        try {
+            categoryRepository.save(category);
+        } catch (Exception ex)  {
+            result.add(ex.getMessage());
+            return result;
+        }
+        return result;
     }
 
     public CategoryViewModel getCategoryViewModel(Long categoryId){

@@ -22,7 +22,7 @@ public class Syllabus implements Serializable {
     private Long id;
     private String chapterTitle;
     @Fetch(value = FetchMode.SUBSELECT)
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinTable(name = "syllabus_chapter_tuts",
             joinColumns = @JoinColumn(name = "syllabus_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "video_id", referencedColumnName = "id"))

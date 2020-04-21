@@ -17,8 +17,8 @@ public class HistoryOfLearning implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne(optional = false)
-    @JoinColumn(name="enrollement_id")
-    private Enrollement enrollement;
+//    @JoinColumn(name="enrollement_id")
+//    private Enrollement enrollement;
     @OneToOne(optional = false)
     @JoinColumn(name="video_id")
     private Video video;

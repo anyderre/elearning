@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Controllers;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.Section;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.SectionInfo;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SectionViewModel;
 import com.sorbSoft.CabAcademie.Services.SectionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,21 +74,19 @@ public class SectionController {
     @PostMapping("/save")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public  ResponseEntity<MessageResponse> saveSection(@Valid @RequestBody SectionViewModel vm){
-        Pair<String, Section> result = sectionService.saveSection(vm);
-        if(result.getSecond() == null)
-            return new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CREATED);
+        Result result = sectionService.saveSection(vm);
+        if(!result.isValid())
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of("Section successfully created"), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/delete/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<String> deleteSection(@PathVariable Long id ){
-        if(id<0)
-            return ResponseEntity.badRequest().build();
-
-        if(sectionService.fetchSection(id)==null)
-            return ResponseEntity.notFound().build();
-
-        return ResponseEntity.ok(sectionService.deleteSection(id));
+    public ResponseEntity<MessageResponse> deleteSection(@PathVariable Long id ){
+        Result result = sectionService.deleteSection(id);
+        if (!result.isValid()){
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        }
+        return  new ResponseEntity<>(MessageResponse.of("Section successfully deleted"), HttpStatus.OK);
     }
 }

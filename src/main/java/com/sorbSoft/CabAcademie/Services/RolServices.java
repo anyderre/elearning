@@ -51,24 +51,26 @@ public class RolServices {
         return rolRepository.findByDescription(description);
     }
 
-    public Pair<String, Rol> updateRol(RolViewModel vm){
+    public Result updateRol(RolViewModel vm){
+        Result result = new Result();
         Rol current = rolRepository.findOne(vm.getId());
         if (current == null) {
-            return Pair.of("The role you want to update does not exist", null);
+            result.add("The role you want to update does not exist");
+            return result;
         }
         Rol savedRol = rolRepository.findRolByNameAndIdIsNot(vm.getName(), vm.getId());
         if (savedRol != null) {
-            return Pair.of("The role name already exist for another definition", null);
+            return result.add("The role name already exist for another definition");
         }
 
-        return save(vm, "update");
+        return save(vm);
     }
 
-    public Pair<String, Rol> saveRole(RolViewModel vm){
+    public Result saveRole(RolViewModel vm){
         vm = prepareEntity(vm);
         Result result = ValidateModel(vm);
         if (!result.isValid()) {
-            return Pair.of(result.lista.get(0).message, null);
+            return result;
         }
         if (vm.getId() > 0L) {
             return updateRol(vm);
@@ -76,23 +78,32 @@ public class RolServices {
             Rol savedRol = rolRepository.findByName(vm.getName());
 
             if (savedRol!= null){
-                return Pair.of("The role you are trying to save already exist", null);
+                result.add("The role you are trying to save already exist");
+                return result;
             }
 
-            return save(vm, "save");
+            return save(vm);
         }
     }
 
-    public String deleteRol(Long id){
+    public Result deleteRol(Long id){
+        Result result = new Result();
         if (id <= 0L) {
-            return "You should indicate the id of the role";
+            result.add("You should indicate the id of the role");
+            return result;
         }
         Rol role = fetchRole(id);
         if (role == null) {
-            return "The role you want to delete doesn't exist";
+            return result.add("The role you want to delete doesn't exist");
         }
         role.setDeleted(true);
-        return "Rol successfully deleted";
+        try {
+            rolRepository.save(role);
+        } catch (Exception ex)  {
+            result.add(ex.getMessage());
+            return result;
+        }
+        return result;
     }
 
     public List<Rol> getAllFiltered(Long roleId){
@@ -104,18 +115,15 @@ public class RolServices {
         return roles.size() <= 0 ? new ArrayList<>() : roles.stream().filter(o -> !o.getId().equals(roleId)).collect(Collectors.toList());
     }
 
-    private  Pair<String, Rol> save (RolViewModel vm, String action) {
-        Rol rol = null;
+    private  Result save (RolViewModel vm) {
+        Result result = new Result();
         try {
-            rol = rolRepository.save(getEntity(vm));
+            rolRepository.save(getEntity(vm));
         } catch (Exception ex)  {
-            return Pair.of(ex.getMessage(), null);
+            result.add(ex.getMessage());
+            return result;
         }
-        if (rol == null){
-            return Pair.of(String.format("Couldn't {0} the role", action), null);
-        } else {
-            return  Pair.of(String.format("Role {0}d successfully", action), rol);
-        }
+        return result;
     }
 
     public RolViewModel getRoleViewModel(Long roleId){
@@ -173,4 +181,4 @@ public class RolServices {
         }
         return vm;
     }
-   }
+}
