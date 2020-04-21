@@ -103,6 +103,7 @@ public class CourseService {
         return save(vm);
     }
 
+    //and this
     public boolean exists(Long id) {
         return courseRepository.exists(id);
     }

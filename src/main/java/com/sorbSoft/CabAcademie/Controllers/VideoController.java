@@ -35,4 +35,6 @@ public class VideoController {
     public String deleteFile(@RequestPart(value = "url") String fileUrl) throws Exception {
         return this.amazonClient.deleteFileFromS3Bucket(fileUrl);
     }
+
+    //reemoved endpoint here
 }

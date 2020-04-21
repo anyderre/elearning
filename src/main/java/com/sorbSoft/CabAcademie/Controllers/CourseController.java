@@ -102,6 +102,7 @@ public class CourseController {
         return  new ResponseEntity<>(MessageResponse.of("Course successfully saved"), HttpStatus.OK);
     }
 
+    //Added this
     @PutMapping(value = "/update")
     public ResponseEntity<Course> updateCourse(@RequestBody CourseViewModel courseVm){
 
