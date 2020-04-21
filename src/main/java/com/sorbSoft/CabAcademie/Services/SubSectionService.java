@@ -1,5 +1,7 @@
 package com.sorbSoft.CabAcademie.Services;
 
+import com.sorbSoft.CabAcademie.Entities.Category;
+import com.sorbSoft.CabAcademie.Entities.Section;
 import com.sorbSoft.CabAcademie.Entities.SubSection;
 import com.sorbSoft.CabAcademie.Repository.SectionRepository;
 import com.sorbSoft.CabAcademie.Repository.SubSectionRepository;
@@ -33,19 +35,7 @@ public class SubSectionService {
     private SubSectionMapper mapper
             = Mappers.getMapper(SubSectionMapper.class);
 
-    private Result ValidateModel(SubSectionViewModel vm){
-        Result result = new Result();
 
-        if (vm.getName().isEmpty()) {
-            result.add("You should the name of the sub-section");
-            return result;
-        }
-        if (vm.getSection()== null || vm.getSection().getId() <= 0) {
-            result.add("You should specify the section for the sub-section");
-            return result;
-        }
-        return result;
-    }
     public List<SubSection> fetchAllSubSections(){
         return subSectionRepository.findAll();
     }
@@ -54,30 +44,30 @@ public class SubSectionService {
         return subSectionRepository.findOne(id);
     }
 
-    public Pair<String, SubSection> updateSubSection (SubSectionViewModel vm){
+    public Result updateSubSection (SubSectionViewModel vm){
+        Result result = new Result();
+
+        SubSection current = subSectionRepository.findOne(vm.getId());
+        if (current == null) {
+            result.add("The sub-section you want to update does not exist");
+            return result;
+        }
         SubSection savedSubSection = subSectionRepository.findSubSectionByNameAndIdIsNot(vm.getName(), vm.getId());
 
         if (savedSubSection != null) {
-            return Pair.of("The subSection name already exist for another definition", null);
+            result.add("The subSection name already exist for another definition");
+            return result;
         }
 
-        SubSection currentSubSection= subSectionRepository.findOne(vm.getId());
-
-        if (currentSubSection == null) {
-            return Pair.of("The subSection you want to update doesn't exist", null);
-        }
-        SubSection result = subSectionRepository.save(getEntity(vm));
-        if (result == null) {
-            return Pair.of("Couldn't update the sub-section", null);
-        } else {
-            return Pair.of("Sub-Section updated successfully", result);
-        }
+        return save(vm);
     }
 
-    public Pair<String, SubSection>  saveSubSection (SubSectionViewModel vm){
+    public Result saveSubSection (SubSectionViewModel vm){
+        vm = prepareEntity(vm);
         Result result = ValidateModel(vm);
         if (!result.isValid()) {
-            return Pair.of(result.lista.get(0).message, null);
+            result.add(result.lista.get(0).getMessage());
+            return result;
         }
         if (vm.getId() > 0L) {
             return updateSubSection(vm);
@@ -85,30 +75,43 @@ public class SubSectionService {
             SubSection savedSubSection = subSectionRepository.findSubSectionByName(vm.getName());
 
             if ( savedSubSection != null){
-                return Pair.of("The subSection you are trying to save already exist", null);
+                result.add("The subSection you are trying to save already exist");
+                return result;
             }
 
-            SubSection subSection = subSectionRepository.save(getEntity(vm));
-            if (subSection == null){
-                return Pair.of("Couldn't save the subSection", null);
-            } else {
-                return  Pair.of("SubSection saved successfully", subSection);
-            }
+            return save(vm);
         }
     }
 
-    public String deleteSubSection(Long id){
+    private Result save (SubSectionViewModel vm) {
+        Result result = new Result();
+        try {
+            subSectionRepository.save(getEntity(vm));
+        } catch (Exception ex)  {
+            result.add(ex.getMessage());
+            return result;
+        }
+        return result;
+    }
+
+    public Result deleteSubSection(Long id){
+        Result result = new Result();
         if (id <= 0L) {
-            return "You should indicate the id of the subSection";
+            return result.add("You should indicate the id of the subSection");
         }
         SubSection subSection = subSectionRepository.findOne(id);
         if (subSection == null) {
-            return "The subSection you want to delete doesn't exist";
+            return result.add("The subSection you want to delete doesn't exist");
         }
 
         subSection.setDeleted(true);
-        subSectionRepository.save(subSection);
-        return "Section successfully deleted";
+        try {
+            subSectionRepository.save(subSection);
+        } catch (Exception ex)  {
+            result.add(ex.getMessage());
+            return result;
+        }
+        return result;
     }
 
     public SubSectionViewModel getSubSectionViewModel(Long subSectionId){
@@ -151,10 +154,47 @@ public class SubSectionService {
     }
 
     private SubSection getEntity(SubSectionViewModel vm){
-        SubSection resultSubSection = mapper.mapToEntity(vm);
-        if (vm.getSection()!= null && vm.getSection().getId() != null && vm.getSection().getId() > 0){
-            resultSubSection.setSection(sectionRepository.findOne(vm.getSection().getId()));
+        return mapper.mapToEntity(vm);
+    }
+
+    private Result ValidateModel(SubSectionViewModel vm){
+        Result result = new Result();
+
+        if (vm.getName().isEmpty()) {
+            result.add("You should the name of the sub-section");
+            return result;
         }
-        return resultSubSection;
+        if (vm.getSection().getId() <= 0) {
+            result.add("You should specify the section for the sub-section");
+            return result;
+        }
+
+        Section section = sectionRepository.findOne(vm.getSection().getId());
+        if (section == null) {
+            result.add("The section you specified does not exist");
+            return result;
+        }
+        return result;
+    }
+
+    public SubSectionViewModel prepareEntity(SubSectionViewModel vm) {
+        if (vm.getId()== null)  {
+            vm.setId(0L);
+        }
+        if (vm.getName()== null)  {
+            vm.setName("");
+        }
+        if (vm.getDescription() == null)  {
+            vm.setDescription("");
+        }
+        if (vm.getSection() == null) {
+            vm.setSection( new Section(){
+                @Override
+                public Long getId() {
+                    return 0L;
+                }
+            });
+        }
+        return vm;
     }
 }

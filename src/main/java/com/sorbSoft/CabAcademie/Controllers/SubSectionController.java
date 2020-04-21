@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Controllers;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.SubSection;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.SubSectionInfo;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SubSectionViewModel;
 import com.sorbSoft.CabAcademie.Services.SubSectionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,20 +75,19 @@ public class SubSectionController {
     @PostMapping(value = "/save")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public  ResponseEntity<MessageResponse> saveSubSection(@Valid @RequestBody SubSectionViewModel vm){
-        Pair<String, SubSection> result = subSectionService.saveSubSection(vm);
-        if(result.getSecond() == null)
-            return new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CREATED);
+        Result result = subSectionService.saveSubSection(vm);
+        if(!result.isValid())
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of("Sub-Section successfully added"), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/delete/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<String> deleteSubSection(@PathVariable Long id ){
-        if(id<0)
-            return ResponseEntity.badRequest().build();
-        if(subSectionService.fetchSubSection(id)==null)
-            return ResponseEntity.notFound().build();
-
-        return ResponseEntity.ok(subSectionService.deleteSubSection(id));
+    public ResponseEntity<MessageResponse> deleteSubSection(@PathVariable Long id ){
+        Result result = subSectionService.deleteSubSection(id);
+        if (!result.isValid()){
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        }
+        return  new ResponseEntity<>(MessageResponse.of("Section successfully deleted"), HttpStatus.OK);
     }
 }

@@ -6,6 +6,7 @@ import com.sorbSoft.CabAcademie.Repository.SectionRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.SectionFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.SectionInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.SectionMapper;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SectionViewModel;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,53 +39,67 @@ public class SectionService {
         return sectionRepository.findOne(id);
     }
 
-    public Pair<String, Section> updateSection(SectionViewModel vm){
+    public Result updateSection(SectionViewModel vm){
+        Result result = new Result();
+        Section current = sectionRepository.findOne(vm.getId());
+        if (current == null) {
+            result.add("The section you want to update does not exist");
+            return result;
+        }
         Section savedSection = sectionRepository.findSectionByNameAndIdIsNot(vm.getName(), vm.getId());
         if (savedSection != null) {
-            return Pair.of("The section name already exist for another definition", null);
+            result.add("The section name already exist for another definition");
+            return result;
         }
-        Section resultSection = mapper.mapToEntity(vm);
-        Section currentSection= sectionRepository.findOne(vm.getId());
-        currentSection.setDescription(resultSection.getDescription());
-        currentSection.setName(resultSection.getName());
-
-        Section result = sectionRepository.save(currentSection);
-        if (result == null) {
-            return Pair.of("Couldn't update the section", null);
-        } else {
-           return Pair.of("Section updated successfully", result);
-        }
+        return save(vm);
     }
 
-    public Pair<String, Section> saveSection(SectionViewModel vm){
+    public Result saveSection(SectionViewModel vm){
+        vm = prepareEntity(vm);
+        Result result = ValidateModel(vm);
+        if (!result.isValid()) {
+            return result;
+        }
         if (vm.getId() > 0L) {
             return updateSection(vm);
         } else {
             Section savedSection = sectionRepository.findSectionByName(vm.getName());
 
             if (savedSection!= null){
-                return Pair.of("The section you are trying to save already exist", null);
+                result.add("The section you are trying to save already exist");
+                return result;
             }
-            Section resultSection = mapper.mapToEntity(vm);
-            Section result = sectionRepository.save(resultSection);
-            if (result == null){
-                return Pair.of("Couldn't save the section", null);
-            } else {
-                return  Pair.of("Section saved successfully", result);
-            }
+            return save(vm);
         }
     }
 
-    public String deleteSection(Long id){
+    private  Result save (SectionViewModel vm) {
+        Result result = new Result();
+        try {
+            sectionRepository.save(getEntity(vm));
+        } catch (Exception ex)  {
+            return result.add(ex.getMessage());
+        }
+        return  result;
+    }
+    public Result deleteSection(Long id){
+        Result result = new Result();
         if (id <= 0L) {
-            return "You should indicate the id of the section";
+            result.add("You should indicate the id of the section");
+            return result;
         }
         Section section = fetchSection(id);
         if (section == null) {
-            return "The section you want to delete doesn't exist";
+            result.add("The section you want to delete doesn't exist");
+            return result;
         }
         section.setDeleted(true);
-        return "Section successfully deleted";
+        try {
+            sectionRepository.save(section);
+        } catch (Exception ex)  {
+            return result.add(ex.getMessage());
+        }
+        return result;
     }
 
     public List<Section> getAllFiltered(Long sectionId){
@@ -120,6 +135,34 @@ public class SectionService {
             info.add(sInfo);
         }
         return info;
+    }
+
+    private Result ValidateModel(SectionViewModel vm){
+        Result result = new Result();
+
+        if (vm.getName().isEmpty()) {
+            result.add("You should specify the section name");
+            return result;
+        }
+
+        return result;
+    }
+
+    public SectionViewModel prepareEntity(SectionViewModel vm) {
+        if (vm.getId()== null)  {
+            vm.setId(0L);
+        }
+        if (vm.getName()== null)  {
+            vm.setName("");
+        }
+        if (vm.getDescription() == null)  {
+            vm.setDescription("");
+        }
+        return vm;
+    }
+
+    private Section getEntity(SectionViewModel vm){
+        return mapper.mapToEntity(vm);
     }
 
 }

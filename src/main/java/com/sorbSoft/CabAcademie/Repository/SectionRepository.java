@@ -1,7 +1,6 @@
 package com.sorbSoft.CabAcademie.Repository;
 
 
-import com.sorbSoft.CabAcademie.Entities.Forum;
 import com.sorbSoft.CabAcademie.Entities.Section;
 import org.springframework.data.jpa.repository.JpaRepository;
 

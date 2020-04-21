@@ -2,8 +2,10 @@ package com.sorbSoft.CabAcademie.Entities;
 
 import lombok.Data;
 import org.hibernate.annotations.Where;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -17,7 +19,10 @@ public class Feature implements Serializable {
     @Id()
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String icon;
+    @NotNull(message="Feature title cannot be null")
+    @NotEmpty(message = "Feature title is required")
     private String title;
+    @NotNull
+    private String icon;
     private boolean deleted = false;
 }

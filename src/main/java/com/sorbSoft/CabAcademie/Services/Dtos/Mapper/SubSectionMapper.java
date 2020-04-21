@@ -15,7 +15,6 @@ public interface SubSectionMapper {
     SubSectionViewModel mapToViewModel(SubSection section);
 
     @Mappings({
-            @Mapping(target = "section", ignore = true),
             @Mapping(target = "deleted", ignore = true),
     })
     SubSection mapToEntity(SubSectionViewModel vm);

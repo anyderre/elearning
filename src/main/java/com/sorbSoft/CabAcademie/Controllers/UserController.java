@@ -4,6 +4,7 @@ import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,21 +87,19 @@ public class UserController {
                     .body(MessageResponse.of("Error: Email is already in use!"));
         }
 
-        Pair<String, User> result = userService.saveUser(user);
-        if(result.getSecond() == null)
-            return new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CREATED);
+        Result result = userService.saveUser(user);
+        if(!result.isValid())
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of("User successfully created"), HttpStatus.CREATED);
     }
 
 
     @DeleteMapping(value = "/{id}")
     public ResponseEntity<MessageResponse> deleteUser(@PathVariable Long id ){
-        if(id<0)
-            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(userService.findAUser(id)==null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        userService.deleteUser(id);
-        return new ResponseEntity<>(MessageResponse.of("User with "+ id+" Deleted!"), HttpStatus.OK);
+        Result result =  userService.deleteUser(id);
+        if (!result.isValid()){
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        }
+        return  new ResponseEntity<>(MessageResponse.of("Section successfully deleted"), HttpStatus.OK);
     }
 }

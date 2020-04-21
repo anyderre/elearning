@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Controllers;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.SubCategory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.SubCategoryInfo;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SubCategoryViewModel;
 import com.sorbSoft.CabAcademie.Services.SubCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,20 +75,19 @@ public class SubCategoryController {
     @PostMapping(value = "/save")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public  ResponseEntity<MessageResponse> saveSubCategory(@Valid @RequestBody SubCategoryViewModel vm){
-        Pair<String, SubCategory> result = subCategoryService.saveSubCategory(vm);
-        if(result.getSecond() == null)
-            return new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CREATED);
+        Result result = subCategoryService.saveSubCategory(vm);
+        if(!result.isValid())
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of("Sub-Category successfully saved"), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/delete/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<String> deleteSubCategory(@PathVariable Long id ){
-        if(id<0)
-            return ResponseEntity.badRequest().build();
-        if(subCategoryService.fetchSubCategory(id)==null)
-            return ResponseEntity.notFound().build();
-
-        return ResponseEntity.ok(subCategoryService.deleteSubCategory(id));
+    public ResponseEntity<MessageResponse> deleteSubCategory(@PathVariable Long id ){
+        Result result = subCategoryService.deleteSubCategory(id);
+        if (!result.isValid()){
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        }
+        return  new ResponseEntity<>(MessageResponse.of("Sub-Category successfully deleted"), HttpStatus.OK);
     }
 }

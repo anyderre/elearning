@@ -28,7 +28,7 @@ public class HistoryOfLearningService {
 
     public HistoryOfLearning updateHistoryOfLearning(HistoryOfLearning historyOfLearning){
         HistoryOfLearning currentHistoryOfLearning= historyOfLearningRepository.findOne(historyOfLearning.getId());
-        currentHistoryOfLearning.setEnrollement(historyOfLearning.getEnrollement());
+//        currentHistoryOfLearning.setEnrollement(historyOfLearning.getEnrollement());
         currentHistoryOfLearning.setTimeStamp(currentHistoryOfLearning.getTimeStamp());
         currentHistoryOfLearning.setVideo(historyOfLearning.getVideo());
 
