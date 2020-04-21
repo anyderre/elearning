@@ -286,6 +286,9 @@ public class UserServices {
         if (vm.getCountry()== null) {
             vm.setCountry("");
         }
+        if (vm.getPhotoURL()== null) {
+            vm.setPhotoURL("");
+        }
         if (vm.getRole()== null) {
             vm.setRole(new Rol(){
                 @Override
