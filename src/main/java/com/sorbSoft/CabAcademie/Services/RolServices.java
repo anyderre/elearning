@@ -6,6 +6,7 @@ import com.sorbSoft.CabAcademie.Repository.RolRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.RolFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.RolInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.RolMapper;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.RolViewModel;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,55 +51,59 @@ public class RolServices {
         return rolRepository.findByDescription(description);
     }
 
-    public Pair<String, Rol> updateRol(RolViewModel vm){
+    public Result updateRol(RolViewModel vm){
+        Result result = new Result();
+        Rol current = rolRepository.findOne(vm.getId());
+        if (current == null) {
+            result.add("The role you want to update does not exist");
+            return result;
+        }
         Rol savedRol = rolRepository.findRolByNameAndIdIsNot(vm.getName(), vm.getId());
         if (savedRol != null) {
-            return Pair.of("The role name already exist for another definition", null);
+            return result.add("The role name already exist for another definition");
         }
-        Rol resultRol = mapper.mapToEntity(vm);
-        Rol currentRol= rolRepository.findOne(vm.getId());
-        currentRol.setDescription(resultRol.getDescription());
-        currentRol.setName(resultRol.getName());
 
-        Rol result = rolRepository.save(currentRol);
-        if (result == null) {
-            return Pair.of("Couldn't update the role", null);
-        } else {
-            return Pair.of("Rol updated successfully", result);
-        }
+        return save(vm);
     }
 
-    public Pair<String, Rol> saveRole(RolViewModel vm){
+    public Result saveRole(RolViewModel vm){
+        vm = prepareEntity(vm);
+        Result result = ValidateModel(vm);
+        if (!result.isValid()) {
+            return result;
+        }
         if (vm.getId() > 0L) {
             return updateRol(vm);
         } else {
             Rol savedRol = rolRepository.findByName(vm.getName());
 
             if (savedRol!= null){
-                return Pair.of("The role you are trying to save already exist", null);
+                result.add("The role you are trying to save already exist");
+                return result;
             }
-            Rol resultRol = mapper.mapToEntity(vm);
-            // TODO Devide by every word
-            resultRol.setDescription("ROLE_"+ String.join("_", resultRol.getName().trim().toUpperCase().split(" ")));
-            Rol result = rolRepository.save(resultRol);
-            if (result == null){
-                return Pair.of("Couldn't save the role", null);
-            } else {
-                return  Pair.of("Rol saved successfully", result);
-            }
+
+            return save(vm);
         }
     }
 
-    public String deleteRol(Long id){
+    public Result deleteRol(Long id){
+        Result result = new Result();
         if (id <= 0L) {
-            return "You should indicate the id of the role";
+            result.add("You should indicate the id of the role");
+            return result;
         }
         Rol role = fetchRole(id);
         if (role == null) {
-            return "The role you want to delete doesn't exist";
+            return result.add("The role you want to delete doesn't exist");
         }
         role.setDeleted(true);
-        return "Rol successfully deleted";
+        try {
+            rolRepository.save(role);
+        } catch (Exception ex)  {
+            result.add(ex.getMessage());
+            return result;
+        }
+        return result;
     }
 
     public List<Rol> getAllFiltered(Long roleId){
@@ -108,6 +113,17 @@ public class RolServices {
         if (roleId <= 0L)
             return new ArrayList<>();
         return roles.size() <= 0 ? new ArrayList<>() : roles.stream().filter(o -> !o.getId().equals(roleId)).collect(Collectors.toList());
+    }
+
+    private  Result save (RolViewModel vm) {
+        Result result = new Result();
+        try {
+            rolRepository.save(getEntity(vm));
+        } catch (Exception ex)  {
+            result.add(ex.getMessage());
+            return result;
+        }
+        return result;
     }
 
     public RolViewModel getRoleViewModel(Long roleId){
@@ -135,4 +151,34 @@ public class RolServices {
         }
         return info;
     }
-   }
+
+    private Rol getEntity(RolViewModel vm){
+        Rol resultRol = mapper.mapToEntity(vm);
+        resultRol.setDescription("ROLE_"+ String.join("_", resultRol.getName().trim().toUpperCase().split(" ")));
+        return resultRol;
+    }
+
+    private Result ValidateModel(RolViewModel vm){
+        Result result = new Result();
+
+        if (vm.getName().isEmpty()) {
+            result.add("You should specify the rol name");
+            return result;
+        }
+
+        return result;
+    }
+
+    public RolViewModel prepareEntity(RolViewModel vm) {
+        if (vm.getId()== null)  {
+            vm.setId(0L);
+        }
+        if (vm.getName()== null)  {
+            vm.setName("");
+        }
+        if (vm.getDescription() == null)  {
+            vm.setDescription("");
+        }
+        return vm;
+    }
+}

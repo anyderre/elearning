@@ -16,7 +16,6 @@ public interface SubCategoryMapper {
     SubCategoryViewModel mapToViewModel(SubCategory subCategory);
 
     @Mappings({
-            @Mapping(target = "category", ignore = true),
             @Mapping(target = "deleted", ignore = true),
     })
     SubCategory mapToEntity(SubCategoryViewModel vm);

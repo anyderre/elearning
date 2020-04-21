@@ -42,9 +42,12 @@ public class JwtUserDetailsService implements UserDetailsService {
 
         com.sorbSoft.CabAcademie.Entities.User User = userRepository.findByUsername(username);
         if (User == null) {
-            throw new UsernameNotFoundException(
-                    String.format("User not found with username: %s",
-                            username));
+            User = userRepository.findByEmail(username);
+            if (User == null) {
+                throw new UsernameNotFoundException(
+                        String.format("User not found with username: %s",
+                                username));
+            }
         }
 
         Set<GrantedAuthority> roles = new HashSet<>();

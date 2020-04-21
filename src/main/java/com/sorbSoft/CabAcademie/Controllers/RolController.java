@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Controllers;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.RolInfo;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.RolViewModel;
 import com.sorbSoft.CabAcademie.Services.RolServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,21 +69,19 @@ public class RolController {
     @PostMapping(value= "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public  ResponseEntity<MessageResponse> saveRole(@Valid @RequestBody RolViewModel role){
-        Pair<String, Rol> result = roleService.saveRole(role);
-        if(result.getSecond() == null)
-            return new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(MessageResponse.of(result.getFirst()), HttpStatus.CREATED);
+        Result result = roleService.saveRole(role);
+        if(!result.isValid())
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of("Role successfully saved"), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = "/delete/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
-    public ResponseEntity<String> deleteRole(@PathVariable Long id ){
-        if(id<0)
-            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(roleService.fetchRole(id)==null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        roleService.deleteRol(id);
-        return new ResponseEntity<>("Role with "+ id+" Deleted!", HttpStatus.OK);
+    public ResponseEntity<MessageResponse> deleteRole(@PathVariable Long id ){
+        Result result =  roleService.deleteRol(id);
+        if (!result.isValid()){
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        }
+        return  new ResponseEntity<>(MessageResponse.of("Section successfully deleted"), HttpStatus.OK);
     }
 }

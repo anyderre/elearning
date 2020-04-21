@@ -11,7 +11,6 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SubCategoryViewModel;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,44 +41,29 @@ public class SubCategoryService {
         return subCategoryRepository.findOne(id);
     }
 
-    private Result ValidateModel(SubCategoryViewModel vm){
+
+    public Result updateSubCategory (SubCategoryViewModel vm){
         Result result = new Result();
-
-        if (vm.getName().isEmpty()) {
-            result.add("You should the name of the sub-category");
+        SubCategory current = subCategoryRepository.findOne(vm.getId());
+        if (current == null) {
+            result.add("The sub-category you want to update does not exist");
             return result;
         }
-        if (vm.getCategory()== null || vm.getCategory().getId() <= 0) {
-            result.add("You should specify the category for the sub-category");
-            return result;
-        }
-        return result;
-    }
-
-    public Pair<String, SubCategory> updateSubCategory (SubCategoryViewModel vm){
         SubCategory savedSubCategory = subCategoryRepository.findSubCategoryByNameAndIdIsNot(vm.getName(), vm.getId());
 
         if (savedSubCategory != null) {
-            return Pair.of("The subCategory name already exist for another definition", null);
+            result.add("The subCategory name already exist for another definition");
+            return result;
         }
 
-        SubCategory currentSubCategory= subCategoryRepository.findOne(vm.getId());
-
-        if (currentSubCategory == null) {
-            return Pair.of("The subCategory you want to update doesn't exist", null);
-        }
-        SubCategory result = subCategoryRepository.save(getEntity(vm));
-        if (result == null) {
-            return Pair.of("Couldn't update the subCategory", null);
-        } else {
-            return Pair.of("SubCategory updated successfully", result);
-        }
+        return save(vm);
     }
 
-    public Pair<String, SubCategory>  saveSubCategory (SubCategoryViewModel vm){
+    public Result saveSubCategory (SubCategoryViewModel vm){
+        vm = prepareEntity(vm);
         Result result = ValidateModel(vm);
         if (!result.isValid()) {
-            return Pair.of(result.lista.get(0).message, null);
+            return result;
         }
         if (vm.getId() > 0L) {
             return updateSubCategory(vm);
@@ -87,36 +71,42 @@ public class SubCategoryService {
             SubCategory savedSubCategory = subCategoryRepository.findSubCategoryByName(vm.getName());
 
             if ( savedSubCategory != null){
-                return Pair.of("The subCategory you are trying to save already exist", null);
+                result.add("The subCategory you are trying to save already exist");
+                return result;
             }
 
-            SubCategory subCategroyr = subCategoryRepository.save(getEntity(vm));
-            if (subCategroyr == null){
-                return Pair.of("Couldn't save the subCategory", null);
-            } else {
-                return  Pair.of("SubCategory saved successfully", subCategroyr);
-            }
+            return save(vm);
         }
     }
 
-    public String deleteSubCategory(Long id){
+    private  Result save (SubCategoryViewModel vm) {
+        Result result = new Result();
+        try {
+           subCategoryRepository.save(getEntity(vm));
+        } catch (Exception ex)  {
+            return result.add(ex.getMessage());
+        }
+        return result;
+    }
+
+    public Result deleteSubCategory(Long id){
+        Result result = new Result();
         if (id <= 0L) {
-            return "You should indicate the id of the subCategory";
+            result.add("You should indicate the id of the subCategory");
+            return result;
         }
         SubCategory subCategory = subCategoryRepository.findOne(id);
         if (subCategory == null) {
-            return "The subCategory you want to delete doesn't exist";
+            result.add("The subCategory you want to delete doesn't exist");
+            return result;
         }
-//        if (subCategory.getCategory()!= null){
-//            List<SubCategory> subCategories = subCategoryRepository.findAllByCategory(subCategory.getParentSubCategory().getId());
-//            subCategories.forEach(cat -> {
-//                cat.setParentSubCategory(null);
-//                subCategoryRepository.save(cat);
-//            });
-//        }
         subCategory.setDeleted(true);
-        subCategoryRepository.save(subCategory);
-        return "Section successfully deleted";
+        try {
+            subCategoryRepository.save(subCategory);
+        } catch (Exception ex)  {
+            return result.add(ex.getMessage());
+        }
+        return result;
     }
 
     public SubCategoryViewModel getSubCategoryViewModel(Long subCategoryId){
@@ -166,10 +156,72 @@ public class SubCategoryService {
 
 
     private SubCategory getEntity(SubCategoryViewModel vm){
-        SubCategory resultSubCategory = mapper.mapToEntity(vm);
-        if (vm.getCategory()!= null && vm.getCategory().getId() != null && vm.getCategory().getId() > 0){
-            resultSubCategory.setCategory(categoryRepository.findOne(vm.getCategory().getId()));
-        }
-        return resultSubCategory;
+        return mapper.mapToEntity(vm);
+//        if (vm.getCategory()!= null && vm.getCategory().getId() != null && vm.getCategory().getId() > 0){
+//            resultSubCategory.setCategory(categoryRepository.findOne(vm.getCategory().getId()));
+//        }
+//        return resultSubCategory;
     }
+
+    private Result ValidateModel(SubCategoryViewModel vm){
+        Result result = new Result();
+
+        if (vm.getName().isEmpty()) {
+            result.add("You should specify the sub-category name");
+            return result;
+        }
+
+        if (vm.getCategory().getId() <= 0L) {
+            result.add("You should specify the category");
+            return result;
+        }
+
+        Category category = categoryRepository.findOne(vm.getCategory().getId());
+        if (category == null) {
+            result.add("The category you specified does not exist");
+            return result;
+        }
+
+        if (vm.getSubCategories().size() > 0) {
+            for (SubCategory subCategory : vm.getSubCategories()) {
+                SubCategory sub = subCategoryRepository.findOne(subCategory.getId());
+                if (sub == null) {
+                    result.add(String.format("The sub-category no. {0} in the list of sub-categories does not exist", vm.getSubCategories().indexOf(subCategory) + 1 ));
+                    return result;
+                }
+                if (vm.getId() > 0L && vm.getId().equals(subCategory.getId())) {
+                    result.add(String.format("The sub-category {0} cannot be a sub-category of himself", vm.getName()));
+                    return result;
+                }
+            }
+        }
+
+        return result;
+    }
+
+
+    public SubCategoryViewModel prepareEntity(SubCategoryViewModel vm) {
+        if (vm.getId()== null)  {
+            vm.setId(0L);
+        }
+        if (vm.getName()== null)  {
+            vm.setName("");
+        }
+        if (vm.getDescription() == null)  {
+            vm.setDescription("");
+        }
+        if (vm.getCategory() == null) {
+            vm.setCategory( new Category(){
+                @Override
+                public Long getId() {
+                    return 0L;
+                }
+            });
+        }
+        if (vm.getSubCategories()== null) {
+            vm.setSubCategories(new ArrayList<>());
+        }
+        return vm;
+    }
+
 }

@@ -1,13 +1,17 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.ViewModel;
 
 import lombok.Data;
-import javax.validation.constraints.Size;
+import org.hibernate.validator.constraints.NotEmpty;
+
+import javax.persistence.Lob;
+import javax.validation.constraints.NotNull;
 
 @Data
 public class SectionViewModel {
     private Long id;
-    @Size(max=250, message = "The description can't be longer than 250 characters")
-    private String description;
-    @Size(max=50, message = "The name can't be longer than 250 characters")
+    @NotNull
+    @NotEmpty(message = "Section name is required")
     private String name;
+    @Lob
+    private String description;
 }

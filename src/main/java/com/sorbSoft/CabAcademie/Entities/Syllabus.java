@@ -1,6 +1,8 @@
 package com.sorbSoft.CabAcademie.Entities;
 
 import lombok.Data;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -19,7 +21,11 @@ public class Syllabus implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String chapterTitle;
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @Fetch(value = FetchMode.SUBSELECT)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinTable(name = "syllabus_chapter_tuts",
+            joinColumns = @JoinColumn(name = "syllabus_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "video_id", referencedColumnName = "id"))
     private List<Video> chapterTuts;
     private boolean deleted = false;
 }
