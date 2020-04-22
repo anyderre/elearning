@@ -1,11 +1,13 @@
 package com.sorbSoft.CabAcademie.Controllers;
 
 import com.sorbSoft.CabAcademie.Entities.Video;
+import com.sorbSoft.CabAcademie.Services.AmazonClient;
 import com.sorbSoft.CabAcademie.Services.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -16,59 +18,23 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/video")
 public class VideoController {
+
+    private AmazonClient amazonClient;
+
     @Autowired
-    private VideoService videoService;
-
-    @GetMapping(value = "/{id}")
-    public ResponseEntity<Video> getVideo(@PathVariable Long id){
-        if(id<0)
-            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        Video video = videoService.fetchVideo(id);
-        if(video ==null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        return new ResponseEntity<>(video, HttpStatus.OK);
+    VideoController(AmazonClient amazonClient) {
+        this.amazonClient = amazonClient;
     }
 
-    @GetMapping()
-    public ResponseEntity<List<Video>> getAllVideos(){
-        List<Video> videos = videoService.fetchAllVideo();
-        if(videos.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        return new ResponseEntity<>(videos, HttpStatus.OK);
+    @PostMapping("/uploadFileToS3")
+    public String uploadFile(@RequestPart(value = "file") MultipartFile file) throws Exception {
+        return this.amazonClient.uploadFile(file);
     }
 
-    @PostMapping()
-    public  ResponseEntity<Video> saveVideo(@Valid @RequestBody Video video){
-        Video currentVideo = videoService.saveVideo(video);
-        if(currentVideo ==null)
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        return  new ResponseEntity<>(HttpStatus.CREATED);
+    @DeleteMapping("/deleteFileAtS3")
+    public String deleteFile(@RequestPart(value = "url") String fileUrl) throws Exception {
+        return this.amazonClient.deleteFileFromS3Bucket(fileUrl);
     }
 
-    @PutMapping(value = "/{id}")
-    public ResponseEntity<Video> updateVideo(@PathVariable Long id, @RequestBody Video video){
-        if(id<0)
-            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(videoService.fetchVideo(id)==null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        Video currentVideo = videoService.updateVideo(video);
-        if (currentVideo ==null)
-            return  new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
-
-        return new ResponseEntity<>(currentVideo, HttpStatus.OK);
-    }
-
-    @DeleteMapping(value = "/{id}")
-    public ResponseEntity<String> deleteVideo(@PathVariable Long id ){
-        if(id<0)
-            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        if(videoService.fetchVideo(id)==null)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-
-        videoService.deleteVideo(id);
-        return new ResponseEntity<>("Video with "+ id+" Deleted!", HttpStatus.OK);
-    }
+    //reemoved endpoint here
 }

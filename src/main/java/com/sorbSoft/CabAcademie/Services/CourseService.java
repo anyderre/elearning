@@ -103,6 +103,11 @@ public class CourseService {
         return save(vm);
     }
 
+    //and this
+    public boolean exists(Long id) {
+        return courseRepository.exists(id);
+    }
+
     private  Result save (CourseViewModel vm) {
         Result result = new Result();
         Course course = null;

@@ -3,6 +3,7 @@ package com.sorbSoft.CabAcademie.Controllers;
 
 import com.sorbSoft.CabAcademie.Entities.Course;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
+import com.sorbSoft.CabAcademie.Entities.LanguageEntity;
 import com.sorbSoft.CabAcademie.Services.CourseService;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
@@ -99,6 +100,28 @@ public class CourseController {
         if(!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(MessageResponse.of("Course successfully saved"), HttpStatus.OK);
+    }
+
+    //Added this
+    @PutMapping(value = "/update")
+    public ResponseEntity<Course> updateCourse(@RequestBody CourseViewModel courseVm){
+
+        //TODO: Validators should be implemenmted as seperate layer
+        if(courseVm == null
+                || courseVm.getId()==null)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Long id = courseVm.getId();
+        if(!courseService.exists(id))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+        Result result = courseService.updateCourse(courseVm);
+
+        if (result == null)
+            return  new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+
+        return new ResponseEntity(result, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")
