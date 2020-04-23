@@ -10,6 +10,8 @@ import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.AppointmentSlotViewModel
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,28 +30,34 @@ public class AppointmentSlotsService {
     private UserRepository userRepository;
 
     //create
-    public void save(List<AppointmentSlotViewModel> appointmentVmSlots) {
+    public Result save(List<AppointmentSlotViewModel> appointmentVmSlots) {
+
+        Result result = new Result();
+
         for(AppointmentSlotViewModel vm : appointmentVmSlots) {
             if(vm.getId()<=0) {
-                validate(vm);
+                result = validate(vm);
+
+                if(!result.isValid()) {
+                    return result;
+                }
                 AppointmentSlot entity = getEntity(vm);
                 slotsRepo.save(entity);
             } else {
-                update(vm);
+                result.add("No update implemented yet. Please remove and add new entity");
+                return result;
             }
         }
+
+        return result;
     }
 
-    private void update(AppointmentSlotViewModel vm) {
-        //TODO: implement
-    }
-
-    //read
     public List<AppointmentSlotViewModel> getSlotsByUserIdWithinDateRange(AppointmentSlotViewModel vm) {
         Date dateFrom = vm.getDateFrom();
         Date dateTo = vm.getDateTo();
         Long userId = vm.getUserId();
 
+        //TODO: add validation and message return
         User user = userRepository.findById(userId);
 
         List<AppointmentSlot> slotsByUserWithinDateRange = slotsRepo.findSlotsByUserWithinDateRange(dateFrom, dateTo, user);
@@ -108,12 +116,6 @@ public class AppointmentSlotsService {
         return vmList;
     }
 
-    //update
-    public void update(List<AppointmentSlot> appointmentSlots) {
-        slotsRepo.save(appointmentSlots);
-    }
-
-    //delete
     public Result deleteOne(Long slotId) {
         Result result = new Result();
         if (slotId <= 0L) {
@@ -135,49 +137,126 @@ public class AppointmentSlotsService {
         return result;
     }
 
-    //delete
-    public void deleteMany(List<AppointmentSlotViewModel> vms) {
+    public Result deleteSlotsByUserIdWithinDateRange(AppointmentSlotViewModel vm) {
+        Result result = new Result();
 
-        List<AppointmentSlot> entities = getEntities(vms);
-        slotsRepo.delete(entities);
+        if(vm.getUserId()==null
+                || vm.getUserId()<=0) {
+            result.add("User id can't be null, zero or below zero");
+            return result;
+        }
+
+
+        result = validateDate(new DateTime(vm.getDateFrom()), new DateTime(vm.getDateTo()));
+        if(!result.isValid()) {
+            return result;
+        }
+
+
+       User user = userRepository.findById(vm.getUserId());
+
+        if(user==null) {
+            result.add("User with id "+ vm.getUserId() +" does not exist in db");
+            return result;
+        }
+
+        List<AppointmentSlot> dbSlots = slotsRepo.findSlotsByUserWithinDateRange(vm.getDateFrom(), vm.getDateTo(), user);
+
+        if(dbSlots==null || dbSlots.isEmpty()) {
+            result.add("There are no slots to delete with a given date range and user");
+            return result;
+        }
+
+        try {
+            slotsRepo.removeSlotsByUserWithDateRange(vm.getDateFrom(), vm.getDateTo(), user);
+        } catch (Exception ex)  {
+            result.add(ex.getMessage());
+            return result;
+        }
+        return result;
     }
 
-    private void validate(AppointmentSlotViewModel vm){
+
+    public Result deleteAllSlotsForUserId(Long userId) {
+        Result result = new Result();
+        if(userId==null || userId<=0) {
+            result.add("User id can't be null, zero or below zero");
+            return result;
+        }
+
+        User user = userRepository.findById(userId);
+
+        if(user == null) {
+            result.add("User with id "+userId+" does not exist");
+            return result;
+        }
+
+        slotsRepo.removeAllSlotsForUser(user);
+
+        return result;
+    }
+
+    private Result validateDate(DateTime from, DateTime to) {
+
+        Result result = new Result();
+
+        if(from.isAfter(to)) {
+            result.add("Date 'From' can't be after Date 'To'");
+            return result;
+        }
+        if(from.isEqual(to)) {
+            result.add("Date 'From' can't be Equal to Date 'To'");
+            return result;
+        }
+
+        return result;
+    }
+
+    private Result validate(AppointmentSlotViewModel vm){
+
+        Result result = new Result();
+
         if(vm.getUserId()==null || vm.getUserId()<=0) {
-            throw new IllegalArgumentException("User id can't be zero or less!");
+            result.add("User id can't be zero or less!");
+            return result;
         }
 
         if(vm.getDateFrom() == null) {
-            throw new IllegalArgumentException("Date From can't be null");
+            result.add("Date From can't be null");
+            return result;
         }
 
         if(vm.getDateTo() == null) {
-            throw new IllegalArgumentException("Date To can't be null");
+            result.add("Date To can't be null");
+            return result;
         }
 
         Long userId = vm.getUserId();
         User user = userRepository.findById(userId);
 
         if(user == null) {
-            throw new IllegalArgumentException("User with "+vm.getId()+" doesn't exist");
+            result.add("User with "+vm.getId()+" doesn't exist");
+            return result;
         }
 
         DateTime  curFrom = new DateTime(vm.getDateFrom());
         DateTime  curTo = new DateTime(vm.getDateTo());
         DateTime  now = DateTime.now();
 
-        if(curFrom.isAfter(curTo)) {
-            throw new IllegalArgumentException("Date 'From' can't be after Date 'To'");
-        }
-        if(curFrom.isEqual(curTo)) {
-            throw new IllegalArgumentException("Date 'From' can't be Equal to Date 'To'");
+        result = validateDate(curFrom, curTo);
+
+        if(!result.isValid()) {
+            return result;
         }
 
+
         if(curFrom.isBefore(now)) {
-            throw new IllegalArgumentException("Date 'From' can't be before 'Now'");
+            result.add("Date 'From' can't be before 'Now'");
+            return result;
         }
         if(curTo.isBefore(now)) {
-            throw new IllegalArgumentException("Date 'To' can't be before 'Now'");
+            result.add("Date 'To' can't be before 'Now'");
+            return result;
         }
 
 
@@ -188,10 +267,12 @@ public class AppointmentSlotsService {
             DateTime dbTo = new DateTime(sl.getDateTo());
 
             if(isOverlapped(curFrom, curTo, dbFrom, dbTo)) {
-                throw new IllegalArgumentException
-                        ("Your dates "+curFrom+"-"+curTo+" overlap with db dates "+dbFrom+"-"+dbTo+" for user "+user.getId());
+                result.add("Your dates "+curFrom+"-"+curTo+" overlap with db dates "+dbFrom+"-"+dbTo+" for user "+user.getId());
+                return result;
             }
         }
+
+        return result;
 
     }
 
@@ -226,5 +307,6 @@ public class AppointmentSlotsService {
         Interval interval2 = new Interval( start2, end2 );
         return interval.overlaps( interval2 );
     }
+
 
 }

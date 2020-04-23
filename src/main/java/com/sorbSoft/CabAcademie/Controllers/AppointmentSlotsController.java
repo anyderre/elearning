@@ -25,13 +25,9 @@ public class AppointmentSlotsController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INSTRUCTOR')")
     public ResponseEntity<MessageResponse> saveAppointmentSlots(@Valid @RequestBody List<AppointmentSlotViewModel> appointmentVmSlots){
 
-        /*
-        Result result = categoryService.saveCategory(vm);
+        Result result = slotsService.save(appointmentVmSlots);
         if(!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(MessageResponse.of("Category successfully added"), HttpStatus.CREATED);
-         */
-        slotsService.save(appointmentVmSlots);
         return  new ResponseEntity<>(MessageResponse.of("Appointment Slots Saved Successfully"), HttpStatus.OK);
     }
 
@@ -53,10 +49,39 @@ public class AppointmentSlotsController {
         return new ResponseEntity(slots, HttpStatus.OK);
     }
 
+    @DeleteMapping(value = "/deleteByUserIdWithinDateRange", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INSTRUCTOR')")
+    public ResponseEntity<MessageResponse> deleteAppointmentSlotsByUserIdWithinDateRange(
+            @Valid @RequestBody AppointmentSlotViewModel vmSlots){
+
+        if(vmSlots==null
+            || vmSlots.getDateFrom() == null
+            || vmSlots.getDateTo() == null) {
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        Result result = slotsService.deleteSlotsByUserIdWithinDateRange(vmSlots);
+
+        if (!result.isValid()){
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        }
+
+        return new ResponseEntity(MessageResponse.of("Slots have been successfully deleted"), HttpStatus.OK);
+    }
+
     @DeleteMapping(value = "/deleteOne/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INSTRUCTOR')")
     public ResponseEntity<MessageResponse> deleteSlot(@PathVariable Long id ){
         Result result = slotsService.deleteOne(id);
+        if (!result.isValid()){
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        }
+        return  new ResponseEntity<>(MessageResponse.of("Slot has been successfully deleted"), HttpStatus.OK);
+    }
+
+    @DeleteMapping(value = "/deleteAllByUserId/{userId}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INSTRUCTOR')")
+    public ResponseEntity<MessageResponse> deleteAllByUserId(@PathVariable Long userId ){
+        Result result = slotsService.deleteAllSlotsForUserId(userId);
         if (!result.isValid()){
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         }
