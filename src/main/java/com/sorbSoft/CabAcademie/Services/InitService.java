@@ -58,6 +58,7 @@ public class InitService {
                     Rol newRole = new Rol();
                     newRole.setName("Professor");
                     newRole.setDescription(role.name());
+                    newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 } else if (role.name().equals(Roles.ROLE_STUDENT.name())) {
                     Rol newRole = new Rol();
