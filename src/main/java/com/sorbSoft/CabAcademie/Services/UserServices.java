@@ -122,6 +122,9 @@ public class UserServices {
         return UserRepository.findAllByRoleName(Roles.ROLE_PROFESSOR.name());
     }
 
+    public User findProfessor(Long professorId){
+        return UserRepository.findByRoleNameAndId(Roles.ROLE_PROFESSOR.name(), professorId);
+    }
 
     public List<User> findAllUsersFilteredFromAdmin(){
         return UserRepository.findAll().stream().filter(user ->
