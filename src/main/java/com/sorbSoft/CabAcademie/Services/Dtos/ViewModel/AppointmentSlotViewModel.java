@@ -12,8 +12,8 @@ public class AppointmentSlotViewModel {
 
     private Long userId;
 
-    private Date from;
+    private Date dateFrom;
 
-    private Date to;
+    private Date dateTo;
 
 }
