@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 
@@ -25,8 +26,9 @@ public class Category implements Serializable {
     @NotNull
     @NotEmpty(message = "Category name is required")
     private String name;
-    @Lob
+
     @NotNull
+    @Size(max = 2147483647)
     private String description;
     @NotNull
     private boolean deleted = false;

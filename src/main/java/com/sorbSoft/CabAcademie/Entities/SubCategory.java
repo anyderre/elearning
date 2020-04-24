@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 
@@ -25,8 +26,10 @@ public class SubCategory implements Serializable {
     @NotNull
     @NotEmpty(message = "Sub-Category name is required")
     private String name;
-    @Lob
+
+    @Size(max = 2147483647)
     private String description;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id")
     private Category category;
