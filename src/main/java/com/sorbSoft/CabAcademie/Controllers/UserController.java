@@ -65,6 +65,22 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/professors" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<User>> findAllProfessors(){
+        List<User> users= userService.findAllProfessor();
+        if(users.isEmpty())
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/professor/{id}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<User> findProfessor(@PathVariable Long id){
+        User professor = userService.findProfessor(id);
+        if(professor == null)
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(professor, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/info" , consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<UserInfo>> findUserInfo(){
         List<UserInfo> users= userService.getUserInfo();

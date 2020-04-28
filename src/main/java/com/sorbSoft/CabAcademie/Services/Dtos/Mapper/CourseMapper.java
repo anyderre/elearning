@@ -12,6 +12,7 @@ public interface CourseMapper {
         @Mappings({
             @Mapping(target="categories", ignore = true),
             @Mapping(target="users", ignore = true),
+            @Mapping(target="videos", ignore = true),
             @Mapping(target="subCategories", ignore = true),
             @Mapping(target="subSections", ignore = true),
             @Mapping(target="schools", ignore = true),

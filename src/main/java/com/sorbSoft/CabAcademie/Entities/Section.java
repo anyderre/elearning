@@ -23,7 +23,7 @@ public class Section implements Serializable {
     @NotNull
     @NotEmpty(message = "Section name is required")
     private String name;
-    @Lob
+    @Size(max = 2147483647)
     private String description;
     private boolean deleted = false;
 }

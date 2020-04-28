@@ -34,9 +34,9 @@ public class Course implements Serializable {
     @NotNull
     @NotEmpty(message = "Title is required")
     private String title;
-    @Lob
+    @Size(max = 2147483647)
     private String description;
-    @Lob
+    @Size(max = 2147483647)
     private String imageUrl;
     @NotNull
     @Min(value = 0, message = "The rating value cannot be less than zero")

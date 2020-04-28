@@ -17,7 +17,7 @@ import java.util.List;
  */
 @Data
 @Entity
-@Table(	name = "user",
+@Table(	name = "user", schema = "public",
         uniqueConstraints = {
                 @UniqueConstraint(columnNames = "username"),
                 @UniqueConstraint(columnNames = "email")
@@ -47,11 +47,13 @@ public class User {
     @NotEmpty(message = "Password is required")
     @Size(max=60)
     private String password;
-    @Lob
+
     @NotNull
+    @Size(max = 2147483647)
     private String photoURL;
-    @Lob
+
     @NotNull
+    @Size(max = 2147483647)
     private String bio;
     @NotNull
     private String country;

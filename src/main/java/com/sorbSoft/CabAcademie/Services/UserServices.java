@@ -111,10 +111,19 @@ public class UserServices {
 
     public User findUserbyUsername(String username){
         return UserRepository.findByUsername(username);
+
     }
 
     public List<User> findAllUser(){
         return UserRepository.findAll();
+    }
+
+    public List<User> findAllProfessor(){
+        return UserRepository.findAllByRoleName(Roles.ROLE_PROFESSOR.name());
+    }
+
+    public User findProfessor(Long professorId){
+        return UserRepository.findByRoleNameAndId(Roles.ROLE_PROFESSOR.name(), professorId);
     }
 
     public List<User> findAllUsersFilteredFromAdmin(){

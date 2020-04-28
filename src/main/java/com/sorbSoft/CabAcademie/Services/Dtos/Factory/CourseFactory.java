@@ -33,6 +33,11 @@ public class CourseFactory {
             }
 
             @Override
+            public List<Video> getVideos() {
+                return new ArrayList<>();
+            }
+
+            @Override
             public float getRatings() {
                 return 5.0f;
             }
