@@ -54,6 +54,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/webjars/**"
     };
 
+    private static final String[] CATEGORY_URLS = {
+
+            "/api/category/all",
+            "/api/category/info",
+            "/api/category/all/filtered"
+
+    };
+
+    private static final String[] SUB_CATEGORIES_URLS = {
+
+            "/api/subCategory/all",
+            "/api/subCategory/info",
+            "/api/subCategory/all/filtered"
+
+    };
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         // configure AuthenticationManager so that it knows from where to load
@@ -94,6 +110,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(SWAGGER_URLS).permitAll()
                 .antMatchers(HttpMethod.GET, "/api/languages/**").permitAll()
+                .antMatchers(HttpMethod.GET, CATEGORY_URLS).permitAll()
+                .antMatchers(HttpMethod.GET, SUB_CATEGORIES_URLS).permitAll()
                 .antMatchers("/authenticate").permitAll()
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
                 .antMatchers(HttpMethod.GET, PRE_SIGN_UP_URL).permitAll()
