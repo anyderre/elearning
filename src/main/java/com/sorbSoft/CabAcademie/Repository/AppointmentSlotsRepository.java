@@ -29,4 +29,7 @@ public interface AppointmentSlotsRepository extends JpaRepository<AppointmentSlo
     @Modifying
     @Query("delete from AppointmentSlot ap where ap.user = :user")
     void removeAllSlotsForUser(@Param("user") User user);
+
+    @Query("select ap from AppointmentSlot ap where ap.dateFrom <= :meetingStart and ap.dateTo >= :meetingEnd and ap.user = :teacher")
+    List<AppointmentSlot> getAvailableSlots(@Param("meetingStart") Date meetingStart, @Param("meetingEnd") Date meetingEnd, @Param("teacher") User teacher);
 }

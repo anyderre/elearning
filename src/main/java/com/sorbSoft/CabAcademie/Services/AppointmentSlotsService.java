@@ -2,6 +2,7 @@ package com.sorbSoft.CabAcademie.Services;
 
 import com.sorbSoft.CabAcademie.Entities.AppointmentSlot;
 import com.sorbSoft.CabAcademie.Entities.Category;
+import com.sorbSoft.CabAcademie.Entities.Enums.AppointmentStatus;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Repository.AppointmentSlotsRepository;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
@@ -28,6 +29,106 @@ public class AppointmentSlotsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    public Result bookMeeting(AppointmentSlotViewModel vm) {
+
+        //check if time range > 10 min
+        //check if time range < 1h
+
+        Result result = new Result();
+
+        User teacher = userRepository.findById(vm.getUserId());
+        List<AppointmentSlot> slots = slotsRepo.getAvailableSlots(vm.getDateFrom(), vm.getDateTo(), teacher);
+
+        AppointmentSlot availableSlot = slots.get(0);
+        DateTime slotFrom = new DateTime(availableSlot.getDateFrom());
+        DateTime slotTo = new DateTime(availableSlot.getDateTo());
+
+        DateTime meetingFrom = new DateTime(vm.getDateFrom());
+        DateTime meetingTo = new DateTime(vm.getDateTo());
+
+        //- if suggested meeting time == slot -> book
+        if(meetingFrom.isEqual(slotFrom) && meetingTo.isEqual(slotTo)) {
+            //book
+            availableSlot.setStatus(AppointmentStatus.WAITING_APPROVAL);
+            slotsRepo.save(availableSlot);
+            result.add("Just Booked");
+        } else {
+
+            DateTime s1 = null;
+            DateTime e1 = null;
+
+            DateTime s2 = null;
+            DateTime e2 = null;
+
+            if(meetingFrom.isAfter(slotFrom) && meetingTo.isBefore(slotTo)) {
+                //split slot
+                s1 = new DateTime(slotFrom);
+                e1 = new DateTime(meetingFrom.minusMinutes(1));
+
+                s2 = new DateTime(meetingTo.plusMinutes(1));
+                e2 = new DateTime(slotTo);
+
+                //if suggested meeting time < available slot
+            } else if(meetingFrom.isEqual(slotFrom) && meetingTo.isBefore(slotTo)) {
+                //split slot
+                s1 = new DateTime(meetingFrom.plusMinutes(1));
+                e1 = new DateTime(slotTo);
+
+                //if suggested meeting time < available slot
+            } else if (meetingFrom.isAfter(slotFrom) && meetingTo.isEqual(slotTo)) {
+                //split slot
+                s1 = new DateTime(slotFrom);
+                e1 = new DateTime(meetingFrom.minusMinutes(1));
+            }
+
+            Long userId = availableSlot.getUser().getId();
+            User user = userRepository.findById(userId);
+
+            //split by creating 2 smaller time slots
+            AppointmentSlot slot1 = new AppointmentSlot();
+            slot1.setUser(user);
+            slot1.setDateFrom(s1.toDate());
+            slot1.setDateTo(e1.toDate());
+            slot1.setStatus(AppointmentStatus.AVAILABLE);
+
+            //split by creating 2 smaller time slots
+            AppointmentSlot slot2 = new AppointmentSlot();
+            slot2.setUser(user);
+            slot2.setDateFrom(s2.toDate());
+            slot2.setDateTo(e2.toDate());
+            slot2.setStatus(AppointmentStatus.AVAILABLE);
+
+            //book time slot
+            AppointmentSlot booked = new AppointmentSlot();
+            booked.setUser(user);
+            booked.setDateFrom(meetingFrom.toDate());
+            booked.setDateTo(meetingTo.toDate());
+            booked.setStatus(AppointmentStatus.WAITING_APPROVAL);
+
+            slotsRepo.save(slot1);
+            slotsRepo.save(slot2);
+            slotsRepo.delete(availableSlot);
+            slotsRepo.save(booked);
+            result.add("Splited and Booked");
+
+            //send email to teacher
+            //send email to student to inform him
+
+
+
+            //book
+            //save splitted slot
+        }
+
+
+        //- if suggested meeting time < available slot -> split time slot
+        //- if suggested meeting time > available slot -> check neighbor slots. book, throw exception of check next neighbor
+        //get available slots
+        //book -> mark busy
+
+        return result;
+    }
 
     //create
     public Result save(List<AppointmentSlotViewModel> appointmentVmSlots) {

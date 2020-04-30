@@ -1,5 +1,7 @@
 package com.sorbSoft.CabAcademie.Entities;
 
+import com.sorbSoft.CabAcademie.Entities.Enums.AppointmentStatus;
+import com.sorbSoft.CabAcademie.Entities.Enums.AppointmentType;
 import lombok.*;
 import org.springframework.data.util.Pair;
 
@@ -33,5 +35,13 @@ public class AppointmentSlot implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "date_to")
     private Date dateTo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private AppointmentStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type")
+    private AppointmentType type;
 
 }
