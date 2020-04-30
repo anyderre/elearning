@@ -70,6 +70,22 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     };
 
+    private static final String[] SECTIONS_URLS = {
+
+            "/api/section/all",
+            "/api/section/info",
+            "/api/section/all/filtered"
+
+    };
+
+    private static final String[] SUB_SECTIONS_URLS = {
+
+            "/api/subSection/all",
+            "/api/subSection/info",
+            "/api/subSection/all/filtered"
+
+    };
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         // configure AuthenticationManager so that it knows from where to load
@@ -112,6 +128,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/languages/**").permitAll()
                 .antMatchers(HttpMethod.GET, CATEGORY_URLS).permitAll()
                 .antMatchers(HttpMethod.GET, SUB_CATEGORIES_URLS).permitAll()
+                .antMatchers(HttpMethod.GET, SECTIONS_URLS).permitAll()
+                .antMatchers(HttpMethod.GET, SUB_SECTIONS_URLS).permitAll()
                 .antMatchers("/authenticate").permitAll()
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
                 .antMatchers(HttpMethod.GET, PRE_SIGN_UP_URL).permitAll()
