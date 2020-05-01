@@ -459,6 +459,124 @@ public class CourseService {
         return resultCourse;
     }
 
+    public List<Course> fetchLastAddedCourses(int amount) {
+
+        Pageable pageable = new PageRequest(0, amount);
+        List<Course> lastCreated = courseRepository.findLastCreated(pageable);
+
+        return lastCreated;
+    }
+
+    public List<Course> fetchBestRatedCourses(int amount) {
+        Pageable pageable = new PageRequest(0, amount);
+        List<Course> bestRated = courseRepository.findBestRated(pageable);
+
+        return bestRated;
+    }
+
+    public List<Course> fetchFeaturedCourses(int amount) {
+        Pageable pageable = new PageRequest(0, amount);
+        List<Course> featureed = courseRepository.findFeatured(pageable);
+
+        return featureed;
+    }
+
+    public List<Course> fetchLastAddedByCategory(Integer amount, Long categoryId) {
+        Pageable pageable = new PageRequest(0, amount);
+        Category category = categoryRepository.findOne(categoryId);
+        List<Course> lastCreated = courseRepository.findLastCreatedByCategory(category, pageable);
+
+        return lastCreated;
+    }
+
+    public List<Course> fetchLastAddedBySubCategory(Integer amount, Long subCategoryId) {
+        Pageable pageable = new PageRequest(0, amount);
+        SubCategory subCategory = subCategoryRepository.findOne(subCategoryId);
+        List<Course> lastCreated = courseRepository.findLastCreatedBySubCategory(subCategory, pageable);
+
+        return lastCreated;
+    }
+
+    public List<Course> fetchLastAddedBySection(Integer amount, Long sectionId) {
+        Pageable pageable = new PageRequest(0, amount);
+        Section section = sectionRepository.findOne(sectionId);
+        List<Course> lastCreated = courseRepository.findLastCreatedBySection(section, pageable);
+
+        return lastCreated;
+    }
+
+    public List<Course> fetchLastAddedBySubSection(Integer amount, Long subSectionId) {
+        Pageable pageable = new PageRequest(0, amount);
+        SubSection subSection = subSectionRepository.findOne(subSectionId);
+        List<Course> lastCreated = courseRepository.findLastCreatedBySubSection(subSection, pageable);
+
+        return lastCreated;
+    }
+
+    public List<Course> fetchBestRatedByCategory(Integer amount, Long categoryId) {
+        Pageable pageable = new PageRequest(0, amount);
+        Category category = categoryRepository.findOne(categoryId);
+        List<Course> bestRated = courseRepository.findBestRatedByCategory(category, pageable);
+
+        return bestRated;
+    }
+
+    public List<Course> fetchBestRatedBySubCategory(Integer amount, Long subCategoryId) {
+        Pageable pageable = new PageRequest(0, amount);
+        SubCategory subCategory = subCategoryRepository.findOne(subCategoryId);
+        List<Course> bestRated = courseRepository.findBestRatedBySubCategory(subCategory, pageable);
+
+        return bestRated;
+    }
+
+    public List<Course> fetchBestRatedBySection(Integer amount, Long sectionId) {
+        Pageable pageable = new PageRequest(0, amount);
+        Section section = sectionRepository.findOne(sectionId);
+        List<Course> bestRated = courseRepository.findBestRatedBySection(section, pageable);
+
+        return bestRated;
+    }
+
+    public List<Course> fetchBestRatedBySubSection(Integer amount, Long subSectionId) {
+        Pageable pageable = new PageRequest(0, amount);
+        SubSection subSection = subSectionRepository.findOne(subSectionId);
+        List<Course> bestRated = courseRepository.findBestRatedBySubSection(subSection, pageable);
+
+        return bestRated;
+    }
+
+    public List<Course> fetchFeaturedByCategory(Integer amount, Long categoryId) {
+        Pageable pageable = new PageRequest(0, amount);
+        Category category = categoryRepository.findOne(categoryId);
+        List<Course> featured = courseRepository.findFeaturedByCategory(category, pageable);
+
+        return featured;
+    }
+
+    public List<Course> fetchFeaturedBySubCategory(Integer amount, Long subCategoryId) {
+        Pageable pageable = new PageRequest(0, amount);
+        SubCategory subCategory = subCategoryRepository.findOne(subCategoryId);
+        List<Course> featured = courseRepository.findFeaturedBySubCategory(subCategory, pageable);
+
+        return featured;
+    }
+
+    public List<Course> fetchFeaturedBySection(Integer amount, Long sectionId) {
+        Pageable pageable = new PageRequest(0, amount);
+        Section section = sectionRepository.findOne(sectionId);
+        List<Course> featured = courseRepository.findFeaturedBySection(section, pageable);
+
+        return featured;
+    }
+
+    public List<Course> fetchFeaturedBySubSection(Integer amount, Long subSectionId) {
+        Pageable pageable = new PageRequest(0, amount);
+        SubSection subSection = subSectionRepository.findOne(subSectionId);
+        List<Course> featured = courseRepository.findFeaturedBySubSection(subSection, pageable);
+
+        return featured;
+    }
+
     // TODO: Update number of enrolled
     // TODO: Update rating
 
