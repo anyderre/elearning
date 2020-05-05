@@ -56,6 +56,10 @@ public class LanguageService {
         return repo.save(lang);
     }
 
+    public boolean exists(String key, String locale) {
+        return repo.findByKeyAndLocale(key, locale) != null;
+    }
+
     public boolean exists(Long id) {
         return repo.exists(id);
     }

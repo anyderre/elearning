@@ -1,11 +1,13 @@
 package com.sorbSoft.CabAcademie.Controllers;
 
 
+import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.LanguageEntity;
 import com.sorbSoft.CabAcademie.Services.LanguageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -60,6 +62,7 @@ public class LanguageController {
     }
 
     @PostMapping("/saveOne")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public  ResponseEntity saveLanguageEntity(@Valid @RequestBody LanguageEntity lang){
 
         if(lang == null
@@ -67,23 +70,36 @@ public class LanguageController {
                 || lang.getContent().isEmpty())
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
+        if (langService.exists(lang.getKey(), lang.getLocale())) {
+            return new ResponseEntity("Language with "+lang.getKey()+" and "+ lang.getLocale() +" already exist", HttpStatus.BAD_REQUEST);
+        }
+
         LanguageEntity currLang = langService.save(lang);
         if(currLang==null)
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        return  new ResponseEntity<>(HttpStatus.CREATED);
+
+        return new ResponseEntity("Language has been saved", HttpStatus.CREATED);
     }
 
     @PostMapping("/saveMany")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity saveSetOfLanguageEntity(@Valid @RequestBody List<LanguageEntity> langs){
 
         if(langs == null || langs.isEmpty())
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
+        for(LanguageEntity lang : langs) {
+            if (langService.exists(lang.getKey(), lang.getLocale())) {
+                return new ResponseEntity("Language with "+lang.getKey()+" and "+ lang.getLocale() +" already exist", HttpStatus.BAD_REQUEST);
+            }
+        }
+
         langService.saveAll(langs);
-        return  new ResponseEntity<>(HttpStatus.CREATED);
+        return new ResponseEntity("Languages have been saved", HttpStatus.CREATED);
     }
 
     @PutMapping("/updateMany")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<LanguageEntity> updateSetOfLanguages(
             @RequestBody List<LanguageEntity> langs){
 
@@ -91,11 +107,13 @@ public class LanguageController {
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         langService.updateAll(langs);
-        return  new ResponseEntity<>(HttpStatus.CREATED);
+
+        return new ResponseEntity("Languages have been updated", HttpStatus.CREATED);
     }
 
 
     @PutMapping(value = "/updateOne")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<LanguageEntity> updateLanguageEntity(@RequestBody LanguageEntity langEntity){
         if(langEntity == null
                 || langEntity.getId()==null
@@ -121,6 +139,7 @@ public class LanguageController {
     }
 
     @DeleteMapping("/deleteMany")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<String> deleteSetOfLangs(@RequestBody List<Long> ids ){
         if(ids==null || ids.isEmpty())
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -130,6 +149,7 @@ public class LanguageController {
     }
 
     @DeleteMapping(value = "deleteOne/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN')")
     public ResponseEntity<String> deleteLang(@PathVariable Long id ){
         if(id==null)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);

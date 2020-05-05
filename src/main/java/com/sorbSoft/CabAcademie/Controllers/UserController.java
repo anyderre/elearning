@@ -89,8 +89,7 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @PostMapping("/save")
-    public  ResponseEntity<MessageResponse> saveUser(@Valid @RequestBody UserViewModel user){
+    private ResponseEntity<MessageResponse> saveUser(UserViewModel user) {
         if (userRepository.existsByUsernameAndIdIsNot(user.getUsername(), user.getId())) {
             return ResponseEntity
                     .badRequest()
@@ -107,6 +106,33 @@ public class UserController {
         if(!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(MessageResponse.of("User successfully created"), HttpStatus.CREATED);
+    }
+
+
+    @PostMapping("/saveStudent")
+    public  ResponseEntity<MessageResponse> saveStudent(@Valid @RequestBody UserViewModel user){
+        return saveUser(user);
+    }
+
+    @PostMapping("/saveOrganization")
+    public  ResponseEntity<MessageResponse> saveOrganization(@Valid @RequestBody UserViewModel user){
+        return saveUser(user);
+    }
+
+
+    @PostMapping("/saveSchool")
+    public  ResponseEntity<MessageResponse> saveSchool(@Valid @RequestBody UserViewModel user){
+        return saveUser(user);
+    }
+
+    @PostMapping("/saveTeacher")
+    public  ResponseEntity<MessageResponse> saveTeacher(@Valid @RequestBody UserViewModel user){
+        return saveUser(user);
+    }
+
+    @PostMapping("/save")
+    public  ResponseEntity<MessageResponse> saveOtherUser(@Valid @RequestBody UserViewModel user){
+        return saveUser(user);
     }
 
 

@@ -54,6 +54,38 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             "/webjars/**"
     };
 
+    private static final String[] CATEGORY_URLS = {
+
+            "/api/category/all",
+            "/api/category/info",
+            "/api/category/all/filtered"
+
+    };
+
+    private static final String[] SUB_CATEGORIES_URLS = {
+
+            "/api/subCategory/all",
+            "/api/subCategory/info",
+            "/api/subCategory/all/filtered"
+
+    };
+
+    private static final String[] SECTIONS_URLS = {
+
+            "/api/section/all",
+            "/api/section/info",
+            "/api/section/all/filtered"
+
+    };
+
+    private static final String[] SUB_SECTIONS_URLS = {
+
+            "/api/subSection/all",
+            "/api/subSection/info",
+            "/api/subSection/all/filtered"
+
+    };
+
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         // configure AuthenticationManager so that it knows from where to load
@@ -93,7 +125,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // dont authenticate this particular request
                 .authorizeRequests()
                 .antMatchers(SWAGGER_URLS).permitAll()
+                .antMatchers(HttpMethod.GET, "/api/languages/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/course/lastCreated/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/course/bestRated/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/course/featured/**").permitAll()
+                .antMatchers(HttpMethod.GET, CATEGORY_URLS).permitAll()
+                .antMatchers(HttpMethod.GET, SUB_CATEGORIES_URLS).permitAll()
+                .antMatchers(HttpMethod.GET, SECTIONS_URLS).permitAll()
+                .antMatchers(HttpMethod.GET, SUB_SECTIONS_URLS).permitAll()
                 .antMatchers("/authenticate").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/user/saveStudent").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/user/saveOrganization").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/user/saveSchool").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/user/saveTeacher").permitAll()
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
                 .antMatchers(HttpMethod.GET, PRE_SIGN_UP_URL).permitAll()
                 .anyRequest().authenticated()

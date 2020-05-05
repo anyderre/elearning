@@ -8,6 +8,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.List;
 
@@ -25,7 +26,8 @@ public class SubSection implements Serializable {
     @NotNull
     @NotEmpty(message = "Sub-Section name is required")
     private String name;
-    @Lob
+
+    @Size(max = 2147483647)
     private String description;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id")

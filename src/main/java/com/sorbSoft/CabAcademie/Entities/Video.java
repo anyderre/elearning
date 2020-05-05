@@ -4,6 +4,7 @@ import lombok.Data;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
@@ -17,11 +18,15 @@ public class Video implements Serializable {
     @Id()
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Lob
+
+    @Size(max = 2147483647)
     private String videoURL;
-    @Lob
+
+    @Size(max = 2147483647)
     private String videoTitle;
-    @Lob
+
+    @Size(max = 2147483647)
     private String attachment;
+
     private boolean deleted = false;
 }
