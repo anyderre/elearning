@@ -129,6 +129,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/api/course/lastCreated/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/course/bestRated/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/course/featured/**").permitAll()
+
+                //TODO: potential security issue here. Need to split api on registerUpload and loggedIn upload
+                //TODO: registerUpload should be limited by file size like up to 10 Mb
+                .antMatchers(HttpMethod.POST, "/api/file/**").permitAll()
+                .antMatchers(HttpMethod.DELETE, "/api/file/**").permitAll()
+
                 .antMatchers(HttpMethod.GET, CATEGORY_URLS).permitAll()
                 .antMatchers(HttpMethod.GET, SUB_CATEGORIES_URLS).permitAll()
                 .antMatchers(HttpMethod.GET, SECTIONS_URLS).permitAll()
