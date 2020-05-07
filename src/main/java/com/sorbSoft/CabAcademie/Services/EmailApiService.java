@@ -42,13 +42,13 @@ public class EmailApiService {
     @Autowired
     public JavaMailSender emailSender;
 
-    @PostConstruct
+    /*@PostConstruct
     public void init() {
         String to = "w.volodymyr.bondarchuk@gmail.com";
         String subject = "Hello world";
         String text = "Test message...";
         sendSimpleMessage(to, subject, text);
-    }
+    }*/
 
     @Bean
     public JavaMailSender getJavaMailSender() {

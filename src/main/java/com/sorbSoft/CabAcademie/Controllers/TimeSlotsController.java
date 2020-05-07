@@ -1,9 +1,11 @@
 package com.sorbSoft.CabAcademie.Controllers;
 
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
-import com.sorbSoft.CabAcademie.Services.AppointmentSlotsService;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotAddRequestModel;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotsGetRequestModel;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotsResponseModel;
+import com.sorbSoft.CabAcademie.Services.TimeSlotService;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
-import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.AppointmentSlotViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,33 +17,35 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/appointment/slots")
-public class AppointmentSlotsController {
+@RequestMapping(value = "/api/appointment")
+public class TimeSlotsController {
 
     @Autowired
-    private AppointmentSlotsService slotsService;
+    private TimeSlotService timeSlotService;
 
-    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
+
+    @PostMapping(value = "/addSlots", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INSTRUCTOR')")
-    public ResponseEntity<MessageResponse> saveAppointmentSlots(@Valid @RequestBody List<AppointmentSlotViewModel> appointmentVmSlots){
+    public ResponseEntity<MessageResponse> add121Slots(@Valid @RequestBody List<SlotAddRequestModel> timeSlotVm){
 
-        Result result = slotsService.save(appointmentVmSlots);
+        Result result = timeSlotService.save(timeSlotVm);
         if(!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(MessageResponse.of("Appointment Slots Saved Successfully"), HttpStatus.OK);
     }
 
-    @PostMapping(value = "/getByUserIdWithinDateRange", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AppointmentSlotViewModel> getAppointmentSlotsByUserIdWithinDateRange(
-            @Valid @RequestBody AppointmentSlotViewModel vmSlots){
 
-        if(vmSlots.getUserId()==null
-                || vmSlots.getUserId()==0
+    @PostMapping(value = "/getByTeacherIdWithinDateRange", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SlotsResponseModel> getSlotsByUserIdWithinDateRange(
+            @Valid @RequestBody SlotsGetRequestModel vmSlots){
+
+        if(vmSlots.getTeacherId()==null
+                || vmSlots.getTeacherId()==0
                 || vmSlots.getDateFrom() == null
                 || vmSlots.getDateTo() == null) {
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        List<AppointmentSlotViewModel> slots = slotsService.getSlotsByUserIdWithinDateRange(vmSlots);
+        List<SlotsResponseModel> slots = (List<SlotsResponseModel>) timeSlotService.getSlotsByUserIdWithinDateRange(vmSlots);
 
         if(slots == null || slots.size() == 0)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
@@ -49,17 +53,17 @@ public class AppointmentSlotsController {
         return new ResponseEntity(slots, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/deleteByUserIdWithinDateRange", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/deleteByTeacherIdWithinDateRange", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INSTRUCTOR')")
-    public ResponseEntity<MessageResponse> deleteAppointmentSlotsByUserIdWithinDateRange(
-            @Valid @RequestBody AppointmentSlotViewModel vmSlots){
+    public ResponseEntity<MessageResponse> deleteSlotsByUserIdWithinDateRange(
+            @Valid @RequestBody SlotAddRequestModel vmSlots){
 
         if(vmSlots==null
             || vmSlots.getDateFrom() == null
             || vmSlots.getDateTo() == null) {
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        Result result = slotsService.deleteSlotsByUserIdWithinDateRange(vmSlots);
+        Result result = timeSlotService.deleteSlotsByUserIdWithinDateRange(vmSlots);
 
         if (!result.isValid()){
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
@@ -71,17 +75,17 @@ public class AppointmentSlotsController {
     @DeleteMapping(value = "/deleteOne/{id}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INSTRUCTOR')")
     public ResponseEntity<MessageResponse> deleteSlot(@PathVariable Long id ){
-        Result result = slotsService.deleteOne(id);
+        Result result = timeSlotService.deleteOne(id);
         if (!result.isValid()){
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         }
         return  new ResponseEntity<>(MessageResponse.of("Slot has been successfully deleted"), HttpStatus.OK);
     }
 
-    @DeleteMapping(value = "/deleteAllByUserId/{userId}")
+    @DeleteMapping(value = "/deleteAllByTeacherId/{teacherId}")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INSTRUCTOR')")
-    public ResponseEntity<MessageResponse> deleteAllByUserId(@PathVariable Long userId ){
-        Result result = slotsService.deleteAllSlotsForUserId(userId);
+    public ResponseEntity<MessageResponse> deleteAllByUserId(@PathVariable Long teacherId ){
+        Result result = timeSlotService.deleteAllSlotsForUserId(teacherId);
         if (!result.isValid()){
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         }
