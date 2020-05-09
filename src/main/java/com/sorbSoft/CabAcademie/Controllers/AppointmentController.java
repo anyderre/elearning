@@ -44,7 +44,7 @@ public class AppointmentController {
         return new ResponseEntity<>(MessageResponse.of("Appointment has been made successfully"), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/approveByTeacher/{uid}")
+    @GetMapping(value = "/approve/{uid}")
     //add roles
     public ResponseEntity<MessageResponse> approveAppointment(@PathVariable String uid) {
 
@@ -52,7 +52,7 @@ public class AppointmentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Result result = oneToOneAppointmeentService.approve121Appointment(uid);
+        Result result = oneToOneAppointmeentService.approveAppointment(uid);
 
         if (!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
@@ -60,7 +60,7 @@ public class AppointmentController {
         return new ResponseEntity<>(MessageResponse.of("Appointment has been approved"), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/declineByTeacher/{uid}")
+    @GetMapping(value = "/decline/{uid}")
     //add roles
     public ResponseEntity<MessageResponse> declineAppointment(@PathVariable String uid) {
 
@@ -68,7 +68,7 @@ public class AppointmentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Result result = oneToOneAppointmeentService.decline121Appointment(uid);
+        Result result = oneToOneAppointmeentService.declineAppointment(uid);
 
         if (!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
@@ -76,7 +76,7 @@ public class AppointmentController {
         return new ResponseEntity<>(MessageResponse.of("Appointment has been declined"), HttpStatus.OK);
     }
 
-    @GetMapping(value = "/cancelByAttendee/{uid}")
+    @GetMapping(value = "/cancel/{uid}")
     //add roles
     public ResponseEntity<MessageResponse> cancelAppointment(@PathVariable String uid) {
 
@@ -84,7 +84,7 @@ public class AppointmentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Result result = oneToOneAppointmeentService.cancel121Appointment(uid);
+        Result result = oneToOneAppointmeentService.cancelAppointment(uid);
 
         if (!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);

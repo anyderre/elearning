@@ -9,6 +9,7 @@ import com.sorbSoft.CabAcademie.Repository.SlotsRepository;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.GroupAppointmentViewModel;
+import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,8 +38,6 @@ public class OneToManyAppointmeentService {
 
     @Autowired
     private EmailApiService emailSender;
-
-    //TODO: add appointment tsv service
 
     public Result subscribeToGroupMeeting(GroupAppointmentViewModel vm) {
 
@@ -87,6 +86,11 @@ public class OneToManyAppointmeentService {
             attendees.add(attendee);
         }
 
+        slotsR.save(groupTimeSlot);
+
+        emailSender.sendAppointmentRequestToTeacherMail(groupTimeSlot, attendee);
+        emailSender.sendAppointmentRequestNotificationToStudentMail(groupTimeSlot, attendee);
+
         /*Long approvedAttendee = groupTimeSlot.getApprovedAttendee();
         if(approvedAttendee==null) {
             approvedAttendee = 0L;
@@ -94,53 +98,7 @@ public class OneToManyAppointmeentService {
         approvedAttendee++;
         groupTimeSlot.setApprovedAttendee(approvedAttendee);*/
 
-        //TODO: book
-
-        //make student pending
-
-        //send approval link to teacher
-
-        //increase approvedAttendee
-
-        //send video conference link to student
-
-        //sendEmailToTeacher(booked);
-        //sendEmailToStudent(booked);
-
-
-
         return result;
-    }
-
-
-    private void sendEmailToStudent(TimeSlot booked) {
-        //send email to student to inform him
-        //String to = student.getEmail();
-        String toStudent = "postullat2@gmail.com";
-        String subjectStudent = "Meeting request sent";
-        String textStudent = "Dear Student, You request has been sent to teacher." + " We will notify you once teacher will approve it";
-        //TODO: fix email send
-        //TODO: generate link with uid
-        //TODO: save uid in db
-        //emailSender.sendSimpleMessage(toStudent, subjectStudent, textStudent);
-        System.out.println("Email sent");
-        //System.out.println("****Approval UID" + booked.getApprovalUid());
-        //System.out.println("****Decline UID" + booked.getDeclineUid());
-
-
-        //book
-        //save splitted slot
-    }
-
-    private void sendEmailToTeacher(TimeSlot booked) {
-        //String to = teacher.getEmail();
-        String to = "w.volodymyr.bondarchuk@gmail.com";
-        String subject = "Meeting request";
-        String text = "Dear Teacher, One of the student is requesting meeting with you." + " Please confirm or decline";
-        //TODO: fix email send
-        //emailSender.sendSimpleMessage(to, subject, text);
-        //send email to teacher
-        System.out.println("Email sent");
     }
 
     private String generateUid() {
@@ -150,7 +108,5 @@ public class OneToManyAppointmeentService {
 
         return id + now.getTime();
     }
-
-
 
 }

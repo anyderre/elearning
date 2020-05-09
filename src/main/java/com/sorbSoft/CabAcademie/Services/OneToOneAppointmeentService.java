@@ -10,6 +10,7 @@ import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Helpers.DatePointName;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.OneToOneAppointmentMakeRequestModel;
+import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
 import com.sorbSoft.CabAcademie.Utils.DateUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -77,14 +78,17 @@ public class OneToOneAppointmeentService {
         result = validateIfMeetingFitsSlot(slotFrom, slotTo, meetingFrom, meetingTo);
         if (!result.isValid()) return result;
 
+        Attendee attendee = new Attendee();
 
         //- if suggested meeting time == slot -> book
         if (meetingFrom.isEqual(slotFrom) && meetingTo.isEqual(slotTo)) {
 
-            makePendingApprovalAndClosed(availableSlot, vm);
+            makePendingApprovalAndClosed(availableSlot, attendee, vm);
 
             slotsR.save(availableSlot);
             result.add("Just Booked");
+            emailSender.sendAppointmentRequestToTeacherMail(availableSlot, attendee);
+            emailSender.sendAppointmentRequestNotificationToStudentMail(availableSlot, attendee);
         } else {
 
             Map<DatePointName, DateTime> datePoints = calculateSlotsPoints(meetingFrom, meetingTo, slotFrom, slotTo);
@@ -107,7 +111,7 @@ public class OneToOneAppointmeentService {
                 slotAfter = createNewOpenedSlot(s2, e2, availableSlot, vm);
             }
 
-            TimeSlot booked = makePendingApprovalAndClosed(meetingFrom, meetingTo, availableSlot, vm);
+            TimeSlot booked = makePendingApprovalAndClosed(meetingFrom, meetingTo, availableSlot, attendee, vm);
 
 
             //if slots that left < 10 min then clean them
@@ -128,8 +132,8 @@ public class OneToOneAppointmeentService {
             result.add("Splited and Booked");
 
 
-            sendEmailToTeacher(booked);
-            sendEmailToStudent(booked);
+            emailSender.sendAppointmentRequestToTeacherMail(booked, attendee);
+            emailSender.sendAppointmentRequestNotificationToStudentMail(booked, attendee);
 
         }
 
@@ -151,36 +155,6 @@ public class OneToOneAppointmeentService {
         }
 
         return result;
-    }
-
-    private void sendEmailToStudent(TimeSlot booked) {
-        //send email to student to inform him
-        //String to = student.getEmail();
-        String toStudent = "postullat2@gmail.com";
-        String subjectStudent = "Meeting request sent";
-        String textStudent = "Dear Student, You request has been sent to teacher." + " We will notify you once teacher will approve it";
-        //TODO: fix email send
-        //TODO: generate link with uid
-        //TODO: save uid in db
-        //emailSender.sendSimpleMessage(toStudent, subjectStudent, textStudent);
-        System.out.println("Email sent");
-        //System.out.println("****Approval UID" + booked.getApprovalUid());
-        //System.out.println("****Decline UID" + booked.getDeclineUid());
-
-
-        //book
-        //save splitted slot
-    }
-
-    private void sendEmailToTeacher(TimeSlot booked) {
-        //String to = teacher.getEmail();
-        String to = "w.volodymyr.bondarchuk@gmail.com";
-        String subject = "Meeting request";
-        String text = "Dear Teacher, One of the student is requesting meeting with you." + " Please confirm or decline";
-        //TODO: fix email send
-        //emailSender.sendSimpleMessage(to, subject, text);
-        //send email to teacher
-        System.out.println("Email sent");
     }
 
     private Map<DatePointName, DateTime> calculateSlotsPoints(DateTime meetingFrom, DateTime meetingTo, DateTime slotFrom, DateTime slotTo) {
@@ -221,7 +195,7 @@ public class OneToOneAppointmeentService {
         return datePoints;
     }
 
-    private TimeSlot makePendingApprovalAndClosed(DateTime meetingFrom, DateTime meetingTo, TimeSlot availableSlot, OneToOneAppointmentMakeRequestModel vm) {
+    private TimeSlot makePendingApprovalAndClosed(DateTime meetingFrom, DateTime meetingTo, TimeSlot availableSlot, Attendee attendee, OneToOneAppointmentMakeRequestModel vm) {
         TimeSlot booked = new TimeSlot();
 
 
@@ -246,7 +220,6 @@ public class OneToOneAppointmeentService {
 
         User student = userR.findById(vm.getStudentId());
         List<Attendee> attendees = new ArrayList<>();
-        Attendee attendee = new Attendee();
         attendee.setTimeSlot(booked);
         attendee.setUser(student);
         attendee.setStatus(AttendeeStatus.PENDING_APPROVAL);
@@ -267,13 +240,13 @@ public class OneToOneAppointmeentService {
         return booked;
     }
 
-    private void makePendingApprovalAndClosed(TimeSlot availableSlot, OneToOneAppointmentMakeRequestModel vm) {
+    private void makePendingApprovalAndClosed(TimeSlot availableSlot, Attendee attendee, OneToOneAppointmentMakeRequestModel vm) {
         String approvalUid = generateUid();
         String declineUid = generateUid();
 
         User student = userR.findById(vm.getStudentId());
         List<Attendee> attendees = new ArrayList<>();
-        Attendee attendee = new Attendee();
+
         attendee.setTimeSlot(availableSlot);
         attendee.setUser(student);
         attendee.setStatus(AttendeeStatus.PENDING_APPROVAL);
@@ -492,11 +465,12 @@ public class OneToOneAppointmeentService {
     }
 
 
-    public Result approve121Appointment(String uid) {
+    public Result approveAppointment(String uid) {
 
         Result result = new Result();
 
         Attendee attendee = attendeeR.findByApprovalUid(uid);
+        attendee.getTimeSlot();
 
         //if exist
         if (attendee == null) {
@@ -533,11 +507,8 @@ public class OneToOneAppointmeentService {
 
                     attendeeR.save(attendee);
 
-                    User student = attendee.getUser();
-                    User teacher = attendee.getTimeSlot().getTeacher();
-
-                    //emailSender.sendSimpleMessage();
-                    //emailSender.sendSimpleMessage();
+                    emailSender.sendApproveNotificationToTeacher(timeSlot, attendee);
+                    emailSender.sendApproveNotificationToStudent(timeSlot, attendee);
                 } else {
                     result.add("Attendee can't be approved due to max attendees reached");
                     return result;
@@ -561,7 +532,7 @@ public class OneToOneAppointmeentService {
         return result;
     }
 
-    public Result decline121Appointment(String uid) {
+    public Result declineAppointment(String uid) {
         Result result = new Result();
 
         Attendee attendee = attendeeR.findByDeclineUid(uid);
@@ -593,14 +564,10 @@ public class OneToOneAppointmeentService {
                 attendee.setDeclineUid("");
                 attendee.setApprovalUid("");
 
-                User student = attendee.getUser();
-                User teacher = attendee.getTimeSlot().getTeacher();
-
-
-                //emailSender.sendSimpleMessage();
-                //emailSender.sendSimpleMessage();
-
                 attendeeR.save(attendee);
+
+                emailSender.sendDeclineNotificationToTeacher(timeSlot, attendee);
+                emailSender.sendDeclineNotificationToStudent(timeSlot, attendee);
             } else {
                 result.add("Appointment/Time slot does not exist for attendee Id: " + attendee.getId());
                 return result;
@@ -616,7 +583,7 @@ public class OneToOneAppointmeentService {
         return result;
     }
 
-    public Result cancel121Appointment(String uid) {
-        return decline121Appointment(uid);
+    public Result cancelAppointment(String uid) {
+        return declineAppointment(uid);
     }
 }
