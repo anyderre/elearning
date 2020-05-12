@@ -184,6 +184,11 @@ public class WebSecurityConfig {
                     authorizeRequests().
                     antMatchers("/swagger**").authenticated().
                     and().httpBasic().and().csrf().disable();
+
+            http.antMatcher("/v2/api-docs").
+                    authorizeRequests().
+                    antMatchers("/v2/api-docs").authenticated().
+                    and().httpBasic().and().csrf().disable();
         }
 
         @Override
