@@ -270,7 +270,7 @@ public class EmailApiService {
         parameters.put("dateFrom", timeSlot.getDateFrom());
         parameters.put("dateTo", timeSlot.getDateTo());
 
-        parameters.put("videoConferenceLink", "...will be added...");
+        parameters.put("videoConferenceLink", timeSlot.getVideoConferenceLink());
 
         parameters.put("declineLink", declineLink);
 
@@ -306,7 +306,7 @@ public class EmailApiService {
         parameters.put("dateFrom", timeSlot.getDateFrom());
         parameters.put("dateTo", timeSlot.getDateTo());
 
-        parameters.put("videoConferenceLink", "...will be added...");
+        parameters.put("videoConferenceLink", timeSlot.getVideoConferenceLink());
 
         parameters.put("declineLink", declineLink);
 

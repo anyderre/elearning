@@ -12,15 +12,13 @@ import java.util.List;
 @Data
 public class SlotsResponseModel {
 
-    private Long id;
-
     private Long timeSlotId;
 
     private Long appointmentId;
 
     private Long teacherId;
 
-    private List<Attendee> attendees;
+    private List<AttendeeModel> attendees;
 
     private Date dateFrom;
 

@@ -94,6 +94,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(SWAGGER_URLS).permitAll()
                 .antMatchers("/authenticate").permitAll()
+                .antMatchers(HttpMethod.GET,"/api/appointment/approve/**").permitAll()
+                .antMatchers(HttpMethod.GET,"/api/appointment/decline/**").permitAll()
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
                 .antMatchers(HttpMethod.GET, PRE_SIGN_UP_URL).permitAll()
                 .anyRequest().authenticated()

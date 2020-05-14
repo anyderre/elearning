@@ -1,5 +1,6 @@
 package com.sorbSoft.CabAcademie.Services;
 
+import com.sorbSoft.CabAcademie.Entities.Attendee;
 import com.sorbSoft.CabAcademie.Entities.Enums.TimeSlotStatus;
 import com.sorbSoft.CabAcademie.Entities.Enums.AppointmentType;
 import com.sorbSoft.CabAcademie.Entities.TimeSlot;
@@ -7,9 +8,7 @@ import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Repository.SlotsRepository;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
-import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotAddRequestModel;
-import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotsGetRequestModel;
-import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotsResponseModel;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.*;
 import com.sorbSoft.CabAcademie.Utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -78,6 +77,7 @@ public class TimeSlotService {
 
     }
 
+
     private List<SlotsResponseModel> getSlotsVms(List<TimeSlot> slotsByUserWithinDateRange) {
 
         List<SlotsResponseModel> list = new ArrayList<>();
@@ -97,13 +97,12 @@ public class TimeSlotService {
 
         SlotsResponseModel vm = new SlotsResponseModel();
 
-
-
         vm.setTimeSlotId(slot.getId());
         vm.setAppointmentId(slot.getId());
         vm.setTeacherId(slot.getTeacher().getId());
 
-        vm.setAttendees(slot.getAttendees());
+        List<AttendeeModel> attendees = convertAttendees(slot.getAttendees());
+        vm.setAttendees(attendees);
         vm.setDateFrom(slot.getDateFrom());
         vm.setDateTo(slot.getDateTo());
 
@@ -120,27 +119,26 @@ public class TimeSlotService {
         return vm;
     }
 
+    private List<AttendeeModel> convertAttendees(List<Attendee> attendees) {
 
-    public List<SlotAddRequestModel> getAllSlotsByUserId(Long userId) {
+        List<AttendeeModel> list = new ArrayList<>();
 
-        User user = userRepository.findById(userId);
-        List<TimeSlot> timeSlots = slotsRepo.findByTeacher(user);
+        for(Attendee at : attendees) {
+            AttendeeModel model = new AttendeeModel();
 
-        List<SlotAddRequestModel> vmList = new ArrayList<>();
+            model.setUserId(at.getUser().getId());
+            model.setFirstName(at.getUser().getFirstName());
+            model.setLastName(at.getUser().getLastName());
 
-        for (TimeSlot dbSlot : timeSlots) {
+            model.setUsername(at.getUser().getUsername());
+            model.setPhotoURL(at.getUser().getPhotoURL());
+            model.setTimeSlotId(at.getTimeSlot().getId());
+            model.setStatus(at.getStatus());
 
-            SlotAddRequestModel vm = new SlotAddRequestModel();
-
-            vm.setId(dbSlot.getId());
-            vm.setTeacherId(dbSlot.getTeacher().getId());
-            vm.setDateFrom(dbSlot.getDateFrom());
-            vm.setDateTo(dbSlot.getDateTo());
-
-            vmList.add(vm);
+            list.add(model);
         }
 
-        return vmList;
+        return list;
     }
 
     public Result deleteOne(Long slotId) {
@@ -164,7 +162,27 @@ public class TimeSlotService {
         return result;
     }
 
-    public Result deleteSlotsByUserIdWithinDateRange(SlotAddRequestModel vm) {
+    public Result getAllSlotsByUserId(Long userId) {
+
+        Result result = new Result();
+
+        if(userId==null
+                || userId<=0) {
+            result.add("User id can't be null, zero or below zero");
+            return result;
+        }
+
+        User user = userRepository.findById(userId);
+        List<TimeSlot> timeSlots = slotsRepo.findByTeacher(user);
+
+        List<SlotsResponseModel> vms = getSlotsVms(timeSlots);
+
+        result.addValue(vms);
+
+        return result;
+    }
+
+    public Result deleteSlotsByUserIdWithinDateRange(SlotDeleteRequestModel vm) {
         Result result = new Result();
 
         if(vm.getTeacherId()==null
@@ -223,19 +241,6 @@ public class TimeSlotService {
         return result;
     }
 
-
-
-    List<TimeSlot> getEntities(List<SlotAddRequestModel> vms) {
-
-        List<TimeSlot> list = new ArrayList<>();
-
-        for(SlotAddRequestModel vm : vms) {
-            TimeSlot entity = getEntity(vm);
-            list.add(entity);
-        }
-
-        return list;
-    }
 
     private TimeSlot getEntity(SlotAddRequestModel vm){
 

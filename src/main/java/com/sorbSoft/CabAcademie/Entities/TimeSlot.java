@@ -66,4 +66,7 @@ public class TimeSlot implements Serializable {
     @Column(name = "book_before_minutes")
     private Integer bookBeforeMinutes;
 
+    @Column(name = "video_conference_link")
+    private String videoConferenceLink;
+
 }

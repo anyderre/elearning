@@ -12,6 +12,7 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.OneToOneAppointmentMakeRequestModel;
 import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
 import com.sorbSoft.CabAcademie.Utils.DateUtils;
+import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +24,14 @@ import java.util.*;
 
 @Service
 @Transactional
+@Log4j2
 public class OneToOneAppointmeentService {
 
     @Value("${minimum.time.slot.size.minutes}")
     private Long MIN_SLOT_SIZE_MINUTES;
+
+    @Value("${meeting.url}")
+    private String MEET_URL;
 
     @Autowired
     private SlotsRepository slotsR;
@@ -470,7 +475,6 @@ public class OneToOneAppointmeentService {
         Result result = new Result();
 
         Attendee attendee = attendeeR.findByApprovalUid(uid);
-        attendee.getTimeSlot();
 
         //if exist
         if (attendee == null) {
@@ -504,6 +508,15 @@ public class OneToOneAppointmeentService {
                     if(approvedAttendee == maxAttendees) {
                         timeSlot.setStatus(TimeSlotStatus.CLOSED);
                     }
+
+                    if(timeSlot.getVideoConferenceLink()== null
+                            || timeSlot.getVideoConferenceLink().isEmpty()) {
+                        String videoConferenceLink = MEET_URL + "/" + generateUid() + "/cabMeeting";
+                        timeSlot.setVideoConferenceLink(videoConferenceLink);
+
+                        log.debug("Video conference link: " + videoConferenceLink);
+                    }
+
 
                     attendeeR.save(attendee);
 
