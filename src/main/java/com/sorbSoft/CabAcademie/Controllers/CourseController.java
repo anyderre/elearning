@@ -79,6 +79,193 @@ public class CourseController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/lastCreated/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getLastAddedCourses(@PathVariable Integer amount) {
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedCourses(amount);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/lastCreated/{amount}/category/{categoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getLastAddedByCategory(@PathVariable Integer amount, @PathVariable Long categoryId) {
+        if(amount<=0 || categoryId <=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedByCategory(amount, categoryId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/lastCreated/{amount}/subCategory/{subCategoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getLastAddedBySubCategory(@PathVariable Integer amount, @PathVariable Long subCategoryId) {
+        if(amount<=0 || subCategoryId <=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedBySubCategory(amount, subCategoryId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/lastCreated/{amount}/section/{sectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getLastAddedBySection(@PathVariable Integer amount, @PathVariable Long sectionId) {
+        if(amount<=0 || sectionId <=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedBySection(amount, sectionId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/lastCreated/{amount}/subSection/{subSectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getLastAddedBySubSection(@PathVariable Integer amount, @PathVariable Long subSectionId) {
+        if(amount<=0 || subSectionId <=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedBySubSection(amount, subSectionId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+
+
+
+
+
+
+    @GetMapping(value = "/bestRated/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getBestRatedCourses(@PathVariable Integer amount) {
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchBestRatedCourses(amount);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/bestRated/{amount}/category/{categoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getBestRatedByCategory(@PathVariable Integer amount, @PathVariable Long categoryId) {
+        if(amount<=0 || categoryId <=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchBestRatedByCategory(amount, categoryId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/bestRated/{amount}/subCategory/{subCategoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getBestRatedBySubCategory(@PathVariable Integer amount, @PathVariable Long subCategoryId) {
+        if(amount<=0 || subCategoryId <=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchBestRatedBySubCategory(amount, subCategoryId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/bestRated/{amount}/section/{sectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getBestRatedBySection(@PathVariable Integer amount, @PathVariable Long sectionId) {
+        if(amount<=0 || sectionId <=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchBestRatedBySection(amount, sectionId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/bestRated/{amount}/subSection/{subSectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getBestRatedBySubSection(@PathVariable Integer amount, @PathVariable Long subSectionId) {
+        if(amount<=0 || subSectionId <=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchBestRatedBySubSection(amount, subSectionId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+
+
+
+
+    @GetMapping(value = "/featured/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getFeaturedCourses(@PathVariable Integer amount) {
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchFeaturedCourses(amount);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/featured/{amount}/category/{categoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getFeaturedByCategory(@PathVariable Integer amount, @PathVariable Long categoryId) {
+        if(amount<=0 || categoryId <=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchFeaturedByCategory(amount, categoryId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/featured/{amount}/subCategory/{subCategoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getFeaturedBySubCategory(@PathVariable Integer amount, @PathVariable Long subCategoryId) {
+        if(amount<=0 || subCategoryId <=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchFeaturedBySubCategory(amount, subCategoryId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/featured/{amount}/section/{sectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getFeaturedBySection(@PathVariable Integer amount, @PathVariable Long sectionId) {
+        if(amount<=0 || sectionId <=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchFeaturedBySection(amount, sectionId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/featured/{amount}/subSection/{subSectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<Course>> getFeaturedBySubSection(@PathVariable Integer amount, @PathVariable Long subSectionId) {
+        if(amount<=0 || subSectionId <=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchFeaturedBySubSection(amount, subSectionId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
     /**
      * Get All Courses Paginate
      * * @param count

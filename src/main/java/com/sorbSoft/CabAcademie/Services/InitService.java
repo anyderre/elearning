@@ -60,41 +60,48 @@ public class InitService {
                     newRole.setName("Admin");
                     newRole.setGenerated(true);
                     newRole.setDescription(role.name());
+                    newRole.setRole(Roles.ROLE_ADMIN);
                     rolRepository.save(newRole);
                 } else if (role.name().equals(Roles.ROLE_SCHOOL.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("School");
                     newRole.setDescription(role.name());
+                    newRole.setRole(Roles.ROLE_SCHOOL);
                     newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 } else if (role.name().equals(Roles.ROLE_PROFESSOR.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Professor");
                     newRole.setDescription(role.name());
+                    newRole.setRole(Roles.ROLE_PROFESSOR);
                     newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 } else if (role.name().equals(Roles.ROLE_STUDENT.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Student");
                     newRole.setDescription(role.name());
+                    newRole.setRole(Roles.ROLE_STUDENT);
                     newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 }else if (role.name().equals(Roles.ROLE_FREELANCER.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Freelancer");
                     newRole.setDescription(role.name());
+                    newRole.setRole(Roles.ROLE_FREELANCER);
                     newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 }else if (role.name().equals(Roles.ROLE_FREE_STUDENT.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Free Student");
                     newRole.setDescription(role.name());
+                    newRole.setRole(Roles.ROLE_FREE_STUDENT);
                     newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 }else if (role.name().equals(Roles.ROLE_ORGANIZATION.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Organization");
                     newRole.setDescription(role.name());
+                    newRole.setRole(Roles.ROLE_ORGANIZATION);
                     newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 }else if (role.name().equals(Roles.ROLE_EMPLOYEE.name())) {
@@ -102,17 +109,23 @@ public class InitService {
                     newRole.setName("Employee");
                     newRole.setGenerated(true);
                     newRole.setDescription(role.name());
+
+                    newRole.setRole(Roles.ROLE_EMPLOYEE);
                     rolRepository.save(newRole);
                 } else if (role.name().equals(Roles.ROLE_SUPER_ADMIN.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Super Admin");
                     newRole.setDescription(role.name());
+
+                    newRole.setRole(Roles.ROLE_SUPER_ADMIN);
                     newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 } else if (role.name().equals(Roles.ROLE_INSTRUCTOR.name())) {
                     Rol newRole = new Rol();
                     newRole.setName("Instructor");
                     newRole.setDescription(role.name());
+
+                    newRole.setRole(Roles.ROLE_INSTRUCTOR);
                     newRole.setGenerated(true);
                     rolRepository.save(newRole);
                 }

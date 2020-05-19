@@ -1,14 +1,12 @@
 package com.sorbSoft.CabAcademie.Entities;
 
+import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -28,6 +26,10 @@ public class Rol implements Serializable {
     private String name;
     @NotNull
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private Roles role;
+
     private boolean generated = true;
     private boolean deleted = false;
     private boolean enabled = true;
