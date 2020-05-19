@@ -48,6 +48,21 @@ public class JwtAuthenticationController {
         return ResponseEntity.ok(new JwtResponse(token));
     }
 
+    @RequestMapping(value = "/jitsi-auth", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> authenticateJistsi(@RequestBody JwtRequest authenticationRequest) throws Exception {
+
+        String authentication = authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+        if (!authentication.equals("")){
+            return new ResponseEntity<>(MessageResponse.of(authentication), HttpStatus.BAD_REQUEST);
+        }
+        /*final UserDetails userDetails = userDetailsService
+                .loadUserByUsername(authenticationRequest.getUsername());
+
+        final String token = jwtTokenUtil.generateToken(userDetails);*/
+
+        return ResponseEntity.ok(true);
+    }
+
     private String authenticate(String username, String password) {
         try {
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
