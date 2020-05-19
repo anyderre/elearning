@@ -4,6 +4,7 @@ import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.JwtRequest;
 import com.sorbSoft.CabAcademie.Entities.JwtResponse;
 import com.sorbSoft.CabAcademie.config.JwtTokenUtil;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -22,6 +23,7 @@ import com.sorbSoft.CabAcademie.Services.JwtUserDetailsService;
 
 
 @RestController
+@Log4j2
 public class JwtAuthenticationController {
 
     @Autowired
@@ -51,6 +53,7 @@ public class JwtAuthenticationController {
     @RequestMapping(value = "/jitsi-auth", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> authenticateJistsi(@RequestBody JwtRequest authenticationRequest) throws Exception {
 
+        log.info("************ Jitsi auth called *********");
         String authentication = authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
         if (!authentication.equals("")){
             return new ResponseEntity<>(MessageResponse.of(authentication), HttpStatus.BAD_REQUEST);
