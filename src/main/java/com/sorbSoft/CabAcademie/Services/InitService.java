@@ -6,12 +6,17 @@ import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Repository.RolRepository;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Bean;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 @Service
 public class InitService {
@@ -32,7 +37,15 @@ public class InitService {
     public void init() {
         createRoles();
         createAdmin();
+        createAdminPostullat();
+        createUser("Satu", "Student");
+        createUser("Dua2", "Student");
+        createUser("Tiga", "Student");
+        createUser("Empat", "Student");
+        createUser("Lima", "Freelancer");
+        createUser("Enum", "Freelancer");
     }
+
     /**
      * Create ROLES on Init
      *
@@ -141,6 +154,62 @@ public class InitService {
             admin.setEnable(1);
             admin.setPhotoURL("");
             admin.setCountry("Haiti");
+            admin.setWorkspaceName("");
+            admin.setCategories(new ArrayList<>());
+            admin.setSubCategories(new ArrayList<>());
+            admin.setCourses(new ArrayList<>());
+            admin.setOrganizations(new ArrayList<>());
+            admin.setSchools(new ArrayList<>());
+            userRepository.save(admin);
+        }
+    }
+
+    public void createAdminPostullat() {
+        System.out.println("Creating user ...");
+        User userAdmin = userRepository.findByUsername("postullat");
+        if (userAdmin == null) {
+            Rol roleAdmin = rolRepository.findByName("Admin");
+            User admin = new User();
+            admin.setRole(roleAdmin);
+            admin.setFirstName("Vova");
+            admin.setLastName("Bond");
+            admin.setName(admin.getFirstName() + ' ' + admin.getLastName());
+            admin.setUsername("postullat");
+            admin.setEmail("postullat2@gmail.com");
+            admin.setPassword(bCryptPasswordEncoder.encode("postullat")); // Todo: Change password
+            admin.setAgreeWithTerms(true);
+            admin.setBio("");
+            admin.setEnable(1);
+            admin.setPhotoURL("");
+            admin.setCountry("Ukraine");
+            admin.setWorkspaceName("");
+            admin.setCategories(new ArrayList<>());
+            admin.setSubCategories(new ArrayList<>());
+            admin.setCourses(new ArrayList<>());
+            admin.setOrganizations(new ArrayList<>());
+            admin.setSchools(new ArrayList<>());
+            userRepository.save(admin);
+        }
+    }
+
+    public void createUser(String name, String role) {
+        System.out.println("Creating user ...");
+        User userAdmin = userRepository.findByUsername(name);
+        if (userAdmin == null) {
+            Rol roleAdmin = rolRepository.findByName(role);
+            User admin = new User();
+            admin.setRole(roleAdmin);
+            admin.setFirstName(name);
+            admin.setLastName(name + " Last");
+            admin.setName(admin.getFirstName() + ' ' + admin.getLastName());
+            admin.setUsername(name);
+            admin.setEmail(name+"@gmail.com");
+            admin.setPassword(bCryptPasswordEncoder.encode("satu")); // Todo: Change password
+            admin.setAgreeWithTerms(true);
+            admin.setBio("");
+            admin.setEnable(1);
+            admin.setPhotoURL("");
+            admin.setCountry("Ukraine");
             admin.setWorkspaceName("");
             admin.setCategories(new ArrayList<>());
             admin.setSubCategories(new ArrayList<>());

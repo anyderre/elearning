@@ -29,7 +29,7 @@ import static com.sorbSoft.CabAcademie.config.JwtTokenUtil.SIGN_UP_URL;
 
 
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)/**/
+@EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurityConfig {
 
     @Autowired
@@ -138,6 +138,8 @@ public class WebSecurityConfig {
                     // dont authenticate this particular request
                     .authorizeRequests()
                     .antMatchers(SWAGGER_URLS).permitAll()
+                    .antMatchers(HttpMethod.GET,"/api/appointment/approve/**").permitAll()
+                    .antMatchers(HttpMethod.GET,"/api/appointment/decline/**").permitAll()
                     .antMatchers(HttpMethod.GET, "/api/languages/**").permitAll()
                     .antMatchers(HttpMethod.GET, "/api/course/lastCreated/**").permitAll()
                     .antMatchers(HttpMethod.GET, "/api/course/bestRated/**").permitAll()

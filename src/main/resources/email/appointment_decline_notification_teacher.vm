@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>GrubEasy</title>
+    <style>
+        .clear {
+            clear: both;
+        }
+
+        .wrapper {
+            width: 600px;
+            height: auto;
+            margin: 0 auto;
+            padding: 0;
+            background-color: #fff;
+        }
+
+        .body {
+            width: 600px;
+            height: auto;
+            margin: 0 auto;
+        }
+
+        .headerarea {
+            width: 600px;
+            height: auto;
+            margin: 0;
+        }
+
+        .header {
+            width: 600px;
+            height: 180px;
+            margin: 0;
+            background-image: url($!{appUrl}images/header.png);
+        }
+
+        .bodyarea {
+            width: 525px;
+            height: auto;
+            margin: 0 auto;
+            padding-top: 80px;
+            padding-bottom: 108px;
+            background-color: #fff;
+        }
+
+        .bodytext {
+            width: 525px;
+            margin: 0 auto;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 15px;
+            color: #393939;
+        }
+
+        .footerarea {
+            width: 600px;
+            height: 154px;
+            padding: 0;
+            margin: 0;
+            background-image: url($!{appUrl}images/footer.png);
+        }
+
+        .social {
+            width: 390px;
+            height: auto;
+            margin: 0 0 0 207px;
+            padding: 40px 0 0 0;
+        }
+
+        .social ul {
+            margin: 0 0 0 10px;
+            padding: 0;
+            border: 0;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+        }
+
+        .social ul li {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            margin-right: 25px;
+            font-size: 100%;
+            font: inherit;
+            vertical-align: baseline;
+            float: left;
+            font-family: Arial, Helvetica, sans-serif;
+            list-style: none;
+        }
+
+        .social ul li a {
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+
+        .social ul li a:hover {
+            margin: 0;
+            padding: 0;
+            border: 0;
+        }
+
+        .socialtext {
+            width: 505px;
+            margin: 15px 0 0 48px;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            line-height: normal;
+            color: #7d400a;
+            text-align: center;
+        }
+
+
+    </style>
+
+</head>
+
+<body>
+<div class="wrapper" style="width: 600px;height: auto;margin: 0 auto;padding: 0;background-color: #fff;">
+    <div class="body" style="width: 600px;height: auto;margin: 0 auto;">
+
+        <!----body area starts hear---->
+        <div class="bodyarea"
+             style="width: 525px;height: auto;margin: 0 auto;padding-top: 80px;padding-bottom: 108px;background-color: #fff;">
+            <div class="bodytext"
+                 style="width: 525px;margin: 0 auto;padding: 0;font-family: Arial, Helvetica, sans-serif;font-size: 15px;color: #393939;">
+
+                Dear $!{firstName} $!{lastName},
+                <p>
+                    Appointment with <b>$!{requesterFName} $!{requesterLName}</b> has been <b>canceled</b>
+                </p>
+                <p>
+                    The appointment type:<b> $!{appointmentType} </b>
+                </p>
+                <p>
+                    Date/Time: <b>$!{dateFrom} - $!{dateTo}</b><br/>
+                <p>
+                    <br/>
+                <p>
+                    Best regards,<br/>
+                    CabAcademie Team
+                </p>
+
+            </div>
+        </div>
+        <!----body area ends hear---->
+
+    </div><!----body ends------>
+</div><!----wrapper ends------>
+</body>
+</html>
