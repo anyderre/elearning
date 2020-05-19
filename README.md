@@ -1,6 +1,6 @@
 # elearning  
 
-Tecchnologies used:
+Technologies used:
 1. Java 8
 2. Maven 3.6.0
 3. Spring Boot 1.5.4
@@ -27,3 +27,4 @@ Tecchnologies used:
 OR
 
 *2. Run CabAcademieApplication.java from IDE
+

@@ -229,7 +229,7 @@ public class UserServices {
             return result;
         }
 
-        if (Roles.ROLE_SCHOOL.ordinal() ==  vm.getRole().getId().intValue() || Roles.ROLE_ORGANIZATION.ordinal() ==  vm.getRole().getId().intValue()) {
+        if (Roles.ROLE_SCHOOL ==  role.getRole() || Roles.ROLE_ORGANIZATION ==  role.getRole()) {
             if (vm.getName().isEmpty()) {
                 result.add("You should specify the name");
                 return result;
