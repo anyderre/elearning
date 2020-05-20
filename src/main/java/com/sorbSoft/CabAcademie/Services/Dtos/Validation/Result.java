@@ -84,4 +84,12 @@ public class Result {
         lista.add(new ValidationResult(message, fields));
         return this;
     }
+
+    public void addValue(Object obj) {
+        this.value = obj;
+    }
+
+    public Object getValue() {
+        return this.value;
+    }
 }

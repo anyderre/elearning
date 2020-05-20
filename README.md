@@ -1,6 +1,6 @@
 # elearning  
 
-Tecchnologies used:
+Technologies used:
 1. Java 8
 2. Maven 3.6.0
 3. Spring Boot 1.5.4
@@ -27,23 +27,4 @@ Tecchnologies used:
 OR
 
 *2. Run CabAcademieApplication.java from IDE
-
-######Deprecated
-Intelij.
-- open gradle view
-- double click on build
-- if you have some changes you should double click on clean first
-- Double click on build
-- Upload the changes to github
-
-Linux
-- sudo git pull
-- cd build/libs
-- screen(So the problem keeps running even if you close the terminal)
-- java -jar Cab....jar
-
-
-Command line
-- gradle clean
-- gradle build
 
