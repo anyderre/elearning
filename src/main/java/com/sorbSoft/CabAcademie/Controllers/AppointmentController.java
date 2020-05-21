@@ -73,7 +73,7 @@ public class AppointmentController {
         if (!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
 
-        return new ResponseEntity<>(MessageResponse.of("Appointment has been declined"), HttpStatus.OK);
+        return new ResponseEntity<>(MessageResponse.of("Appointment has been cancelled"), HttpStatus.OK);
     }
 
     @GetMapping(value = "/cancel/{uid}")

@@ -1,5 +1,9 @@
 package com.sorbSoft.CabAcademie.Services.email;
 
+import biweekly.Biweekly;
+import biweekly.ICalendar;
+import biweekly.component.VEvent;
+import biweekly.property.Method;
 import com.sorbSoft.CabAcademie.Entities.Attendee;
 import com.sorbSoft.CabAcademie.Entities.TimeSlot;
 import com.sorbSoft.CabAcademie.Entities.User;
@@ -21,8 +25,12 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.io.File;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -64,6 +72,8 @@ public class EmailApiService {
     @Value("${decline.api.url}")
     private String declineEndpoint;
 
+    private SimpleDateFormat F;
+
 
     @Autowired
     public JavaMailSender emailSender;
@@ -78,6 +88,8 @@ public class EmailApiService {
         velocityEngine.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         velocityEngine.init();
+
+        F = new SimpleDateFormat("yyyy-MM-dd hh:mm");
     }
 
     @PostConstruct
@@ -117,6 +129,9 @@ public class EmailApiService {
         messageHelper.setFrom(mail.getMailFrom(), "CabAcademie");
         messageHelper.setTo(mail.getMailTo());
         messageHelper.setSubject(mail.getMailSubject());
+
+        if(mail.getICal() != null)
+            messageHelper.addAttachment("appointment.ics", mail.getICal());
 
         String name = mail.getTemplateName();
 
@@ -197,8 +212,8 @@ public class EmailApiService {
         parameters.put("requesterLName", student.getLastName());
 
         parameters.put("appointmentType", booked.getType());
-        parameters.put("dateFrom", booked.getDateFrom());
-        parameters.put("dateTo", booked.getDateTo());
+        parameters.put("dateFrom", F.format(booked.getDateFrom()));
+        parameters.put("dateTo", F.format(booked.getDateTo()));
 
         parameters.put("approveLink", approveLink);
         parameters.put("declineLink", declineLink);
@@ -232,8 +247,8 @@ public class EmailApiService {
         parameters.put("teacherLName", teacher.getLastName());
 
         parameters.put("appointmentType", booked.getType());
-        parameters.put("dateFrom", booked.getDateFrom());
-        parameters.put("dateTo", booked.getDateTo());
+        parameters.put("dateFrom", F.format(booked.getDateFrom()));
+        parameters.put("dateTo", F.format(booked.getDateTo()));
 
         parameters.put("declineLink", declineLink);
 
@@ -267,14 +282,16 @@ public class EmailApiService {
         parameters.put("requesterLName", student.getLastName());
 
         parameters.put("appointmentType", timeSlot.getType());
-        parameters.put("dateFrom", timeSlot.getDateFrom());
-        parameters.put("dateTo", timeSlot.getDateTo());
+        parameters.put("dateFrom", F.format(timeSlot.getDateFrom()));
+        parameters.put("dateTo", F.format(timeSlot.getDateTo()));
 
         parameters.put("videoConferenceLink", timeSlot.getVideoConferenceLink());
 
         parameters.put("declineLink", declineLink);
 
-        sendMail(mail, parameters);
+        iCal ical = makeICalModel4TeacherApprove(student, teacher, timeSlot);
+
+        sendMailWithICal(mail, parameters, ical);
     }
 
     public void sendApproveNotificationToStudent(TimeSlot timeSlot, Attendee attendee) {
@@ -303,14 +320,98 @@ public class EmailApiService {
         parameters.put("teacherLName", teacher.getLastName());
 
         parameters.put("appointmentType", timeSlot.getType());
-        parameters.put("dateFrom", timeSlot.getDateFrom());
-        parameters.put("dateTo", timeSlot.getDateTo());
+        parameters.put("dateFrom", F.format(timeSlot.getDateFrom()));
+        parameters.put("dateTo", F.format(timeSlot.getDateTo()));
 
         parameters.put("videoConferenceLink", timeSlot.getVideoConferenceLink());
 
         parameters.put("declineLink", declineLink);
 
-        sendMail(mail, parameters);
+        iCal ical = makeICalModel4StudentApprove(student, teacher, timeSlot);
+
+        sendMailWithICal(mail, parameters, ical);
+
+    }
+
+    private void sendMailWithICal(Mail mail, Map<String, Object> parameters, iCal ical) {
+
+        try {
+            File file = createICalFile(ical);
+            mail.setICal(file);
+
+            sendMail(mail, parameters);
+
+            Files.deleteIfExists(file.toPath());
+
+            log.debug("File has been removed: "+file.toPath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+        }
+    }
+
+    private iCal makeICalModel4StudentApprove(User student, User teacher, TimeSlot timeSlot) {
+
+        String teacherName = teacher.getFirstName() +" "+teacher.getLastName();
+
+        iCal ical = new iCal();
+        ical.setStart(timeSlot.getDateFrom());
+        ical.setEnd(timeSlot.getDateTo());
+        ical.setSummary("Meeting with teacher "+teacherName);
+        ical.setDescription("Teacher will be waiting for you by following link "+timeSlot.getVideoConferenceLink());
+        ical.setUrl(""); //to avoid null in email
+        ical.setOrganizer(USER_NAME);
+        ical.setAttendee(student.getEmail());
+
+        return ical;
+    }
+
+    private iCal makeICalModel4StudentCancel(User student, User teacher, TimeSlot timeSlot) {
+
+        String teacherName = teacher.getFirstName() +" "+teacher.getLastName();
+
+        iCal ical = new iCal();
+        ical.setStart(timeSlot.getDateFrom());
+        ical.setEnd(timeSlot.getDateTo());
+        ical.setSummary("Cancelled: Meeting with teacher "+teacherName);
+        ical.setDescription("Teacher will be waiting for you by following link "+timeSlot.getVideoConferenceLink());
+
+        ical.setOrganizer(USER_NAME);
+        ical.setAttendee(student.getEmail());
+
+        return ical;
+    }
+
+    private iCal makeICalModel4TeacherApprove(User student, User teacher, TimeSlot timeSlot) {
+
+        String studentName = student.getFirstName() +" "+student.getLastName();
+
+        iCal ical = new iCal();
+        ical.setStart(timeSlot.getDateFrom());
+        ical.setEnd(timeSlot.getDateTo());
+        ical.setSummary("Meeting with student "+studentName);
+        ical.setDescription("Student will be waiting for you by following link "+timeSlot.getVideoConferenceLink());
+        ical.setUrl(""); //to avoid null in email
+        ical.setOrganizer(USER_NAME);
+        ical.setAttendee(teacher.getEmail());
+
+        return ical;
+    }
+
+    private iCal makeICalModel4TeacherCancel(User student, User teacher, TimeSlot timeSlot) {
+
+        String studentName = student.getFirstName() +" "+student.getLastName();
+
+        iCal ical = new iCal();
+        ical.setStart(timeSlot.getDateFrom());
+        ical.setEnd(timeSlot.getDateTo());
+        ical.setSummary("Cancelled: Meeting with student "+studentName);
+        ical.setDescription("Student will be waiting for you by following link "+timeSlot.getVideoConferenceLink());
+
+        ical.setOrganizer(USER_NAME);
+        ical.setAttendee(teacher.getEmail());
+
+        return ical;
     }
 
     public void sendDeclineNotificationToTeacher(TimeSlot timeSlot, Attendee attendee) {
@@ -337,10 +438,12 @@ public class EmailApiService {
         parameters.put("requesterLName", student.getLastName());
 
         parameters.put("appointmentType", timeSlot.getType());
-        parameters.put("dateFrom", timeSlot.getDateFrom());
-        parameters.put("dateTo", timeSlot.getDateTo());
+        parameters.put("dateFrom", F.format(timeSlot.getDateFrom()));
+        parameters.put("dateTo", F.format(timeSlot.getDateTo()));
 
-        sendMail(mail, parameters);
+        iCal ical = makeICalModel4TeacherCancel(student, teacher, timeSlot);
+
+        sendMailWithICal(mail, parameters, ical);
     }
 
     public void sendDeclineNotificationToStudent(TimeSlot timeSlot, Attendee attendee) {
@@ -367,9 +470,34 @@ public class EmailApiService {
         parameters.put("teacherLName", teacher.getLastName());
 
         parameters.put("appointmentType", timeSlot.getType());
-        parameters.put("dateFrom", timeSlot.getDateFrom());
-        parameters.put("dateTo", timeSlot.getDateTo());
+        parameters.put("dateFrom", F.format(timeSlot.getDateFrom()));
+        parameters.put("dateTo", F.format(timeSlot.getDateTo()));
 
-        sendMail(mail, parameters);
+        iCal ical = makeICalModel4StudentCancel(student, teacher, timeSlot);
+
+        sendMailWithICal(mail, parameters, ical);
+    }
+
+    private File createICalFile(iCal ical) throws IOException {
+        ICalendar iCalendar = new ICalendar();
+        VEvent event = new VEvent();
+
+        event.setSummary(ical.getSummary());
+        event.setDateStart(ical.getStart());
+        event.setDateEnd(ical.getEnd());
+        event.setDescription(ical.getDescription() + ical.getUrl());
+        event.setUrl(ical.getUrl());
+        event.setOrganizer(ical.getOrganizer());
+        event.addAttendee(ical.getAttendee());
+
+
+        iCalendar.addEvent(event);
+        iCalendar.setMethod(ical.getMethod());
+        //iCalendar.getTimezoneInfo().setDefaultTimezone(utc);
+
+        File file = new File("my.ics");
+        Biweekly.write(iCalendar).go(file);
+
+        return file;
     }
 }
