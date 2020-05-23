@@ -137,7 +137,7 @@
                     The appointment type:<b> $!{appointmentType} </b>
                 </p>
                 <p>
-                    Date/Time: <b>$!{dateFrom} - $!{dateTo}</b><br/>
+                    Date/Time: <b>$!{dateFrom} - $!{dateTo}, UTC $!{utc}</b><br/>
                 <p>
                     <br/>
                 <p>Do not forget to remove this appointmet from your calendar manually</p>

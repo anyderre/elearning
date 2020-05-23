@@ -55,14 +55,16 @@ public class TimeSlotsController {
         return new ResponseEntity(slots, HttpStatus.OK);
     }
 
-    @GetMapping(value = "{teacher_id}/all", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<SlotsResponseModel> getAllSlotsByUserId(@PathVariable("teacher_id") Long teacherId){
+    //TODO: fix - convert to student/admin time zone
+    @GetMapping(value = "{teacher_id}/all/{requester_id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<SlotsResponseModel> getAllSlotsByUserId(@PathVariable("teacher_id") Long teacherId,
+                                                                  @PathVariable("requester_id") Long requesterId){
 
         if(teacherId==null
                 || teacherId<=0) {
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        Result result = timeSlotService.getAllSlotsByUserId(teacherId);
+        Result result = timeSlotService.getAllSlotsByUserId(teacherId, requesterId);
         List<SlotsResponseModel> slots = (List<SlotsResponseModel>)result.getValue();
 
         if(slots == null || slots.size() == 0)

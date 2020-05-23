@@ -16,4 +16,7 @@ public class SlotDeleteRequestModel {
 
     private Date dateTo;
 
+    private Long requesterId;
+
+
 }

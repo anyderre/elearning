@@ -7,6 +7,7 @@ import biweekly.property.Method;
 import com.sorbSoft.CabAcademie.Entities.Attendee;
 import com.sorbSoft.CabAcademie.Entities.TimeSlot;
 import com.sorbSoft.CabAcademie.Entities.User;
+import com.sorbSoft.CabAcademie.Services.TimeZoneConverter;
 import lombok.extern.log4j.Log4j2;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -31,6 +32,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -72,8 +74,13 @@ public class EmailApiService {
     @Value("${decline.api.url}")
     private String declineEndpoint;
 
+    @Value("${email.date.time.format}")
+    private String emailDateTimeFormat;
+
     private SimpleDateFormat F;
 
+    @Autowired
+    private TimeZoneConverter tzConverter;
 
     @Autowired
     public JavaMailSender emailSender;
@@ -89,13 +96,16 @@ public class EmailApiService {
         velocityEngine.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         velocityEngine.init();
 
-        F = new SimpleDateFormat("yyyy-MM-dd hh:mm");
     }
 
     @PostConstruct
     public void init() {
         this.approveEndpoint = appUrl + this.approveEndpoint;
         this.declineEndpoint = appUrl + this.declineEndpoint;
+
+        this.F = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
+
+        log.debug("Simple date format output: "+emailDateTimeFormat);
 
         /*String to = "w.volodymyr.bondarchuk@gmail.com";
         String subject = "Hello world";
@@ -184,9 +194,9 @@ public class EmailApiService {
 
 
     //from, to, approveUid, declineUid, appointment type, date from, date to
-    public void sendAppointmentRequestToTeacherMail(final TimeSlot booked, final Attendee attendee) {
+    public void sendAppointmentRequestToTeacherMail(final TimeSlot timeSlot, final Attendee attendee) {
 
-        User teacher = booked.getTeacher();
+        User teacher = timeSlot.getTeacher();
         User student = attendee.getUser();
 
         log.debug("Sending appointment request email to teacher: {}", teacher);
@@ -211,9 +221,20 @@ public class EmailApiService {
         parameters.put("requesterFName", student.getFirstName());
         parameters.put("requesterLName", student.getLastName());
 
-        parameters.put("appointmentType", booked.getType());
-        parameters.put("dateFrom", F.format(booked.getDateFrom()));
-        parameters.put("dateTo", F.format(booked.getDateTo()));
+        parameters.put("appointmentType", timeSlot.getType());
+
+
+        Date dateFrom = new Date();
+        Date dateTo = new Date();
+        dateFrom.setTime(timeSlot.getDateFrom().getTime());
+        dateTo.setTime(timeSlot.getDateTo().getTime());
+        String teacherTZ = teacher.getTimeZone();
+        tzConverter.convertFromUtcToTimeZoned(teacherTZ, dateFrom, dateTo);
+
+        parameters.put("dateFrom", F.format(dateFrom));
+        parameters.put("dateTo", F.format(dateTo));
+
+        parameters.put("utc", teacherTZ);
 
         parameters.put("approveLink", approveLink);
         parameters.put("declineLink", declineLink);
@@ -247,8 +268,18 @@ public class EmailApiService {
         parameters.put("teacherLName", teacher.getLastName());
 
         parameters.put("appointmentType", booked.getType());
-        parameters.put("dateFrom", F.format(booked.getDateFrom()));
-        parameters.put("dateTo", F.format(booked.getDateTo()));
+
+        Date dateFrom = new Date();
+        Date dateTo = new Date();
+        dateFrom.setTime(booked.getDateFrom().getTime());
+        dateTo.setTime(booked.getDateTo().getTime());
+        String studentTZ = student.getTimeZone();
+        tzConverter.convertFromUtcToTimeZoned(studentTZ, dateFrom, dateTo);
+
+        parameters.put("dateFrom", F.format(dateFrom));
+        parameters.put("dateTo", F.format(dateTo));
+
+        parameters.put("utc", studentTZ);
 
         parameters.put("declineLink", declineLink);
 
@@ -282,8 +313,17 @@ public class EmailApiService {
         parameters.put("requesterLName", student.getLastName());
 
         parameters.put("appointmentType", timeSlot.getType());
-        parameters.put("dateFrom", F.format(timeSlot.getDateFrom()));
-        parameters.put("dateTo", F.format(timeSlot.getDateTo()));
+
+        Date dateFrom = new Date();
+        Date dateTo = new Date();
+        dateFrom.setTime(timeSlot.getDateFrom().getTime());
+        dateTo.setTime(timeSlot.getDateTo().getTime());
+        String teacherTZ = teacher.getTimeZone();
+        tzConverter.convertFromUtcToTimeZoned(teacherTZ, dateFrom, dateTo);
+
+        parameters.put("dateFrom", F.format(dateFrom));
+        parameters.put("dateTo", F.format(dateTo));
+        parameters.put("utc", teacherTZ);
 
         parameters.put("videoConferenceLink", timeSlot.getVideoConferenceLink());
 
@@ -320,8 +360,18 @@ public class EmailApiService {
         parameters.put("teacherLName", teacher.getLastName());
 
         parameters.put("appointmentType", timeSlot.getType());
-        parameters.put("dateFrom", F.format(timeSlot.getDateFrom()));
-        parameters.put("dateTo", F.format(timeSlot.getDateTo()));
+
+
+        Date dateFrom = new Date();
+        Date dateTo = new Date();
+        dateFrom.setTime(timeSlot.getDateFrom().getTime());
+        dateTo.setTime(timeSlot.getDateTo().getTime());
+        String studentTZ = student.getTimeZone();
+        tzConverter.convertFromUtcToTimeZoned(studentTZ, dateFrom, dateTo);
+
+        parameters.put("dateFrom", F.format(dateFrom));
+        parameters.put("dateTo", F.format(dateTo));
+        parameters.put("utc", studentTZ);
 
         parameters.put("videoConferenceLink", timeSlot.getVideoConferenceLink());
 
@@ -438,8 +488,17 @@ public class EmailApiService {
         parameters.put("requesterLName", student.getLastName());
 
         parameters.put("appointmentType", timeSlot.getType());
-        parameters.put("dateFrom", F.format(timeSlot.getDateFrom()));
-        parameters.put("dateTo", F.format(timeSlot.getDateTo()));
+
+        Date dateFrom = new Date();
+        Date dateTo = new Date();
+        dateFrom.setTime(timeSlot.getDateFrom().getTime());
+        dateTo.setTime(timeSlot.getDateTo().getTime());
+        String teacherTZ = teacher.getTimeZone();
+        tzConverter.convertFromUtcToTimeZoned(teacherTZ, dateFrom, dateTo);
+
+        parameters.put("dateFrom", F.format(dateFrom));
+        parameters.put("dateTo", F.format(dateTo));
+        parameters.put("utc", teacherTZ);
 
         iCal ical = makeICalModel4TeacherCancel(student, teacher, timeSlot);
 
@@ -470,8 +529,19 @@ public class EmailApiService {
         parameters.put("teacherLName", teacher.getLastName());
 
         parameters.put("appointmentType", timeSlot.getType());
-        parameters.put("dateFrom", F.format(timeSlot.getDateFrom()));
-        parameters.put("dateTo", F.format(timeSlot.getDateTo()));
+
+
+        Date dateFrom = new Date();
+        Date dateTo = new Date();
+        dateFrom.setTime(timeSlot.getDateFrom().getTime());
+        dateTo.setTime(timeSlot.getDateTo().getTime());
+        String studentTZ = student.getTimeZone();
+        tzConverter.convertFromUtcToTimeZoned(studentTZ, dateFrom, dateTo);
+
+
+        parameters.put("dateFrom", F.format(dateFrom));
+        parameters.put("dateTo", F.format(dateTo));
+        parameters.put("utc", studentTZ);
 
         iCal ical = makeICalModel4StudentCancel(student, teacher, timeSlot);
 

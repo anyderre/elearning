@@ -10,6 +10,7 @@ import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Helpers.DatePointName;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.OneToOneAppointmentMakeRequestModel;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotAddRequestModel;
 import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
 import com.sorbSoft.CabAcademie.Utils.DateUtils;
 import lombok.extern.log4j.Log4j2;
@@ -45,20 +46,25 @@ public class OneToOneAppointmeentService {
     @Autowired
     private EmailApiService emailSender;
 
+    @Autowired
+    private TimeZoneConverter tzConverter;
+
     //TODO: add appointment validator service
 
-    public Result book121Meeting(OneToOneAppointmentMakeRequestModel vm) {
+    public Result book121Meeting(OneToOneAppointmentMakeRequestModel vmTimeZoned) {
 
         Result result = new Result();
 
-        result = validateBookMeeting(vm);
+        OneToOneAppointmentMakeRequestModel vmUtc = tzConverter.convertFromTimeZonedToUtc(vmTimeZoned);
+
+        result = validateBookMeeting(vmUtc);
         if (!result.isValid()) return result;
 
-        removeSeconds(vm);
+        removeSeconds(vmUtc);
 
 
-        User teacher = userR.findById(vm.getTeacherId());
-        TimeSlot availableSlot = slotsR.getAvailableSlot(vm.getDateFrom(), vm.getDateTo(), teacher);
+        User teacher = userR.findById(vmUtc.getTeacherId());
+        TimeSlot availableSlot = slotsR.getAvailableSlot(vmUtc.getDateFrom(), vmUtc.getDateTo(), teacher);
 
         if (availableSlot == null) {
             result.add("There is no available slots for time you specified");
@@ -70,15 +76,23 @@ public class OneToOneAppointmeentService {
             return result;
         }
 
-        result = validateAppointmentRestrictions(vm, availableSlot);
+        result = validateAppointmentRestrictions(vmUtc, availableSlot);
         if (!result.isValid()) return result;
 
 
         DateTime slotFrom = new DateTime(availableSlot.getDateFrom());
         DateTime slotTo = new DateTime(availableSlot.getDateTo());
 
-        DateTime meetingFrom = new DateTime(vm.getDateFrom());
-        DateTime meetingTo = new DateTime(vm.getDateTo());
+
+
+        DateTime meetingFrom = new DateTime(vmUtc.getDateFrom());
+        DateTime meetingTo = new DateTime(vmUtc.getDateTo());
+
+        log.debug("Slot date from: "+slotFrom);
+        log.debug("Slot date to: "+slotTo);
+
+        log.debug("Meeting date from: "+meetingFrom);
+        log.debug("Meeting date to: "+meetingTo);
 
         result = validateIfMeetingFitsSlot(slotFrom, slotTo, meetingFrom, meetingTo);
         if (!result.isValid()) return result;
@@ -88,7 +102,7 @@ public class OneToOneAppointmeentService {
         //- if suggested meeting time == slot -> book
         if (meetingFrom.isEqual(slotFrom) && meetingTo.isEqual(slotTo)) {
 
-            makePendingApprovalAndClosed(availableSlot, attendee, vm);
+            makePendingApprovalAndClosed(availableSlot, attendee, vmUtc);
 
             slotsR.save(availableSlot);
             result.add("Just Booked");
@@ -109,14 +123,14 @@ public class OneToOneAppointmeentService {
             TimeSlot slotAfter = null;
 
             if (s1 != null && e1 != null) {
-                slotBefore = createNewOpenedSlot(s1, e1, availableSlot, vm);
+                slotBefore = createNewOpenedSlot(s1, e1, availableSlot, vmUtc);
             }
 
             if (s2 != null && e2 != null) {
-                slotAfter = createNewOpenedSlot(s2, e2, availableSlot, vm);
+                slotAfter = createNewOpenedSlot(s2, e2, availableSlot, vmUtc);
             }
 
-            TimeSlot booked = makePendingApprovalAndClosed(meetingFrom, meetingTo, availableSlot, attendee, vm);
+            TimeSlot booked = makePendingApprovalAndClosed(meetingFrom, meetingTo, availableSlot, attendee, vmUtc);
 
 
             //if slots that left < 10 min then clean them

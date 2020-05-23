@@ -137,7 +137,7 @@
                     Your appointment type:<b> $!{appointmentType} </b>
                 </p>
                 <p>
-                    Date/Time: <b>$!{dateFrom} - $!{dateTo}</b>
+                    Date/Time: <b>$!{dateFrom} - $!{dateTo}, UTC $!{utc}</b>
                 <p>
 
 
