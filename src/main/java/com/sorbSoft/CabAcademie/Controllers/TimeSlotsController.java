@@ -26,7 +26,11 @@ public class TimeSlotsController {
 
 
     @PostMapping(value = "/addSlots", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INSTRUCTOR')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasAuthority('ROLE_SUPER_ADMIN') " +
+            "or hasAuthority('ROLE_INSTRUCTOR') " +
+            "or hasAuthority('ROLE_PROFESSOR') " +
+            "or hasAuthority('ROLE_FREELANCER')")
     public ResponseEntity<MessageResponse> addSlots(@Valid @RequestBody List<SlotAddRequestModel> timeSlotVm){
 
         Result result = timeSlotService.save(timeSlotVm);
@@ -55,7 +59,6 @@ public class TimeSlotsController {
         return new ResponseEntity(slots, HttpStatus.OK);
     }
 
-    //TODO: fix - convert to student/admin time zone
     @GetMapping(value = "{teacher_id}/all/{requester_id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SlotsResponseModel> getAllSlotsByUserId(@PathVariable("teacher_id") Long teacherId,
                                                                   @PathVariable("requester_id") Long requesterId){
@@ -74,7 +77,11 @@ public class TimeSlotsController {
     }
 
     @DeleteMapping(value = "/deleteByTeacherIdWithinDateRange", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INSTRUCTOR')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasAuthority('ROLE_SUPER_ADMIN') " +
+            "or hasAuthority('ROLE_INSTRUCTOR') " +
+            "or hasAuthority('ROLE_PROFESSOR') " +
+            "or hasAuthority('ROLE_FREELANCER')")
     public ResponseEntity<MessageResponse> deleteSlotsByUserIdWithinDateRange(
             @Valid @RequestBody SlotDeleteRequestModel vmSlots){
 
@@ -93,7 +100,11 @@ public class TimeSlotsController {
     }
 
     @DeleteMapping(value = "/deleteOne/{slot_id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INSTRUCTOR')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasAuthority('ROLE_SUPER_ADMIN') " +
+            "or hasAuthority('ROLE_INSTRUCTOR') " +
+            "or hasAuthority('ROLE_PROFESSOR') " +
+            "or hasAuthority('ROLE_FREELANCER')")
     public ResponseEntity<MessageResponse> deleteSlot(@PathVariable("slot_id") Long id ){
         Result result = timeSlotService.deleteOne(id);
         if (!result.isValid()){
@@ -103,7 +114,11 @@ public class TimeSlotsController {
     }
 
     @DeleteMapping(value = "/deleteAllByTeacherId/{teacher_id}")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_SUPER_ADMIN') or hasAuthority('ROLE_INSTRUCTOR')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasAuthority('ROLE_SUPER_ADMIN') " +
+            "or hasAuthority('ROLE_INSTRUCTOR') " +
+            "or hasAuthority('ROLE_PROFESSOR') " +
+            "or hasAuthority('ROLE_FREELANCER')")
     public ResponseEntity<MessageResponse> deleteAllByUserId(@PathVariable("teacher_id") Long teacherId ){
         Result result = timeSlotService.deleteAllSlotsForUserId(teacherId);
         if (!result.isValid()){

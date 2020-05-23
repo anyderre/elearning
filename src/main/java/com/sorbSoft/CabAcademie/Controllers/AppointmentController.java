@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -25,7 +26,11 @@ public class AppointmentController {
     private OneToManyAppointmeentService oneToManyAppointmeentService;
 
     @PostMapping(value = "/oneToOne/make", consumes = MediaType.APPLICATION_JSON_VALUE)
-    //add roles
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasAuthority('ROLE_SUPER_ADMIN') " +
+            "or hasAuthority('ROLE_STUDENT') " +
+            "or hasAuthority('ROLE_EMPLOYEE') " +
+            "or hasAuthority('ROLE_FREE_STUDENT')")
     public ResponseEntity<MessageResponse> make121Appointment(@Valid @RequestBody OneToOneAppointmentMakeRequestModel appointmentVmSlot) {
 
         Result result = oneToOneAppointmeentService.book121Meeting(appointmentVmSlot);
@@ -35,7 +40,11 @@ public class AppointmentController {
     }
 
     @PostMapping(value = "/oneToMany/make", consumes = MediaType.APPLICATION_JSON_VALUE)
-    //add roles
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasAuthority('ROLE_SUPER_ADMIN') " +
+            "or hasAuthority('ROLE_STUDENT') " +
+            "or hasAuthority('ROLE_EMPLOYEE') " +
+            "or hasAuthority('ROLE_FREE_STUDENT')")
     public ResponseEntity<MessageResponse> makeOneToManyAppointment(@Valid @RequestBody GroupAppointmentViewModel appointmentVmSlot) {
 
         Result result = oneToManyAppointmeentService.subscribeToGroupMeeting(appointmentVmSlot);
@@ -45,7 +54,6 @@ public class AppointmentController {
     }
 
     @GetMapping(value = "/approve/{uid}")
-    //add roles
     public ResponseEntity<MessageResponse> approveAppointment(@PathVariable String uid) {
 
         if (uid == null) {
@@ -61,7 +69,6 @@ public class AppointmentController {
     }
 
     @GetMapping(value = "/decline/{uid}")
-    //add roles
     public ResponseEntity<MessageResponse> declineAppointment(@PathVariable String uid) {
 
         if (uid == null) {
@@ -77,7 +84,6 @@ public class AppointmentController {
     }
 
     @GetMapping(value = "/cancel/{uid}")
-    //add roles
     public ResponseEntity<MessageResponse> cancelAppointment(@PathVariable String uid) {
 
         if (uid == null) {
@@ -91,6 +97,4 @@ public class AppointmentController {
 
         return new ResponseEntity<>(MessageResponse.of("Appointment has been canceled"), HttpStatus.OK);
     }
-
-
 }
