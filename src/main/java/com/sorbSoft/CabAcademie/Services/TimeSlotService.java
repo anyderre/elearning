@@ -121,8 +121,8 @@ public class TimeSlotService {
 
         List<AttendeeModel> attendees = convertAttendees(slot.getAttendees());
         vm.setAttendees(attendees);
-        vm.setDateFrom(slot.getDateFrom());
-        vm.setDateTo(slot.getDateTo());
+        vm.setDateFrom((Date) slot.getDateFrom().clone());
+        vm.setDateTo((Date)slot.getDateTo().clone());
 
         vm.setPrices(slot.getPrices());
         vm.setMinMinutes(slot.getMinMinutes());

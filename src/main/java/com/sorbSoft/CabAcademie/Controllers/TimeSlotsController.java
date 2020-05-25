@@ -45,9 +45,11 @@ public class TimeSlotsController {
             @Valid @RequestBody SlotsGetRequestModel vmSlots){
 
         if(vmSlots.getTeacherId()==null
-                || vmSlots.getTeacherId()==0
+                || vmSlots.getTeacherId() < 0
                 || vmSlots.getDateFrom() == null
-                || vmSlots.getDateTo() == null) {
+                || vmSlots.getDateTo() == null
+                || vmSlots.getRequesterId() == null
+                || vmSlots.getRequesterId() < 0) {
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         Result result = timeSlotService.getSlotsByUserIdWithinDateRange(vmSlots);

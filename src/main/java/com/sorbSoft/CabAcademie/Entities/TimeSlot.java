@@ -55,13 +55,8 @@ public class TimeSlot implements Serializable {
     @Column(name = "min_minutes")
     private Long minMinutes;
 
-    //@Column(name = "agreed_price")
     @OneToOne
-    private AppointmentPrice agreedPrice;
-
-    //@Column(name = "suggested_price")
-    @OneToOne
-    private AppointmentPrice suggestedPrice;
+    private AppointmentPrice selectedPrice;
 
     @Column(name = "book_before_minutes")
     private Integer bookBeforeMinutes;

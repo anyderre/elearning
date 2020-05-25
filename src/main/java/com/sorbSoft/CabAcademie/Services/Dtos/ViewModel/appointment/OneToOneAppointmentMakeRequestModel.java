@@ -17,8 +17,6 @@ public class OneToOneAppointmentMakeRequestModel {
 
     private Date dateTo;
 
-    private Long suggestedPrice;
-
-    private String currency;
+    private Long priceId;
 
 }

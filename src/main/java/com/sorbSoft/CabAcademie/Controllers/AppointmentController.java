@@ -3,8 +3,8 @@ package com.sorbSoft.CabAcademie.Controllers;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.GroupAppointmentViewModel;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.OneToOneAppointmentMakeRequestModel;
-import com.sorbSoft.CabAcademie.Services.OneToManyAppointmeentService;
-import com.sorbSoft.CabAcademie.Services.OneToOneAppointmeentService;
+import com.sorbSoft.CabAcademie.Services.Appointment12nService;
+import com.sorbSoft.CabAcademie.Services.Appointmeent121Service;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,10 +20,10 @@ import javax.validation.Valid;
 public class AppointmentController {
 
     @Autowired
-    private OneToOneAppointmeentService oneToOneAppointmeentService;
+    private Appointmeent121Service appointmeent121Service;
 
     @Autowired
-    private OneToManyAppointmeentService oneToManyAppointmeentService;
+    private Appointment12nService appointment12nService;
 
     @PostMapping(value = "/oneToOne/make", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
@@ -33,7 +33,7 @@ public class AppointmentController {
             "or hasAuthority('ROLE_FREE_STUDENT')")
     public ResponseEntity<MessageResponse> make121Appointment(@Valid @RequestBody OneToOneAppointmentMakeRequestModel appointmentVmSlot) {
 
-        Result result = oneToOneAppointmeentService.book121Meeting(appointmentVmSlot);
+        Result result = appointmeent121Service.book121Meeting(appointmentVmSlot);
         if (!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         return new ResponseEntity<>(MessageResponse.of("Appointment has been made successfully"), HttpStatus.OK);
@@ -47,7 +47,7 @@ public class AppointmentController {
             "or hasAuthority('ROLE_FREE_STUDENT')")
     public ResponseEntity<MessageResponse> makeOneToManyAppointment(@Valid @RequestBody GroupAppointmentViewModel appointmentVmSlot) {
 
-        Result result = oneToManyAppointmeentService.subscribeToGroupMeeting(appointmentVmSlot);
+        Result result = appointment12nService.subscribeToGroupMeeting(appointmentVmSlot);
         if (!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         return new ResponseEntity<>(MessageResponse.of("Appointment has been made successfully"), HttpStatus.OK);
@@ -60,7 +60,7 @@ public class AppointmentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Result result = oneToOneAppointmeentService.approveAppointment(uid);
+        Result result = appointmeent121Service.approveAppointment(uid);
 
         if (!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
@@ -75,7 +75,7 @@ public class AppointmentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Result result = oneToOneAppointmeentService.declineAppointment(uid);
+        Result result = appointmeent121Service.declineAppointment(uid);
 
         if (!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
@@ -90,7 +90,7 @@ public class AppointmentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        Result result = oneToOneAppointmeentService.cancelAppointment(uid);
+        Result result = appointmeent121Service.cancelAppointment(uid);
 
         if (!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
