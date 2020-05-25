@@ -25,7 +25,7 @@ import java.util.*;
 @Service
 @Transactional
 @Log4j2
-public class OneToOneAppointmeentService {
+public class Appointmeent121Service {
 
     @Value("${minimum.time.slot.size.minutes}")
     private Long MIN_SLOT_SIZE_MINUTES;
@@ -45,20 +45,24 @@ public class OneToOneAppointmeentService {
     @Autowired
     private EmailApiService emailSender;
 
+    @Autowired
+    private TimeZoneConverter tzConverter;
+
     //TODO: add appointment validator service
 
-    public Result book121Meeting(OneToOneAppointmentMakeRequestModel vm) {
+    public Result book121Meeting(OneToOneAppointmentMakeRequestModel vmTimeZoned) {
 
         Result result = new Result();
 
-        result = validateBookMeeting(vm);
+        OneToOneAppointmentMakeRequestModel vmUtc = tzConverter.convertFromTimeZonedToUtc(vmTimeZoned);
+
+        result = validateBookMeeting(vmUtc);
         if (!result.isValid()) return result;
 
-        removeSeconds(vm);
+        removeSeconds(vmUtc);
 
-
-        User teacher = userR.findById(vm.getTeacherId());
-        TimeSlot availableSlot = slotsR.getAvailableSlot(vm.getDateFrom(), vm.getDateTo(), teacher);
+        User teacher = userR.findById(vmUtc.getTeacherId());
+        TimeSlot availableSlot = slotsR.getAvailableSlot(vmUtc.getDateFrom(), vmUtc.getDateTo(), teacher);
 
         if (availableSlot == null) {
             result.add("There is no available slots for time you specified");
@@ -70,17 +74,29 @@ public class OneToOneAppointmeentService {
             return result;
         }
 
-        result = validateAppointmentRestrictions(vm, availableSlot);
-        if (!result.isValid()) return result;
+        /*result = validateAppointmentRestrictions(vmUtc, availableSlot);
+        if (!result.isValid()) return result;*/
 
 
         DateTime slotFrom = new DateTime(availableSlot.getDateFrom());
         DateTime slotTo = new DateTime(availableSlot.getDateTo());
 
-        DateTime meetingFrom = new DateTime(vm.getDateFrom());
-        DateTime meetingTo = new DateTime(vm.getDateTo());
+        DateTime meetingFrom = new DateTime(vmUtc.getDateFrom());
+        DateTime meetingTo = new DateTime(vmUtc.getDateTo());
+
+        log.debug("Slot date from: "+slotFrom);
+        log.debug("Slot date to: "+slotTo);
+
+        log.debug("Meeting date from: "+meetingFrom);
+        log.debug("Meeting date to: "+meetingTo);
 
         result = validateIfMeetingFitsSlot(slotFrom, slotTo, meetingFrom, meetingTo);
+        if (!result.isValid()) return result;
+
+        Long meetingDuration = getMinutesDuration(meetingFrom, meetingTo);
+        List<AppointmentPrice> prices = availableSlot.getPrices();
+
+        result = vlidateIfMeetingDurationMatchesPriceTimeSlotDuration(meetingDuration, vmUtc.getPriceId(), prices);
         if (!result.isValid()) return result;
 
         Attendee attendee = new Attendee();
@@ -88,7 +104,7 @@ public class OneToOneAppointmeentService {
         //- if suggested meeting time == slot -> book
         if (meetingFrom.isEqual(slotFrom) && meetingTo.isEqual(slotTo)) {
 
-            makePendingApprovalAndClosed(availableSlot, attendee, vm);
+            makePendingApprovalAndClosed(availableSlot, attendee, vmUtc);
 
             slotsR.save(availableSlot);
             result.add("Just Booked");
@@ -109,14 +125,14 @@ public class OneToOneAppointmeentService {
             TimeSlot slotAfter = null;
 
             if (s1 != null && e1 != null) {
-                slotBefore = createNewOpenedSlot(s1, e1, availableSlot, vm);
+                slotBefore = createNewOpenedSlot(s1, e1, availableSlot, vmUtc);
             }
 
             if (s2 != null && e2 != null) {
-                slotAfter = createNewOpenedSlot(s2, e2, availableSlot, vm);
+                slotAfter = createNewOpenedSlot(s2, e2, availableSlot, vmUtc);
             }
 
-            TimeSlot booked = makePendingApprovalAndClosed(meetingFrom, meetingTo, availableSlot, attendee, vm);
+            TimeSlot booked = makePendingApprovalAndClosed(meetingFrom, meetingTo, availableSlot, attendee, vmUtc);
 
 
             //if slots that left < 10 min then clean them
@@ -140,6 +156,43 @@ public class OneToOneAppointmeentService {
             emailSender.sendAppointmentRequestToTeacherMail(booked, attendee);
             emailSender.sendAppointmentRequestNotificationToStudentMail(booked, attendee);
 
+        }
+
+        return result;
+    }
+
+    private Result vlidateIfMeetingDurationMatchesPriceTimeSlotDuration(Long meetingDuration, Long priceId, List<AppointmentPrice> prices) {
+
+        Result result = new Result();
+
+        boolean isTimeMatched = false;
+        boolean isPriceIdMatched = false;
+
+        StringBuffer sb = new StringBuffer();
+
+        for(AppointmentPrice pr : prices) {
+            Long priceMinutes = (long)pr.getMinutes();
+            sb.append("ID: "+pr.getId()+ ", "+priceMinutes+" min -> "+pr.getPrice()+" "+pr.getCurrency()+"\n");
+            if(priceMinutes == meetingDuration) {
+                isTimeMatched = true;
+
+                if(priceId == pr.getId()) {
+                    isPriceIdMatched = true;
+                }
+                break;
+            }
+        }
+
+        if(!isTimeMatched) {
+            log.debug("Time slot duration does'n fit prices time slot. Available durations: "+sb.toString());
+            result.add("Time slot duration does'n fit prices time slot. Available durations: "+sb.toString());
+            return result;
+        }
+
+        if(!isPriceIdMatched) {
+            log.debug("Price Id does not match. Available prices id: "+sb.toString());
+            result.add("Price Id does not match. Available prices id: "+sb.toString());
+            return result;
         }
 
         return result;
@@ -234,13 +287,14 @@ public class OneToOneAppointmeentService {
 
         booked.setAttendees(attendees);
 
-        if (vm.getSuggestedPrice() != null && vm.getSuggestedPrice() > 0) {
-            AppointmentPrice price = new AppointmentPrice();
-            price.setPrice(vm.getSuggestedPrice());
-            price.setCurrency(vm.getCurrency());
-            booked.setSuggestedPrice(price);
+        //select price
+        for(AppointmentPrice price : availableSlot.getPrices()){
+
+            if(price.getId() == vm.getPriceId()) {
+                booked.setSelectedPrice(price);
+                break;
+            }
         }
-        //TODO: calculate a price
 
         return booked;
     }
@@ -259,6 +313,15 @@ public class OneToOneAppointmeentService {
         attendee.setDeclineUid(declineUid);
 
         attendees.add(attendee);
+
+        for(AppointmentPrice price : availableSlot.getPrices()){
+
+            if(price.getId() == vm.getPriceId()) {
+                availableSlot.setSelectedPrice(price);
+                break;
+            }
+        }
+        //TODO: availableSlot.getPrices().stream().filter(s-> s.getId() == vm.getPriceId()).collect(Collectors)
 
         availableSlot.setAttendees(attendees);
 
@@ -309,7 +372,7 @@ public class OneToOneAppointmeentService {
         return id + now.getTime();
     }
 
-    private Result validateAppointmentRestrictions(OneToOneAppointmentMakeRequestModel vm, TimeSlot availableSlot) {
+    /*private Result validateAppointmentRestrictions(OneToOneAppointmentMakeRequestModel vm, TimeSlot availableSlot) {
 
         Result result = new Result();
 
@@ -341,7 +404,7 @@ public class OneToOneAppointmeentService {
 
         return result;
 
-    }
+    }*/
 
     private Result validateBookMeeting(OneToOneAppointmentMakeRequestModel vm) {
         Result result = new Result();

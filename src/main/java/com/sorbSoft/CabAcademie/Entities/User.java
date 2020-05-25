@@ -104,4 +104,7 @@ public class User {
     private boolean agreeWithTerms;
     @NotNull
     private boolean deleted = false;
+
+    @Column(name = "time_zone")
+    private String timeZone; //0:00, +1:00, +2:00
 }
