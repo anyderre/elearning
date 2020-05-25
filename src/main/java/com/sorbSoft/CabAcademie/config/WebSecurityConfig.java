@@ -155,6 +155,7 @@ public class WebSecurityConfig {
                     .antMatchers(HttpMethod.GET, SECTIONS_URLS).permitAll()
                     .antMatchers(HttpMethod.GET, SUB_SECTIONS_URLS).permitAll()
                     .antMatchers("/authenticate").permitAll()
+                    .antMatchers("/jitsi-auth").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveStudent").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveOrganization").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveSchool").permitAll()
