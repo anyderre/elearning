@@ -7,8 +7,11 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.List;
 
@@ -24,12 +29,16 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/user")
+@Log4j2
 public class UserController {
     @Autowired
     private UserServices userService;
 
     @Autowired
     private UserRepository userRepository;
+
+    @Value("${frontend.url}")
+    private String FRONTEND_URL;
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<UserViewModel> getUser(@PathVariable Long id, @RequestParam (value = "filterRoles", defaultValue = "1") String filterRoles){
@@ -143,5 +152,25 @@ public class UserController {
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         }
         return  new ResponseEntity<>(MessageResponse.of("Section successfully deleted"), HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/confirm/email/{emailConfirmationUid}")
+    public ResponseEntity<MessageResponse> confirmUserEmail(@PathVariable String emailConfirmationUid ){
+        Result result =  userService.confirmUserEmail(emailConfirmationUid);
+        if (!result.isValid()){
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        }
+
+        URI frontendLoginUrl = null;
+        try {
+            frontendLoginUrl = new URI(FRONTEND_URL+"login?msg=emailConfirmed");
+            log.debug("Redirect url: "+frontendLoginUrl);
+        } catch (URISyntaxException e) {
+            log.error("Can't construct frontend login url: "+e.getMessage());
+            //e.printStackTrace();
+        }
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setLocation(frontendLoginUrl);
+        return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
     }
 }

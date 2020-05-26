@@ -107,4 +107,16 @@ public class User {
 
     @Column(name = "time_zone")
     private String timeZone; //0:00, +1:00, +2:00
+
+    @Column(name = "facebook_id")
+    private String facebookId;
+
+    @Column(name = "google_id")
+    private String googleId;
+
+    @Column(name = "linkedin_id")
+    private String linkedinId;
+
+    @Column(name = "email_confirmation_uid")
+    private String emailConfirmationUID;
 }

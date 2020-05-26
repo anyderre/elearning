@@ -2,24 +2,23 @@ package com.sorbSoft.CabAcademie.Services;
 
 import com.sorbSoft.CabAcademie.Entities.*;
 import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
-import com.sorbSoft.CabAcademie.Entities.Error.CustomExceptionHandler;
 import com.sorbSoft.CabAcademie.Repository.*;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.UserFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.UserMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
-import org.hibernate.NonUniqueObjectException;
+import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -28,8 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @Transactional
 public class UserServices {
-    @Autowired
-   private UserRepository UserRepository;
+
     @Autowired
     private RolServices rolServices;
     @Autowired
@@ -51,6 +49,9 @@ public class UserServices {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private EmailApiService emailAPI;
 
     private UserMapper mapper
             = Mappers.getMapper(UserMapper.class);
@@ -77,7 +78,10 @@ public class UserServices {
     private  Result save (UserViewModel vm) {
         Result result = new Result();
         try {
-            userRepository.save(getEntity(vm));
+            User user = getEntity(vm);
+            user.setEmailConfirmationUID(generateUid());
+            userRepository.save(user);
+            emailAPI.sendUserRegistrationMail(user);
         } catch (Exception ex)  {
             result.add(ex.getMessage());
             return result;
@@ -99,7 +103,7 @@ public class UserServices {
             result.add("The user name already exist for another definition");
             return result;
         }
-        User currentUser = UserRepository.findById(vm.getId());
+        User currentUser = userRepository.findById(vm.getId());
 
         if (currentUser == null){
             result.add("The user you are trying to update does not exist anymore");
@@ -110,29 +114,29 @@ public class UserServices {
     }
 
     public User findUserbyUsername(String username){
-        return UserRepository.findByUsername(username);
+        return userRepository.findByUsername(username);
 
     }
 
     public List<User> findAllUser(){
-        return UserRepository.findAll();
+        return userRepository.findAll();
     }
 
     public List<User> findAllProfessor(){
-        return UserRepository.findAllByRoleName(Roles.ROLE_PROFESSOR.name());
+        return userRepository.findAllByRoleName(Roles.ROLE_PROFESSOR.name());
     }
 
     public User findProfessor(Long professorId){
-        return UserRepository.findByRoleNameAndId(Roles.ROLE_PROFESSOR.name(), professorId);
+        return userRepository.findByRoleNameAndId(Roles.ROLE_PROFESSOR.name(), professorId);
     }
 
     public List<User> findAllUsersFilteredFromAdmin(){
-        return UserRepository.findAll().stream().filter(user ->
+        return userRepository.findAll().stream().filter(user ->
                 !user.getRole().getDescription().equals(Roles.ROLE_SUPER_ADMIN.name()) && !user.getRole().getDescription().equals(Roles.ROLE_ADMIN.name())).collect(Collectors.toList());
     }
 
     public List<User> filterUserByRole(Long roleId){
-        return UserRepository.findAll().stream().filter(user ->
+        return userRepository.findAll().stream().filter(user ->
                 user.getRole().getId().equals(roleId)).collect(Collectors.toList());
     }
 
@@ -156,7 +160,7 @@ public class UserServices {
     }
 
     public User findAUser(Long id){
-        return UserRepository.findById(id);
+        return userRepository.findById(id);
     }
 
     public UserViewModel getUserViewModel(Long userId, String filterRoles){
@@ -473,5 +477,38 @@ public class UserServices {
         return  result;
     }
 
+    public User createFacebookUser(String email, String firstName, String lastName, String id) {
+
+        User user = new User();
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setFacebookId(id);
+
+        return null;
+    }
+
+    private String generateUid() {
+        UUID uuid = UUID.randomUUID();
+        String id = uuid.toString().replace("-", "");
+        Date now = new Date();
+
+        return id + now.getTime();
+    }
+
+    public Result confirmUserEmail(String emailConfirmationUid) {
+
+        Result result = new Result();
+        User user = userRepository.findUserByEmailConfirmationUID(emailConfirmationUid);
+
+        if(user == null) {
+            result.add("User not found");
+        }
+
+        user.setEnable(1);
+        user.setEmailConfirmationUID("");
+        userRepository.save(user);
+
+        return result;
+    }
 }
 
