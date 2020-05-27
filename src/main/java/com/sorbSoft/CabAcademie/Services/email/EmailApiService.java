@@ -586,7 +586,7 @@ public class EmailApiService {
 
         title = "Email Confirmation";
         mail.setMailSubject(title);
-        mail.setTemplateName("appointment_decline_notification_student.vm");
+        mail.setTemplateName("confirm_registration.vm");
 
         final Map<String, Object> parameters = new HashMap<>();
         parameters.put("title", title);

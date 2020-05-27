@@ -161,8 +161,8 @@ public class UserController {
         URI feLoginUrlSuccess = null;
         URI feLoginUrlError = null;
         try {
-            feLoginUrlSuccess = new URI(FRONTEND_URL + "login?msg=emailConfirmationSuccess");
-            feLoginUrlError = new URI(FRONTEND_URL + "login?msg=emailConfirmationError");
+            feLoginUrlSuccess = new URI(FRONTEND_URL + "/login?msg=emailConfirmationSuccess");
+            feLoginUrlError = new URI(FRONTEND_URL + "/login?msg=emailConfirmationError");
             log.debug("Frontend login url with Success message: " + feLoginUrlSuccess);
             log.debug("Frontend login url with Error message: " + feLoginUrlError);
         } catch (URISyntaxException e) {
