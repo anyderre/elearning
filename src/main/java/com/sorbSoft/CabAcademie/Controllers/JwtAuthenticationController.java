@@ -3,7 +3,13 @@ package com.sorbSoft.CabAcademie.Controllers;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.JwtRequest;
 import com.sorbSoft.CabAcademie.Entities.JwtResponse;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SocialData;
+import com.sorbSoft.CabAcademie.Services.UserServices;
+import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
 import com.sorbSoft.CabAcademie.config.JwtTokenUtil;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,10 +20,10 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.social.facebook.api.Facebook;
+import org.springframework.social.facebook.api.User;
+import org.springframework.social.facebook.api.impl.FacebookTemplate;
+import org.springframework.web.bind.annotation.*;
 import com.sorbSoft.CabAcademie.Services.JwtUserDetailsService;
 
 
@@ -34,6 +40,7 @@ public class JwtAuthenticationController {
 
     @Autowired
     private JwtUserDetailsService userDetailsService;
+
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
@@ -64,6 +71,30 @@ public class JwtAuthenticationController {
         final String token = jwtTokenUtil.generateToken(userDetails);*/
 
         return ResponseEntity.ok(true);
+    }
+
+    @PostMapping(value = "/facebookLogin", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Register user")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "Something wrong in Server")})
+    public ResponseEntity<?> facebookLogin(SocialData data) {
+        String token = null;
+
+        Facebook facebook = new FacebookTemplate(data.getAccessToken());
+
+        String[] fields = {"id", "email", "first_name", "last_name"};
+        User userProfile = facebook.fetchObject("me", User.class, fields);
+
+        if (userProfile != null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userProfile.getEmail());
+
+            token = jwtTokenUtil.generateToken(userDetails);
+
+            return ResponseEntity.ok(new JwtResponse(token));
+        } else {
+            return new ResponseEntity<>("Failed to authenticate", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     private String authenticate(String username, String password) {
