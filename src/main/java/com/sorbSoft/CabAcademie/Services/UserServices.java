@@ -502,6 +502,7 @@ public class UserServices {
 
         if(user == null) {
             result.add("User not found");
+            return result;
         }
 
         user.setEnable(1);
