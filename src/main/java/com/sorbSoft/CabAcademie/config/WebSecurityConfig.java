@@ -161,6 +161,7 @@ public class WebSecurityConfig {
                     .antMatchers(HttpMethod.POST, "/api/user/saveOrganization").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveSchool").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveTeacher").permitAll()
+                    .antMatchers(HttpMethod.POST, "/api/user/save").permitAll()
                     .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
                     .antMatchers(HttpMethod.GET, PRE_SIGN_UP_URL).permitAll()
                     .anyRequest().authenticated()
