@@ -155,22 +155,33 @@ public class UserController {
     }
 
     @GetMapping(value = "/confirm/email/{emailConfirmationUid}")
-    public ResponseEntity<MessageResponse> confirmUserEmail(@PathVariable String emailConfirmationUid ){
-        Result result =  userService.confirmUserEmail(emailConfirmationUid);
-        if (!result.isValid()){
-            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
-        }
+    public ResponseEntity<MessageResponse> confirmUserEmail(@PathVariable String emailConfirmationUid) {
+        Result result = userService.confirmUserEmail(emailConfirmationUid);
 
-        URI frontendLoginUrl = null;
+        URI feLoginUrlSuccess = null;
+        URI feLoginUrlError = null;
         try {
-            frontendLoginUrl = new URI(FRONTEND_URL+"login?msg=emailConfirmed");
-            log.debug("Redirect url: "+frontendLoginUrl);
+            feLoginUrlSuccess = new URI(FRONTEND_URL + "login?msg=emailConfirmationSuccess");
+            feLoginUrlError = new URI(FRONTEND_URL + "login?msg=emailConfirmationError");
+            log.debug("Frontend login url with Success message: " + feLoginUrlSuccess);
+            log.debug("Frontend login url with Error message: " + feLoginUrlError);
         } catch (URISyntaxException e) {
-            log.error("Can't construct frontend login url: "+e.getMessage());
+            log.error("Can't construct frontend login url: " + e.getMessage());
             //e.printStackTrace();
         }
+
+        if (!result.isValid()) {
+
+            log.debug("Redirecting to: " + feLoginUrlError);
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setLocation(feLoginUrlError);
+            return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
+        }
+
+
+        log.debug("Redirecting to: " + feLoginUrlSuccess);
         HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setLocation(frontendLoginUrl);
+        httpHeaders.setLocation(feLoginUrlSuccess);
         return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
     }
 }
