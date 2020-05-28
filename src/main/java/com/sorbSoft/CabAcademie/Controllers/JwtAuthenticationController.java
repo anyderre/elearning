@@ -5,6 +5,7 @@ import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.JwtRequest;
 import com.sorbSoft.CabAcademie.Entities.JwtResponse;
 import com.sorbSoft.CabAcademie.Entities.Rol;
+import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.social.SocialRequest;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
@@ -34,6 +35,7 @@ import org.springframework.social.google.api.plus.Person;
 import org.springframework.web.bind.annotation.*;
 import com.sorbSoft.CabAcademie.Services.JwtUserDetailsService;
 
+import javax.validation.Valid;
 
 
 @RestController
@@ -51,6 +53,9 @@ public class JwtAuthenticationController {
 
     @Autowired
     private UserServices userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -93,7 +98,7 @@ public class JwtAuthenticationController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something wrong in Server")})
-    public ResponseEntity<?> facebookLogin(SocialRequest data) {
+    public ResponseEntity<?> facebookLogin(@Valid @RequestBody SocialRequest data) {
         String token = null;
 
         Facebook facebook = new FacebookTemplate(data.getAccessToken());
@@ -103,6 +108,7 @@ public class JwtAuthenticationController {
         log.debug("Fetched fb data: ", userProfile);
 
         if (userProfile != null) {
+
             UserDetails userDetails = userDetailsService.loadUserByUsername(userProfile.getEmail());
 
             token = jwtTokenUtil.generateToken(userDetails);
@@ -118,7 +124,7 @@ public class JwtAuthenticationController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something wrong in Server")})
-    public ResponseEntity<?> facebookSignUp(SocialRequest socialRequest) {
+    public ResponseEntity<?> facebookSignUp(@Valid @RequestBody SocialRequest socialRequest) {
         String token = null;
 
         Facebook facebook = new FacebookTemplate(socialRequest.getAccessToken());
@@ -182,7 +188,7 @@ public class JwtAuthenticationController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something wrong in Server")})
-    public ResponseEntity<?> googleLogin(SocialRequest data) {
+    public ResponseEntity<?> googleLogin(@Valid @RequestBody SocialRequest data) {
         String token = null;
 
         Google google = new GoogleTemplate(data.getAccessToken());
@@ -204,7 +210,7 @@ public class JwtAuthenticationController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something wrong in Server")})
-    public ResponseEntity<?> googleSignUp(SocialRequest socialRequest) {
+    public ResponseEntity<?> googleSignUp(@Valid @RequestBody SocialRequest socialRequest) {
         String token = null;
 
         Google google = new GoogleTemplate(socialRequest.getAccessToken());
