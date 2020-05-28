@@ -1,11 +1,15 @@
 package com.sorbSoft.CabAcademie.Controllers;
 
+import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.JwtRequest;
 import com.sorbSoft.CabAcademie.Entities.JwtResponse;
-import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.SocialData;
+import com.sorbSoft.CabAcademie.Entities.Rol;
+import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.social.SocialRequest;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.social.SocialResponse;
 import com.sorbSoft.CabAcademie.Services.UserServices;
-import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
 import com.sorbSoft.CabAcademie.config.JwtTokenUtil;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -20,9 +24,13 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.User;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
+import org.springframework.social.google.api.Google;
+import org.springframework.social.google.api.impl.GoogleTemplate;
+import org.springframework.social.google.api.plus.Person;
 import org.springframework.web.bind.annotation.*;
 import com.sorbSoft.CabAcademie.Services.JwtUserDetailsService;
 
@@ -41,6 +49,9 @@ public class JwtAuthenticationController {
     @Autowired
     private JwtUserDetailsService userDetailsService;
 
+    @Autowired
+    private UserServices userService;
+
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
@@ -51,6 +62,10 @@ public class JwtAuthenticationController {
        }
         final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
+
+       if(!userDetails.isEnabled()) {
+           return new ResponseEntity<>("Please confirm your email", HttpStatus.FORBIDDEN);
+       }
 
         final String token = jwtTokenUtil.generateToken(userDetails);
 
@@ -74,17 +89,18 @@ public class JwtAuthenticationController {
     }
 
     @PostMapping(value = "/facebookLogin", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Register user")
+    @ApiOperation(value = "Login facebook user")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something wrong in Server")})
-    public ResponseEntity<?> facebookLogin(SocialData data) {
+    public ResponseEntity<?> facebookLogin(SocialRequest data) {
         String token = null;
 
         Facebook facebook = new FacebookTemplate(data.getAccessToken());
 
         String[] fields = {"id", "email", "first_name", "last_name"};
         User userProfile = facebook.fetchObject("me", User.class, fields);
+        log.debug("Fetched fb data: ", userProfile);
 
         if (userProfile != null) {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userProfile.getEmail());
@@ -94,6 +110,156 @@ public class JwtAuthenticationController {
             return ResponseEntity.ok(new JwtResponse(token));
         } else {
             return new ResponseEntity<>("Failed to authenticate", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping(value = "/facebookSignUp", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "SignUp facebook user")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "Something wrong in Server")})
+    public ResponseEntity<?> facebookSignUp(SocialRequest socialRequest) {
+        String token = null;
+
+        Facebook facebook = new FacebookTemplate(socialRequest.getAccessToken());
+
+        String[] fields = {"id", "email", "first_name", "last_name"};
+        //TODO: fetch photo
+        User userProfile = facebook.fetchObject("me", User.class, fields);
+        log.debug("Fetched fb data: ", userProfile);
+        if (userProfile != null) {
+            UserDetails userDetails = null;
+
+            try{
+                userDetails = userDetailsService.loadUserByUsername(userProfile.getEmail());
+            } catch (UsernameNotFoundException e) {
+                log.debug("User with email "+userProfile.getEmail()+" was not found in db");
+            }
+
+            if(userDetails == null) {
+
+                Rol freeStudent = new Rol();
+                freeStudent.setRole(Roles.ROLE_FREE_STUDENT);
+
+                UserViewModel user = new UserViewModel();
+                user.setFacebookId(userProfile.getId());
+                user.setFirstName(userProfile.getFirstName());
+                user.setLastName(userProfile.getLastName());
+                user.setUsername(userProfile.getEmail());
+                user.setEmail(userProfile.getEmail());
+                user.setAgreeWithTerms(true);
+                user.setRole(freeStudent);
+                user.setSocialUser(true);
+                user.setEnable(1);
+                user.setTimeZone(socialRequest.getUserTimeZone());
+                //TODO: add photo
+
+                Result result = userService.saveSocialUser(user);
+                if(!result.isValid())
+                    return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+
+                token = jwtTokenUtil.generateToken(userDetails);
+
+                SocialResponse socialResponse = (SocialResponse) result.getValue();
+                socialResponse.setToken(token);
+
+                log.debug("Facebook user has been registered: ", socialResponse);
+                return ResponseEntity.ok(socialResponse);
+
+            } else {
+                log.warn("User with "+ userProfile.getEmail() +" email already exist in db");
+                return new ResponseEntity<>("User with this email already exist in db", HttpStatus.NOT_ACCEPTABLE);
+            }
+
+        } else {
+            log.error("Failed to fetch social data from facebook");
+            return new ResponseEntity<>("Failed to fetch social data from facebook", HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
+
+    @PostMapping(value = "/googleLogin", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Login google user")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "Something wrong in Server")})
+    public ResponseEntity<?> googleLogin(SocialRequest data) {
+        String token = null;
+
+        Google google = new GoogleTemplate(data.getAccessToken());
+        Person person = google.plusOperations().getGoogleProfile();
+        log.debug("Fetched google data: ", person);
+        if (person != null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(person.getAccountEmail());
+
+            token = jwtTokenUtil.generateToken(userDetails);
+
+            return ResponseEntity.ok(new JwtResponse(token));
+        } else {
+            return new ResponseEntity<>("Failed to authenticate", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping(value = "/googleSignUp", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "SignUp google user")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "Something wrong in Server")})
+    public ResponseEntity<?> googleSignUp(SocialRequest socialRequest) {
+        String token = null;
+
+        Google google = new GoogleTemplate(socialRequest.getAccessToken());
+        Person person = google.plusOperations().getGoogleProfile();
+        log.debug("Fetched google data: ", person);
+        if (person != null) {
+            UserDetails userDetails = null;
+
+            try{
+                userDetails = userDetailsService.loadUserByUsername(person.getAccountEmail());
+            } catch (UsernameNotFoundException e) {
+                log.debug("User with email "+person.getAccountEmail()+" was not found in db");
+            }
+
+            if(userDetails == null) {
+
+                Rol freeStudent = new Rol();
+                freeStudent.setRole(Roles.ROLE_FREE_STUDENT);
+
+                UserViewModel user = new UserViewModel();
+                user.setFacebookId(person.getId());
+                user.setFirstName(person.getGivenName());
+                user.setLastName(person.getFamilyName());
+                user.setUsername(person.getAccountEmail());
+                user.setEmail(person.getAccountEmail());
+                user.setAgreeWithTerms(true);
+                user.setRole(freeStudent);
+                user.setSocialUser(true);
+                user.setEnable(1);
+
+                user.setPhotoURL(person.getImageUrl());
+                user.setBio(person.getAboutMe());
+                user.setTimeZone(socialRequest.getUserTimeZone());
+
+
+                Result result = userService.saveSocialUser(user);
+                if(!result.isValid())
+                    return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+
+                token = jwtTokenUtil.generateToken(userDetails);
+
+                SocialResponse socialResponse = (SocialResponse) result.getValue();
+                socialResponse.setToken(token);
+
+                log.debug("Facebook user has been registered: ", socialResponse);
+                return ResponseEntity.ok(socialResponse);
+
+            } else {
+                log.warn("User with "+ person.getAccountEmail() +" email already exist in db");
+                return new ResponseEntity<>("User with this email already exist in db", HttpStatus.NOT_ACCEPTABLE);
+            }
+
+        } else {
+            log.error("Failed to fetch social data from facebook");
+            return new ResponseEntity<>("Failed to fetch social data from google", HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 

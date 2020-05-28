@@ -55,7 +55,8 @@ public class User {
     @NotNull
     @Size(max = 2147483647)
     private String bio;
-    @NotNull
+
+
     private String country;
     @NotNull
     private String workspaceName;
@@ -116,6 +117,9 @@ public class User {
 
     @Column(name = "linkedin_id")
     private String linkedinId;
+
+    @Column(name = "social_user")
+    private Boolean socialUser;
 
     @Column(name = "email_confirmation_uid")
     private String emailConfirmationUID;

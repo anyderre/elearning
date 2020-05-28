@@ -81,11 +81,49 @@ public class UserServices {
             User user = getEntity(vm);
             user.setEmailConfirmationUID(generateUid());
             userRepository.save(user);
-            emailAPI.sendUserRegistrationMail(user);
+
+            //if not social
+            if(!vm.isSocialUser()) {
+                emailAPI.sendUserRegistrationMail(user);
+            }
+            result.addValue(user);
         } catch (Exception ex)  {
             result.add(ex.getMessage());
             return result;
         }
+
+        return result;
+    }
+
+    public Result saveSocialUser(UserViewModel vm) {
+
+        Result result = new Result();
+        result = save(vm);
+
+        if (!result.isValid()) {
+            return result;
+        }
+
+        User user = (User)result.getValue();
+        UserViewModel view = new UserViewModel();
+
+        view.setId(user.getId());
+        view.setRole(user.getRole());
+        view.setFirstName(user.getFirstName());
+        view.setLastName(user.getLastName());
+        view.setUsername(user.getUsername());
+        view.setEmail(user.getEmail());
+        view.setWorkspaceName(user.getWorkspaceName());
+        view.setPhotoURL(user.getPhotoURL());
+
+        view.setFacebookId(user.getFacebookId());
+        view.setGoogleId(user.getGoogleId());
+        view.setLinkedinId(user.getLinkedinId());
+        view.setBio(user.getBio());
+        view.setTimeZone(user.getTimeZone());
+
+        result.setValue(view);
+
         return result;
     }
 
@@ -289,7 +327,11 @@ public class UserServices {
         if (vm.getUsername()== null)  {
             vm.setUsername("");
         }
-        vm.setEnable(1);
+
+        if(!vm.isSocialUser()) {
+            vm.setEnable(0);
+        }
+
         if (vm.getPassword()== null) {
             vm.setPassword("");
         }
@@ -477,16 +519,6 @@ public class UserServices {
         return  result;
     }
 
-    public User createFacebookUser(String email, String firstName, String lastName, String id) {
-
-        User user = new User();
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setFacebookId(id);
-
-        return null;
-    }
-
     private String generateUid() {
         UUID uuid = UUID.randomUUID();
         String id = uuid.toString().replace("-", "");
@@ -511,5 +543,7 @@ public class UserServices {
 
         return result;
     }
+
+
 }
 

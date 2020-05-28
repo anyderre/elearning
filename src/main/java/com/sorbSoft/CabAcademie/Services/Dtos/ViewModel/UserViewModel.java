@@ -58,4 +58,14 @@ public class UserViewModel {
     private List<SubCategory> allSubCategories;
     private String workspaceName;
 
+    private boolean socialUser;
+
+    private String facebookId;
+
+    private String googleId;
+
+    private String linkedinId;
+
+    private String timeZone;
+
 }
