@@ -101,6 +101,7 @@ public class JwtAuthenticationController {
     public ResponseEntity<?> facebookLogin(@Valid @RequestBody SocialRequest data) {
         String token = null;
 
+        log.debug("FB login started");
         Facebook facebook = new FacebookTemplate(data.getAccessToken());
 
         String[] fields = {"id", "email", "first_name", "last_name"};
@@ -126,7 +127,7 @@ public class JwtAuthenticationController {
             @ApiResponse(code = 500, message = "Something wrong in Server")})
     public ResponseEntity<?> facebookSignUp(@Valid @RequestBody SocialRequest socialRequest) {
         String token = null;
-
+        log.debug("FB signup started");
         Facebook facebook = new FacebookTemplate(socialRequest.getAccessToken());
 
         String[] fields = {"id", "email", "first_name", "last_name"};
@@ -190,7 +191,7 @@ public class JwtAuthenticationController {
             @ApiResponse(code = 500, message = "Something wrong in Server")})
     public ResponseEntity<?> googleLogin(@Valid @RequestBody SocialRequest data) {
         String token = null;
-
+        log.debug("Google login started");
         Google google = new GoogleTemplate(data.getAccessToken());
         Person person = google.plusOperations().getGoogleProfile();
         log.debug("Fetched google data: ", person);
@@ -212,7 +213,7 @@ public class JwtAuthenticationController {
             @ApiResponse(code = 500, message = "Something wrong in Server")})
     public ResponseEntity<?> googleSignUp(@Valid @RequestBody SocialRequest socialRequest) {
         String token = null;
-
+        log.debug("Google signup started");
         Google google = new GoogleTemplate(socialRequest.getAccessToken());
         Person person = google.plusOperations().getGoogleProfile();
         log.debug("Fetched google data: ", person);
