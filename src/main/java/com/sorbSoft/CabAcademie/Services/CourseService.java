@@ -196,12 +196,33 @@ public class CourseService {
         }
     }
 
-    public List<Course> fetchCourseBySubSection(Long id) {
-        return courseRepository.findAllBySubSectionId(id);
+    public List<Course> fetchPublicCourseBySubSection(Long subSectionId) {
+        return courseRepository.findAllBySubSectionIdAndSchoolsIsNull(subSectionId);
+    }
+    public List<Course> fetchPrivateCourseBySubSection(Long subSectionId, String userName) {
+        User user = userRepository.findByUsername(userName);
+        List<User> schools = user.getSchools();
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User school : schools) {
+            List<Course> coursesBySubSection = courseRepository.findAllBySubSectionId(subSectionId);
+            for(Course course : coursesBySubSection) {
+                for(User sCourse : course.getSchools()) {
+
+                    if(school.getId() == sCourse.getId()) {
+                        courses.add(course);
+                    }
+                }
+            }
+            //courses.addAll(coursesBySubSection);
+        }
+
+        return courses;
     }
 
     public List<Course> fetchCourseBySubCategory(Long subCategoryId) {
-        return courseRepository.findAllBySubSectionId(subCategoryId);
+        return courseRepository.findAllBySubCategoryId(subCategoryId);
     }
     private Result ValidateModel(CourseViewModel vm){
         Result result = new Result();
