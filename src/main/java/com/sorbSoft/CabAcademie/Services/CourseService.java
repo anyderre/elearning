@@ -206,6 +206,8 @@ public class CourseService {
         List<Course> courses = new ArrayList<>();
 
         for(User school : schools) {
+            //TODO: should be refactored: added sql query with subquesry at db level
+            //select * from Course where Course.id IN (select course_id from Course_School where Course_School.user_id = school.id)
             List<Course> coursesBySubSection = courseRepository.findAllBySubSectionId(subSectionId);
             for(Course course : coursesBySubSection) {
                 for(User sCourse : course.getSchools()) {
@@ -215,11 +217,11 @@ public class CourseService {
                     }
                 }
             }
-            //courses.addAll(coursesBySubSection);
         }
 
         return courses;
     }
+
 
     public List<Course> fetchCourseBySubCategory(Long subCategoryId) {
         return courseRepository.findAllBySubCategoryId(subCategoryId);
