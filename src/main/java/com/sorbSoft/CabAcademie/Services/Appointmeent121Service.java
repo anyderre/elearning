@@ -61,7 +61,7 @@ public class Appointmeent121Service {
 
         removeSeconds(vmUtc);
 
-        User teacher = userR.findById(vmUtc.getTeacherId());
+        User teacher = userR.getOne(vmUtc.getTeacherId());
         TimeSlot availableSlot = slotsR.getAvailableSlot(vmUtc.getDateFrom(), vmUtc.getDateTo(), teacher);
 
         if (availableSlot == null) {
@@ -258,7 +258,7 @@ public class Appointmeent121Service {
 
 
         Long userId = availableSlot.getTeacher().getId();
-        User user = userR.findById(userId);
+        User user = userR.getOne(userId);
 
         booked.setTeacher(user);
         booked.setDateFrom(meetingFrom.toDate());
@@ -276,7 +276,7 @@ public class Appointmeent121Service {
         String approvalUid = generateUid();
         String declineUid = generateUid();
 
-        User student = userR.findById(vm.getStudentId());
+        User student = userR.getOne(vm.getStudentId());
         List<Attendee> attendees = new ArrayList<>();
         attendee.setTimeSlot(booked);
         attendee.setUser(student);
@@ -303,7 +303,7 @@ public class Appointmeent121Service {
         String approvalUid = generateUid();
         String declineUid = generateUid();
 
-        User student = userR.findById(vm.getStudentId());
+        User student = userR.getOne(vm.getStudentId());
         List<Attendee> attendees = new ArrayList<>();
 
         attendee.setTimeSlot(availableSlot);
@@ -332,7 +332,7 @@ public class Appointmeent121Service {
         TimeSlot slot = new TimeSlot();
 
         Long userId = availableSlot.getTeacher().getId();
-        User user = userR.findById(userId);
+        User user = userR.getOne(userId);
         slot.setTeacher(user);
 
         slot.setDateFrom(fromDate.toDate());
@@ -467,10 +467,10 @@ public class Appointmeent121Service {
         Result result = new Result();
 
         Long teacherId = vm.getTeacherId();
-        User teacher = userR.findById(teacherId);
+        User teacher = userR.getOne(teacherId);
 
         Long studentId = vm.getStudentId();
-        User student = userR.findById(studentId);
+        User student = userR.getOne(studentId);
 
         if (teacher == null) {
             result.add("Teacher with " + teacherId + " doesn't exist");

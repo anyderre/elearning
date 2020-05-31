@@ -40,7 +40,7 @@ public class RolServices {
     }
 
     public Rol fetchRole(Long id){
-        return rolRepository.findOne(id);
+        return rolRepository.getOne(id);
     }
 
     public Rol findRoleByName(String role){
@@ -53,7 +53,7 @@ public class RolServices {
 
     public Result updateRol(RolViewModel vm){
         Result result = new Result();
-        Rol current = rolRepository.findOne(vm.getId());
+        Rol current = rolRepository.getOne(vm.getId());
         if (current == null) {
             result.add("The role you want to update does not exist");
             return result;

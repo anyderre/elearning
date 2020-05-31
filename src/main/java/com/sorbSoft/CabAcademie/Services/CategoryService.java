@@ -36,12 +36,12 @@ public class CategoryService {
     }
 
     public Category fetchCategory(Long id){
-        return categoryRepository.findOne(id);
+        return categoryRepository.getOne(id);
     }
 
     public Result updateCategory (CategoryViewModel vm){
         Result result = new Result();
-        Category current = categoryRepository.findOne(vm.getId());
+        Category current = categoryRepository.getOne(vm.getId());
         if (current == null) {
             result.add("The category you want to update does not exist");
             return result;
@@ -54,7 +54,7 @@ public class CategoryService {
             return result;
         }
 
-        Category currentCategory= categoryRepository.findOne(vm.getId());
+        Category currentCategory= categoryRepository.getOne(vm.getId());
 
         if (currentCategory == null) {
             result.add("The category you want to update doesn't exist");
@@ -100,7 +100,7 @@ public class CategoryService {
             result.add("You should indicate the id of the category");
             return result;
         }
-        Category category = categoryRepository.findOne(id);
+        Category category = categoryRepository.getOne(id);
         if (category == null) {
             result.add("The category you want to delete doesn't exist");
             return result;

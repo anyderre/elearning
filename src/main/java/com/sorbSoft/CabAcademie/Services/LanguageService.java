@@ -25,7 +25,7 @@ public class LanguageService {
     public void updateAll(List<LanguageEntity> list) {
 
         for(LanguageEntity ln : list) {
-            LanguageEntity dbEntity = repo.findOne(ln.getId());
+            LanguageEntity dbEntity = repo.getOne(ln.getId());
             dbEntity.setLocale(ln.getLocale());
             dbEntity.setKey(ln.getKey());
             dbEntity.setContent(ln.getContent());
@@ -36,7 +36,7 @@ public class LanguageService {
 
     public void deleteAll(List<Long> ids) {
         for(Long id : ids) {
-            repo.delete(id);
+            repo.deleteById(id);
         }
     }
 
@@ -61,14 +61,14 @@ public class LanguageService {
     }
 
     public boolean exists(Long id) {
-        return repo.exists(id);
+        return repo.existsById(id);
     }
 
     public LanguageEntity fetchOne(Long id) {
-        return repo.findOne(id);
+        return repo.getOne(id);
     }
 
     public void delete(Long id) {
-        repo.delete(id);
+        repo.deleteById(id);
     }
 }

@@ -17,6 +17,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +33,14 @@ import org.springframework.social.facebook.api.User;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.google.api.Google;
 import org.springframework.social.google.api.impl.GoogleTemplate;
+import org.springframework.social.google.api.oauth2.UserInfo;
 import org.springframework.social.google.api.plus.Person;
 import org.springframework.web.bind.annotation.*;
 import com.sorbSoft.CabAcademie.Services.JwtUserDetailsService;
 
 import javax.validation.Valid;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 
 @RestController
@@ -56,6 +61,9 @@ public class JwtAuthenticationController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Value("${frontend.url}")
+    private String FRONTEND_URL;
 
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -193,14 +201,33 @@ public class JwtAuthenticationController {
         String token = null;
         log.debug("Google login started");
         Google google = new GoogleTemplate(data.getAccessToken());
-        Person person = google.plusOperations().getGoogleProfile();
-        log.debug("Fetched google data: ", person);
-        if (person != null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(person.getAccountEmail());
+        UserInfo userinfo = google.oauth2Operations().getUserinfo();
+        log.debug("Fetched google data: ", userinfo.toString());
+        if (userinfo != null) {
+            UserDetails userDetails = userDetailsService.loadUserByUsername(userinfo.getEmail());
 
-            token = jwtTokenUtil.generateToken(userDetails);
+            if(userDetails != null) {
 
-            return ResponseEntity.ok(new JwtResponse(token));
+                token = jwtTokenUtil.generateToken(userDetails);
+
+                //success
+                return ResponseEntity.ok(new JwtResponse(token));
+            } else {
+
+                //error - redirect to signup
+                URI signUpUrl = null;
+                try {
+                    signUpUrl = new URI(FRONTEND_URL + "/signup?msg=userIsNotInSystem");
+                    log.debug("Frontend signup url with Success message: " + signUpUrl);
+                } catch (URISyntaxException e) {
+                    log.error("Can't construct frontend signup url: " + e.getMessage());
+                    //e.printStackTrace();
+                }
+                log.debug("Redirecting to: " + signUpUrl);
+                HttpHeaders httpHeaders = new HttpHeaders();
+                httpHeaders.setLocation(signUpUrl);
+                return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
+            }
         } else {
             return new ResponseEntity<>("Failed to authenticate", HttpStatus.UNAUTHORIZED);
         }
@@ -215,15 +242,15 @@ public class JwtAuthenticationController {
         String token = null;
         log.debug("Google signup started");
         Google google = new GoogleTemplate(socialRequest.getAccessToken());
-        Person person = google.plusOperations().getGoogleProfile();
-        log.debug("Fetched google data: ", person);
-        if (person != null) {
+        UserInfo userinfo = google.oauth2Operations().getUserinfo();
+        log.debug("Fetched google data: ", userinfo.toString());
+        if (userinfo != null) {
             UserDetails userDetails = null;
 
             try{
-                userDetails = userDetailsService.loadUserByUsername(person.getAccountEmail());
+                userDetails = userDetailsService.loadUserByUsername(userinfo.getEmail());
             } catch (UsernameNotFoundException e) {
-                log.debug("User with email "+person.getAccountEmail()+" was not found in db");
+                log.debug("User with email "+userinfo.getEmail()+" was not found in db");
             }
 
             if(userDetails == null) {
@@ -232,18 +259,17 @@ public class JwtAuthenticationController {
                 freeStudent.setRole(Roles.ROLE_FREE_STUDENT);
 
                 UserViewModel user = new UserViewModel();
-                user.setFacebookId(person.getId());
-                user.setFirstName(person.getGivenName());
-                user.setLastName(person.getFamilyName());
-                user.setUsername(person.getAccountEmail());
-                user.setEmail(person.getAccountEmail());
+                user.setGoogleId(userinfo.getId());
+                user.setFirstName(userinfo.getGivenName());
+                user.setLastName(userinfo.getFamilyName());
+                user.setUsername(userinfo.getEmail());
+                user.setEmail(userinfo.getEmail());
                 user.setAgreeWithTerms(true);
                 user.setRole(freeStudent);
                 user.setSocialUser(true);
                 user.setEnable(1);
 
-                user.setPhotoURL(person.getImageUrl());
-                user.setBio(person.getAboutMe());
+                user.setPhotoURL(userinfo.getPicture());
                 user.setTimeZone(socialRequest.getUserTimeZone());
 
 
@@ -256,16 +282,17 @@ public class JwtAuthenticationController {
                 SocialResponse socialResponse = (SocialResponse) result.getValue();
                 socialResponse.setToken(token);
 
-                log.debug("Facebook user has been registered: ", socialResponse);
+                log.debug("Google user has been registered: ", socialResponse);
                 return ResponseEntity.ok(socialResponse);
 
             } else {
-                log.warn("User with "+ person.getAccountEmail() +" email already exist in db");
-                return new ResponseEntity<>("User with this email already exist in db", HttpStatus.NOT_ACCEPTABLE);
+                log.warn("User with "+ userinfo.getEmail() +" email already exist in db");
+                return googleLogin(socialRequest);
+                //return new ResponseEntity<>("User with this email already exist in db", HttpStatus.NOT_ACCEPTABLE);
             }
 
         } else {
-            log.error("Failed to fetch social data from facebook");
+            log.error("Failed to fetch social data from google");
             return new ResponseEntity<>("Failed to fetch social data from google", HttpStatus.SERVICE_UNAVAILABLE);
         }
     }

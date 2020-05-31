@@ -129,7 +129,7 @@ public class UserServices {
 
     public Result updateUser(UserViewModel vm){
         Result result = new Result();
-        User current = userRepository.findOne(vm.getId());
+        User current = userRepository.getOne(vm.getId());
 
         if (current == null) {
             result.add("The user you want to update does not exist");
@@ -141,7 +141,7 @@ public class UserServices {
             result.add("The user name already exist for another definition");
             return result;
         }
-        User currentUser = userRepository.findById(vm.getId());
+        User currentUser = userRepository.getOne(vm.getId());
 
         if (currentUser == null){
             result.add("The user you are trying to update does not exist anymore");
@@ -183,7 +183,7 @@ public class UserServices {
         if (id <= 0L) {
             return result.add("You should indicate the id of the user");
         }
-        User user = userRepository.findById(id);
+        User user = userRepository.getOne(id);
         if (user == null) {
             return result.add("The user you want to delete doesn't exist");
         }
@@ -198,7 +198,7 @@ public class UserServices {
     }
 
     public User findAUser(Long id){
-        return userRepository.findById(id);
+        return userRepository.getOne(id);
     }
 
     public UserViewModel getUserViewModel(Long userId, String filterRoles){
@@ -265,7 +265,7 @@ public class UserServices {
             return result;
         }
 
-        Rol role = rolRepository.findOne(vm.getRole().getId());
+        Rol role = rolRepository.getOne(vm.getRole().getId());
         if (role == null) {
             result.add("The role you specified does not exist");
             return result;
@@ -368,7 +368,7 @@ public class UserServices {
             vm.setOrganizations(new ArrayList<>());
         }
 
-        Rol role = rolRepository.findOne(vm.getRole().getId());
+        Rol role = rolRepository.getOne(vm.getRole().getId());
         if (role != null) {
             if (role.getDescription().equals(Roles.ROLE_SCHOOL.name())){
                 vm.setCategories(new ArrayList<>());
@@ -440,7 +440,7 @@ public class UserServices {
             return result;
         }
         for (Category category : categories) {
-            Category cat = categoryRepository.findOne(category.getId());
+            Category cat = categoryRepository.getOne(category.getId());
             if (cat == null) {
                 result.add(String.format("The category no. {0} in the list of categories does not exist", categories.indexOf(category) + 1));
                 return result;
@@ -455,7 +455,7 @@ public class UserServices {
             return result;
         }
         for (SubCategory subCategory: subCategories) {
-            SubCategory sub = subCategoryRepository.findOne(subCategory.getId());
+            SubCategory sub = subCategoryRepository.getOne(subCategory.getId());
             if (sub == null) {
                 result.add(String.format("The sub-category no. {0} in the list of sub-categories does not exist", subCategories.indexOf(subCategory) + 1));
                 return result;
@@ -470,7 +470,7 @@ public class UserServices {
             return result;
         }
         for (Course course: courses) {
-            Course savedCourse = courseRepository.findOne(course.getId());
+            Course savedCourse = courseRepository.getOne(course.getId());
             if (savedCourse == null) {
                 result.add(String.format("The course no. {0} in the list of courses does not exist", courses.indexOf(course) + 1));
                 return result;
@@ -485,7 +485,7 @@ public class UserServices {
             return result;
         }
         for (User school: schools) {
-            User savedSchool = userRepository.findOne(school.getId());
+            User savedSchool = userRepository.getOne(school.getId());
             if (savedSchool == null) {
                 result.add(String.format("The school no. {0} in the list of schools does not exist", schools.indexOf(school) + 1));
                 return result;
@@ -505,7 +505,7 @@ public class UserServices {
             return result;
         }
         for (User organization: organizations) {
-            User savedOrganization = userRepository.findOne(organization.getId());
+            User savedOrganization = userRepository.getOne(organization.getId());
             if (savedOrganization == null) {
                 result.add(String.format("The organization no. {0} in the list of organizations does not exist", organizations.indexOf(organization) + 1));
                 return result;

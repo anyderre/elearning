@@ -24,6 +24,6 @@ public class FeatureService {
         return featureRepository.save(feature);
     }
     public void deleteFeature(Long id){
-        featureRepository.delete(id);
+        featureRepository.deleteById(id);
     }
 }

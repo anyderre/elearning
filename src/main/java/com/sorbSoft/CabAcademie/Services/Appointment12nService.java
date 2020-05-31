@@ -48,7 +48,7 @@ public class Appointment12nService {
 
         Long appointmentId = vm.getAppointmentId();
 
-        TimeSlot groupTimeSlot = slotsR.findOne(appointmentId);
+        TimeSlot groupTimeSlot = slotsR.getOne(appointmentId);
 
         if (groupTimeSlot == null || groupTimeSlot.getType()!=AppointmentType.GROUP) {
             result.add("There is no group appointment with id "+appointmentId);
@@ -67,7 +67,7 @@ public class Appointment12nService {
         result = gav.validateIfAttendeeSubscribed(vm);
         if (!result.isValid()) return result;
 
-        User student = userR.findById(vm.getStudentId());
+        User student = userR.getOne(vm.getStudentId());
 
         Attendee attendee = new Attendee();
         attendee.setUser(student);

@@ -38,13 +38,13 @@ public class SubCategoryService {
     }
 
     public SubCategory fetchSubCategory(Long id){
-        return subCategoryRepository.findOne(id);
+        return subCategoryRepository.getOne(id);
     }
 
 
     public Result updateSubCategory (SubCategoryViewModel vm){
         Result result = new Result();
-        SubCategory current = subCategoryRepository.findOne(vm.getId());
+        SubCategory current = subCategoryRepository.getOne(vm.getId());
         if (current == null) {
             result.add("The sub-category you want to update does not exist");
             return result;
@@ -95,7 +95,7 @@ public class SubCategoryService {
             result.add("You should indicate the id of the subCategory");
             return result;
         }
-        SubCategory subCategory = subCategoryRepository.findOne(id);
+        SubCategory subCategory = subCategoryRepository.getOne(id);
         if (subCategory == null) {
             result.add("The subCategory you want to delete doesn't exist");
             return result;
@@ -158,7 +158,7 @@ public class SubCategoryService {
     private SubCategory getEntity(SubCategoryViewModel vm){
         return mapper.mapToEntity(vm);
 //        if (vm.getCategory()!= null && vm.getCategory().getId() != null && vm.getCategory().getId() > 0){
-//            resultSubCategory.setCategory(categoryRepository.findOne(vm.getCategory().getId()));
+//            resultSubCategory.setCategory(categoryRepository.getOne(vm.getCategory().getId()));
 //        }
 //        return resultSubCategory;
     }
@@ -176,7 +176,7 @@ public class SubCategoryService {
             return result;
         }
 
-        Category category = categoryRepository.findOne(vm.getCategory().getId());
+        Category category = categoryRepository.getOne(vm.getCategory().getId());
         if (category == null) {
             result.add("The category you specified does not exist");
             return result;
@@ -184,7 +184,7 @@ public class SubCategoryService {
 
         if (vm.getSubCategories().size() > 0) {
             for (SubCategory subCategory : vm.getSubCategories()) {
-                SubCategory sub = subCategoryRepository.findOne(subCategory.getId());
+                SubCategory sub = subCategoryRepository.getOne(subCategory.getId());
                 if (sub == null) {
                     result.add(String.format("The sub-category no. {0} in the list of sub-categories does not exist", vm.getSubCategories().indexOf(subCategory) + 1 ));
                     return result;

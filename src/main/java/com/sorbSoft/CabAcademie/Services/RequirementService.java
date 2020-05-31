@@ -24,6 +24,6 @@ public class RequirementService {
         return requirementRepository.save(requirement);
     }
     public void deleteRequirement(Long id){
-        requirementRepository.delete(id);
+        requirementRepository.deleteById(id);
     }
 }

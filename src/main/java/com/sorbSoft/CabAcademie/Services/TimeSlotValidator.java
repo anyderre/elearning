@@ -204,7 +204,7 @@ public class TimeSlotValidator {
         Date from = DateUtils.removeSeconds(vm.getDateFrom());
         Date to = DateUtils.removeSeconds(vm.getDateTo());
 
-        User user = userR.findById(vm.getTeacherId());
+        User user = userR.getOne(vm.getTeacherId());
 
         DateTime curFrom = new DateTime(from);
         DateTime curTo = new DateTime(to);

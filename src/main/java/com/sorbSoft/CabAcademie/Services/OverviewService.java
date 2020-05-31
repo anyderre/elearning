@@ -23,11 +23,11 @@ public class OverviewService {
 //    }
 
     public Overview fetchOverview(Long id){
-        return overviewRepository.findOne(id);
+        return overviewRepository.getOne(id);
     }
 
     public Overview updateOverview(Overview overview){
-        Overview currentOverview = overviewRepository.findOne(overview.getId());
+        Overview currentOverview = overviewRepository.getOne(overview.getId());
 //        currentOverview.setSyllabus(overview.getSyllabus());
 
         return overviewRepository.save(currentOverview);
@@ -36,7 +36,7 @@ public class OverviewService {
         return overviewRepository.save(overview);
     }
     public void deleteOverview(Long id){
-        overviewRepository.delete(id);
+        overviewRepository.deleteById(id);
     }
     //other delete methods
     //other fetching methods

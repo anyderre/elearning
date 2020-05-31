@@ -21,7 +21,7 @@ public class SyllabusService {
     }
 
     public Syllabus fetchSyllabus(Long id){
-        return syllabusRepository.findOne(id);
+        return syllabusRepository.getOne(id);
     }
 
     public Pair <String, Syllabus> updateSyllabus(Syllabus syllabus){
@@ -31,7 +31,7 @@ public class SyllabusService {
             return Pair.of("The syllabus name already exist for another definition", null);
         }
 
-        Syllabus currentSyllabus= syllabusRepository.findOne(syllabus.getId());
+        Syllabus currentSyllabus= syllabusRepository.getOne(syllabus.getId());
 
         if (currentSyllabus == null) {
             return Pair.of("The syllabus you want to update doesn't exist", null);
@@ -68,7 +68,7 @@ public class SyllabusService {
         if (id <= 0L) {
             return "You should indicate the id of the syllabus";
         }
-        Syllabus syllabus = syllabusRepository.findOne(id);
+        Syllabus syllabus = syllabusRepository.getOne(id);
         if (syllabus == null) {
             return "The syllabus you want to delete doesn't exist";
         }

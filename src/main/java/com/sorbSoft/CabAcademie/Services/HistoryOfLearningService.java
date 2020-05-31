@@ -23,11 +23,11 @@ public class HistoryOfLearningService {
     }
 
     public HistoryOfLearning fetchHistoryOfLearning(Long id){
-        return historyOfLearningRepository.findOne(id);
+        return historyOfLearningRepository.getOne(id);
     }
 
     public HistoryOfLearning updateHistoryOfLearning(HistoryOfLearning historyOfLearning){
-        HistoryOfLearning currentHistoryOfLearning= historyOfLearningRepository.findOne(historyOfLearning.getId());
+        HistoryOfLearning currentHistoryOfLearning= historyOfLearningRepository.getOne(historyOfLearning.getId());
 //        currentHistoryOfLearning.setEnrollement(historyOfLearning.getEnrollement());
         currentHistoryOfLearning.setTimeStamp(currentHistoryOfLearning.getTimeStamp());
         currentHistoryOfLearning.setVideo(historyOfLearning.getVideo());
@@ -40,7 +40,7 @@ public class HistoryOfLearningService {
     }
 
     public void deleteHistoryOfLearning(Long id){
-        historyOfLearningRepository.delete(id);
+        historyOfLearningRepository.deleteById(id);
     }
     //other delete methods
     //other fetching methods

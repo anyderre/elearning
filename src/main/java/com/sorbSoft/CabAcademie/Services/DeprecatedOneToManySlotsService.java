@@ -116,7 +116,7 @@ public class DeprecatedOneToManySlotsService {
         Result result = new Result();
 
         Long userId = vm.getTeacherId();
-        User user = userRepository.findById(userId);
+        User user = userRepository.getOne(userId);
 
         if(user == null) {
             result.add("User with "+vm.getId()+" doesn't exist");
@@ -209,7 +209,7 @@ public class DeprecatedOneToManySlotsService {
         DateTime  curFrom = new DateTime(from);
         DateTime  curTo = new DateTime(to);
 
-        User user = userRepository.findById(vm.getTeacherId());
+        User user = userRepository.getOne(vm.getTeacherId());
 
         List<TimeSlot> dbSlots = slotsRepo.findByTeacher(user);
 
@@ -250,7 +250,7 @@ public class DeprecatedOneToManySlotsService {
         /*TimeSlot slot = new TimeSlot();
         slot.setId(vm.getId());
 
-        User user = userRepository.findById(vm.getTeacherId());
+        User user = userRepository.getOne(vm.getTeacherId());
 
         slot.setTeacher(user);
 

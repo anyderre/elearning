@@ -36,12 +36,12 @@ public class SectionService {
     }
 
     public Section fetchSection(Long id){
-        return sectionRepository.findOne(id);
+        return sectionRepository.getOne(id);
     }
 
     public Result updateSection(SectionViewModel vm){
         Result result = new Result();
-        Section current = sectionRepository.findOne(vm.getId());
+        Section current = sectionRepository.getOne(vm.getId());
         if (current == null) {
             result.add("The section you want to update does not exist");
             return result;

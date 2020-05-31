@@ -78,7 +78,7 @@ public class TimeSlotService {
         if(!result.isValid()) return result;
 
 
-        User user = userR.findById(userId);
+        User user = userR.getOne(userId);
 
         List<TimeSlot> slotsByUserWithinDateRange = slotsRepo.findSlotsByUserWithinDateRange(dateFrom, dateTo, user);
 
@@ -165,14 +165,14 @@ public class TimeSlotService {
             result.add("You should indicate the id of the appointment");
             return result;
         }
-        TimeSlot slot = slotsRepo.findOne(slotId);
+        TimeSlot slot = slotsRepo.getOne(slotId);
         if (slot == null) {
             result.add("The slot you want to delete doesn't exist");
             return result;
         }
 
         try {
-            slotsRepo.delete(slotId);
+            slotsRepo.deleteById(slotId);
         } catch (Exception ex)  {
             result.add(ex.getMessage());
             return result;
@@ -190,7 +190,7 @@ public class TimeSlotService {
             return result;
         }
 
-        User user = userR.findById(userId);
+        User user = userR.getOne(userId);
         List<TimeSlot> timeSlots = slotsRepo.findByTeacher(user);
 
         List<SlotsResponseModel> vms = getSlotsVms(timeSlots);
@@ -224,7 +224,7 @@ public class TimeSlotService {
         }
 
 
-       User user = userR.findById(vmUtc.getTeacherId());
+       User user = userR.getOne(vmUtc.getTeacherId());
 
         if(user==null) {
             result.add("User with id "+ vmUtc.getTeacherId() +" does not exist in db");
@@ -255,7 +255,7 @@ public class TimeSlotService {
             return result;
         }
 
-        User user = userR.findById(userId);
+        User user = userR.getOne(userId);
 
         if(user == null) {
             result.add("User with id "+userId+" does not exist");
@@ -273,7 +273,7 @@ public class TimeSlotService {
         TimeSlot slot = new TimeSlot();
         slot.setId(vm.getId());
 
-        User user = userR.findById(vm.getTeacherId());
+        User user = userR.getOne(vm.getTeacherId());
 
         slot.setTeacher(user);
 

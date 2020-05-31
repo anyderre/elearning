@@ -24,6 +24,6 @@ public class ObjectiveService {
         return objectiveRepository.save(objective);
     }
     public void deleteObjective(Long id){
-        objectiveRepository.delete(id);
+        objectiveRepository.deleteById(id);
     }
 }

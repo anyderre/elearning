@@ -41,13 +41,13 @@ public class SubSectionService {
     }
 
     public SubSection fetchSubSection(Long id){
-        return subSectionRepository.findOne(id);
+        return subSectionRepository.getOne(id);
     }
 
     public Result updateSubSection (SubSectionViewModel vm){
         Result result = new Result();
 
-        SubSection current = subSectionRepository.findOne(vm.getId());
+        SubSection current = subSectionRepository.getOne(vm.getId());
         if (current == null) {
             result.add("The sub-section you want to update does not exist");
             return result;
@@ -99,7 +99,7 @@ public class SubSectionService {
         if (id <= 0L) {
             return result.add("You should indicate the id of the subSection");
         }
-        SubSection subSection = subSectionRepository.findOne(id);
+        SubSection subSection = subSectionRepository.getOne(id);
         if (subSection == null) {
             return result.add("The subSection you want to delete doesn't exist");
         }
@@ -169,7 +169,7 @@ public class SubSectionService {
             return result;
         }
 
-        Section section = sectionRepository.findOne(vm.getSection().getId());
+        Section section = sectionRepository.getOne(vm.getSection().getId());
         if (section == null) {
             result.add("The section you specified does not exist");
             return result;

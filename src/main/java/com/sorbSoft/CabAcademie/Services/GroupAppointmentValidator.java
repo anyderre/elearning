@@ -81,8 +81,8 @@ public class GroupAppointmentValidator {
 
         Result result = new Result();
 
-        User user = userRepository.findById(vm.getStudentId());
-        TimeSlot timeSlot = slotsRepo.findOne(vm.getAppointmentId());
+        User user = userRepository.getOne(vm.getStudentId());
+        TimeSlot timeSlot = slotsRepo.getOne(vm.getAppointmentId());
 
         List<Attendee> attendees = attendeeRepository.findByUserAndTimeSlot(user, timeSlot);
 

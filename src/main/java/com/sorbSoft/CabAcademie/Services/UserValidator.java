@@ -14,7 +14,7 @@ public class UserValidator {
 
     public Result validateUserExists(Long userId) {
         Result result = new Result();
-        User user = userRepository.findById(userId);
+        User user = userRepository.getOne(userId);
         if (user == null) {
             result.add("User with " + userId + " doesn't exist");
             return result;

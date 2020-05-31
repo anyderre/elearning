@@ -25,11 +25,11 @@ public class VideoService {
     }
 
     public Video fetchVideo(Long id){
-        return videoRepository.findOne(id);
+        return videoRepository.getOne(id);
     }
 
     public Video updateVideo(Video video){
-        Video currentVideo = videoRepository.findOne(video.getId());
+        Video currentVideo = videoRepository.getOne(video.getId());
         currentVideo.setVideoTitle(video.getVideoTitle());
         currentVideo.setVideoURL(video.getVideoURL());
 
@@ -39,6 +39,6 @@ public class VideoService {
         return videoRepository.save(video);
     }
     public void deleteVideo(Long id){
-        videoRepository.delete(id);
+        videoRepository.deleteById(id);
     }
 }

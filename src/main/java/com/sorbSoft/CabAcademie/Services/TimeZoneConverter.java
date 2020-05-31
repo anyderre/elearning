@@ -56,14 +56,14 @@ public class TimeZoneConverter {
     }
 
     public void convertFromTimeZonedToUtc(Long userId, Date from, Date to) {
-        User user = userR.findOne(userId);
+        User user = userR.getOne(userId);
         String userTZ = user.getTimeZone();
         from = DateUtils.fromTimeZonedToUtc(from, userTZ);
         to = DateUtils.fromTimeZonedToUtc(to, userTZ);
     }
 
     public void convertFromUtcToTimeZoned(Long userId, Date from, Date to) {
-        User user = userR.findOne(userId);
+        User user = userR.getOne(userId);
         String userTZ = user.getTimeZone();
         convertFromUtcToTimeZoned(userTZ, from, to);
 
