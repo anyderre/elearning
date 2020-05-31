@@ -29,7 +29,7 @@ public class UserViewModel {
     @Size(min = 4, max = 30)
     private String username;
     @Column(name="enabled", nullable = false, columnDefinition = "int default 1")
-    private int enable = 1;
+    private int enable = 0;
     @NotNull(message="Password invalid")
     @NotEmpty(message = "Password is required")
     @Size(max=60)

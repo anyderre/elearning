@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class SocialResponse {
 
-    private UserViewModel user;
+    private Object user;
     private String token;
+    private String type;
 }

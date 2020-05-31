@@ -5,11 +5,11 @@ import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.JwtRequest;
 import com.sorbSoft.CabAcademie.Entities.JwtResponse;
 import com.sorbSoft.CabAcademie.Entities.Rol;
-import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
-import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.social.SocialRequest;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.social.SocialRequest;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.social.SocialResponse;
+import com.sorbSoft.CabAcademie.Services.JwtUserDetailsService;
 import com.sorbSoft.CabAcademie.Services.UserServices;
 import com.sorbSoft.CabAcademie.config.JwtTokenUtil;
 import io.swagger.annotations.ApiOperation;
@@ -18,7 +18,6 @@ import io.swagger.annotations.ApiResponses;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,25 +27,18 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.social.connect.Connection;
-import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.User;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.google.api.Google;
 import org.springframework.social.google.api.impl.GoogleTemplate;
 import org.springframework.social.google.api.oauth2.UserInfo;
-import org.springframework.social.google.api.plus.Person;
 import org.springframework.social.linkedin.api.LinkedIn;
 import org.springframework.social.linkedin.api.LinkedInProfile;
 import org.springframework.social.linkedin.api.impl.LinkedInTemplate;
 import org.springframework.web.bind.annotation.*;
-import com.sorbSoft.CabAcademie.Services.JwtUserDetailsService;
 
-import javax.inject.Inject;
 import javax.validation.Valid;
-import java.net.URI;
-import java.net.URISyntaxException;
 
 
 @RestController
@@ -103,6 +95,9 @@ public class JwtAuthenticationController {
             return new ResponseEntity<>("Please confirm your email", HttpStatus.FORBIDDEN);
         }
 
+        //TODO: check if user has appointment
+        //TODO: check if user logged in only from 1 pc
+
         final String token = jwtTokenUtil.generateToken(userDetails);
 
         return ResponseEntity.ok(new JwtResponse(token));
@@ -121,8 +116,8 @@ public class JwtAuthenticationController {
         String[] fields = {"id", "email", "first_name", "last_name"};
         //TODO: fetch photo
         User userProfile = facebook.fetchObject("me", User.class, fields);
-        log.debug("Fetched fb data: ", userProfile);
         if (userProfile != null) {
+            log.debug("Fetched fb data: ", userProfile);
             UserDetails userDetails = null;
 
             try{
@@ -135,6 +130,7 @@ public class JwtAuthenticationController {
 
                 Rol freeStudent = new Rol();
                 freeStudent.setRole(Roles.ROLE_FREE_STUDENT);
+                freeStudent.setId(6L);
 
                 UserViewModel user = new UserViewModel();
                 user.setFacebookId(userProfile.getId());
@@ -147,26 +143,42 @@ public class JwtAuthenticationController {
                 user.setSocialUser(true);
                 user.setEnable(1);
                 user.setTimeZone(socialRequest.getUserTimeZone());
+                user.setPassword(userProfile.getEmail()+userProfile.getFirstName());
                 //TODO: add photo
 
                 Result result = userService.saveSocialUser(user);
                 if(!result.isValid())
                     return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
 
-                //TODO: add to security context
+                userDetails = userDetailsService.loadUserByUsername(userProfile.getEmail());
                 token = jwtTokenUtil.generateToken(userDetails);
 
-                SocialResponse socialResponse = (SocialResponse) result.getValue();
+                com.sorbSoft.CabAcademie.Entities.User userbyUsername = userService.findUserbyUsername(userProfile.getEmail());
+
+                SocialResponse socialResponse = new SocialResponse();
+                socialResponse.setUser(userbyUsername);
                 socialResponse.setToken(token);
+                socialResponse.setType("Registration");
 
                 log.debug("Facebook user has been registered: ", socialResponse);
                 return ResponseEntity.ok(socialResponse);
 
             } else {
                 log.debug("User with "+ userProfile.getEmail() +" email already exist in db");
+
+                com.sorbSoft.CabAcademie.Entities.User userbyUsername = userService.findUserbyUsername(userProfile.getEmail());
+
                 token = jwtTokenUtil.generateToken(userDetails);
-                //TODO: add to security context
-                return ResponseEntity.ok(new JwtResponse(token));
+
+                SocialResponse socialResponse = new SocialResponse();
+                socialResponse.setUser(userbyUsername);
+                socialResponse.setToken(token);
+                socialResponse.setType("Login");
+
+
+                log.debug("Facebook user has been logged in: ", socialResponse);
+                //success
+                return ResponseEntity.ok(socialResponse);
             }
 
         } else {
@@ -180,13 +192,13 @@ public class JwtAuthenticationController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something wrong in Server")})
-    public ResponseEntity<?> googleSignUp(@Valid @RequestBody SocialRequest socialRequest) {
+    public ResponseEntity<?> googleAuth(@Valid @RequestBody SocialRequest socialRequest) {
         String token = null;
         log.debug("Google signup started");
         Google google = new GoogleTemplate(socialRequest.getAccessToken());
         UserInfo userinfo = google.oauth2Operations().getUserinfo();
-        log.debug("Fetched google data: ", userinfo.toString());
         if (userinfo != null) {
+            log.debug("Fetched google data: ", userinfo.toString());
             UserDetails userDetails = null;
 
             try{
@@ -199,6 +211,7 @@ public class JwtAuthenticationController {
 
                 Rol freeStudent = new Rol();
                 freeStudent.setRole(Roles.ROLE_FREE_STUDENT);
+                freeStudent.setId(6L);
 
                 UserViewModel user = new UserViewModel();
                 user.setGoogleId(userinfo.getId());
@@ -213,27 +226,42 @@ public class JwtAuthenticationController {
 
                 user.setPhotoURL(userinfo.getPicture());
                 user.setTimeZone(socialRequest.getUserTimeZone());
+                user.setPassword(userinfo.getEmail()+userinfo.getGivenName());
 
 
                 Result result = userService.saveSocialUser(user);
                 if(!result.isValid())
                     return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
 
-                //TODO: add to security context
+                userDetails = userDetailsService.loadUserByUsername(userinfo.getEmail());
+
                 token = jwtTokenUtil.generateToken(userDetails);
 
-                SocialResponse socialResponse = (SocialResponse) result.getValue();
+                com.sorbSoft.CabAcademie.Entities.User userbyUsername = userService.findUserbyUsername(userinfo.getEmail());
+
+                SocialResponse socialResponse = new SocialResponse();
+                socialResponse.setUser(userbyUsername);
                 socialResponse.setToken(token);
+                socialResponse.setType("Registration");
 
                 log.debug("Google user has been registered: ", socialResponse);
                 return ResponseEntity.ok(socialResponse);
 
             } else {
                 log.debug("User with "+ userinfo.getEmail() +" email already exist in db");
+
+                com.sorbSoft.CabAcademie.Entities.User userbyUsername = userService.findUserbyUsername(userinfo.getEmail());
+
                 token = jwtTokenUtil.generateToken(userDetails);
-                //TODO: add to security context
+
+                SocialResponse socialResponse = new SocialResponse();
+                socialResponse.setUser(userbyUsername);
+                socialResponse.setToken(token);
+                socialResponse.setType("Login");
+
+                log.debug("Google user has been logged In: ", socialResponse);
                 //success
-                return ResponseEntity.ok(new JwtResponse(token));
+                return ResponseEntity.ok(socialResponse);
             }
 
         } else {
@@ -286,6 +314,7 @@ public class JwtAuthenticationController {
                 if(!result.isValid())
                     return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
 
+                userDetails = userDetailsService.loadUserByUsername(userinfo.getEmailAddress());
                 //TODO: add to security context
                 token = jwtTokenUtil.generateToken(userDetails);
 

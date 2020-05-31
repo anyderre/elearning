@@ -49,7 +49,7 @@ public class JwtUserDetailsService implements UserDetailsService {
                     username);
             User = userRepository.findByEmail(username);
             if (User == null) {
-                log.error("User not found with email: %s",
+                log.warn("User not found with email: %s",
                         username);
                 throw new UsernameNotFoundException(
                         String.format("User not found with username: %s",

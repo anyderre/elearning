@@ -79,7 +79,6 @@ public class UserServices {
         Result result = new Result();
         try {
             User user = getEntity(vm);
-            user.setEmailConfirmationUID(generateUid());
             userRepository.save(user);
 
             //if not social
@@ -98,7 +97,7 @@ public class UserServices {
     public Result saveSocialUser(UserViewModel vm) {
 
         Result result = new Result();
-        result = save(vm);
+        result = saveUser(vm);
 
         if (!result.isValid()) {
             return result;
@@ -235,8 +234,14 @@ public class UserServices {
     private User getEntity(UserViewModel vm){
         User resultUser = mapper.mapToEntity(vm);
         resultUser.setPassword(bCryptPasswordEncoder.encode(resultUser.getPassword()));
+
         if (resultUser.getRole().getId() == Roles.ROLE_STUDENT.ordinal() || resultUser.getRole().getId() == Roles.ROLE_FREE_STUDENT.ordinal()){
             resultUser.setName(resultUser.getFirstName() + ' ' + resultUser.getLastName());
+        }
+
+        //if user is not social
+        if(!resultUser.getSocialUser()) {
+            resultUser.setEmailConfirmationUID(generateUid());
         }
         return resultUser;
     }
