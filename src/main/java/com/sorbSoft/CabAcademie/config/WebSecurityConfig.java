@@ -97,19 +97,6 @@ public class WebSecurityConfig {
     };
 
     @Configuration
-    @Order(3)
-    public class OAuthConfig extends WebSecurityConfigurerAdapter {
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            http.authorizeRequests()
-                    .anyRequest().authenticated()
-                    .and()
-                    .oauth2Login();
-        }
-    }
-
-    @Configuration
     @Order(2)
     public class RestApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -176,7 +163,6 @@ public class WebSecurityConfig {
                     .antMatchers("/facebookLogin").permitAll()
                     .antMatchers("/googleLogin").permitAll()
                     .antMatchers("/googleSignUp").permitAll()
-                    .antMatchers("/oauth2/**").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveStudent").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveOrganization").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveSchool").permitAll()
