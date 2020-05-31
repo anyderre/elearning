@@ -41,8 +41,9 @@ public class User {
     @NotEmpty(message = "UserName is required")
     @Size(min = 4, max = 30)
     private String username;
-    @Column(name="enabled", nullable = false, columnDefinition = "int default 1")
-    private int enable = 0;
+
+    @Column(name="enabled", columnDefinition = "int default 1")
+    private int enable;
     @NotNull(message="Password invalid")
     @NotEmpty(message = "Password is required")
     @Size(max=60)

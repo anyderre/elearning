@@ -242,6 +242,9 @@ public class UserServices {
         //if user is not social
         if(!resultUser.getSocialUser()) {
             resultUser.setEmailConfirmationUID(generateUid());
+        } else {
+            //if social user
+            resultUser.setEnable(1);
         }
         return resultUser;
     }
