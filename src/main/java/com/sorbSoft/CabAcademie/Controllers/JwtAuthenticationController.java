@@ -28,6 +28,8 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.social.connect.Connection;
+import org.springframework.social.connect.ConnectionRepository;
 import org.springframework.social.facebook.api.Facebook;
 import org.springframework.social.facebook.api.User;
 import org.springframework.social.facebook.api.impl.FacebookTemplate;
@@ -35,9 +37,13 @@ import org.springframework.social.google.api.Google;
 import org.springframework.social.google.api.impl.GoogleTemplate;
 import org.springframework.social.google.api.oauth2.UserInfo;
 import org.springframework.social.google.api.plus.Person;
+import org.springframework.social.linkedin.api.LinkedIn;
+import org.springframework.social.linkedin.api.LinkedInProfile;
+import org.springframework.social.linkedin.api.impl.LinkedInTemplate;
 import org.springframework.web.bind.annotation.*;
 import com.sorbSoft.CabAcademie.Services.JwtUserDetailsService;
 
+import javax.inject.Inject;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -90,43 +96,20 @@ public class JwtAuthenticationController {
         if (!authentication.equals("")){
             return new ResponseEntity<>(MessageResponse.of(authentication), HttpStatus.BAD_REQUEST);
         }
-        /*final UserDetails userDetails = userDetailsService
+        final UserDetails userDetails = userDetailsService
                 .loadUserByUsername(authenticationRequest.getUsername());
 
-        final String token = jwtTokenUtil.generateToken(userDetails);*/
+        if(!userDetails.isEnabled()) {
+            return new ResponseEntity<>("Please confirm your email", HttpStatus.FORBIDDEN);
+        }
 
-        return ResponseEntity.ok(true);
+        final String token = jwtTokenUtil.generateToken(userDetails);
+
+        return ResponseEntity.ok(new JwtResponse(token));
     }
 
     @PostMapping(value = "/facebookLogin", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Login facebook user")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 500, message = "Something wrong in Server")})
-    public ResponseEntity<?> facebookLogin(@Valid @RequestBody SocialRequest data) {
-        String token = null;
-
-        log.debug("FB login started");
-        Facebook facebook = new FacebookTemplate(data.getAccessToken());
-
-        String[] fields = {"id", "email", "first_name", "last_name"};
-        User userProfile = facebook.fetchObject("me", User.class, fields);
-        log.debug("Fetched fb data: ", userProfile);
-
-        if (userProfile != null) {
-
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userProfile.getEmail());
-
-            token = jwtTokenUtil.generateToken(userDetails);
-
-            return ResponseEntity.ok(new JwtResponse(token));
-        } else {
-            return new ResponseEntity<>("Failed to authenticate", HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    @PostMapping(value = "/facebookSignUp", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "SignUp facebook user")
+    @ApiOperation(value = "SignUp & Login facebook user")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something wrong in Server")})
@@ -170,6 +153,7 @@ public class JwtAuthenticationController {
                 if(!result.isValid())
                     return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
 
+                //TODO: add to security context
                 token = jwtTokenUtil.generateToken(userDetails);
 
                 SocialResponse socialResponse = (SocialResponse) result.getValue();
@@ -179,8 +163,10 @@ public class JwtAuthenticationController {
                 return ResponseEntity.ok(socialResponse);
 
             } else {
-                log.warn("User with "+ userProfile.getEmail() +" email already exist in db");
-                return new ResponseEntity<>("User with this email already exist in db", HttpStatus.NOT_ACCEPTABLE);
+                log.debug("User with "+ userProfile.getEmail() +" email already exist in db");
+                token = jwtTokenUtil.generateToken(userDetails);
+                //TODO: add to security context
+                return ResponseEntity.ok(new JwtResponse(token));
             }
 
         } else {
@@ -190,48 +176,7 @@ public class JwtAuthenticationController {
     }
 
     @PostMapping(value = "/googleLogin", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Login google user")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK"),
-            @ApiResponse(code = 500, message = "Something wrong in Server")})
-    public ResponseEntity<?> googleLogin(@Valid @RequestBody SocialRequest data) {
-        String token = null;
-        log.debug("Google login started");
-        Google google = new GoogleTemplate(data.getAccessToken());
-        UserInfo userinfo = google.oauth2Operations().getUserinfo();
-        log.debug("Fetched google data: ", userinfo.toString());
-        if (userinfo != null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userinfo.getEmail());
-
-            if(userDetails != null) {
-
-                token = jwtTokenUtil.generateToken(userDetails);
-
-                //success
-                return ResponseEntity.ok(new JwtResponse(token));
-            } else {
-
-                //error - redirect to signup
-                URI signUpUrl = null;
-                try {
-                    signUpUrl = new URI(FRONTEND_URL + "/signup?msg=userIsNotInSystem");
-                    log.debug("Frontend signup url with Success message: " + signUpUrl);
-                } catch (URISyntaxException e) {
-                    log.error("Can't construct frontend signup url: " + e.getMessage());
-                    //e.printStackTrace();
-                }
-                log.debug("Redirecting to: " + signUpUrl);
-                HttpHeaders httpHeaders = new HttpHeaders();
-                httpHeaders.setLocation(signUpUrl);
-                return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
-            }
-        } else {
-            return new ResponseEntity<>("Failed to authenticate", HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    @PostMapping(value = "/googleSignUp", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "SignUp google user")
+    @ApiOperation(value = "SignUp or Login google user")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something wrong in Server")})
@@ -274,6 +219,7 @@ public class JwtAuthenticationController {
                 if(!result.isValid())
                     return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
 
+                //TODO: add to security context
                 token = jwtTokenUtil.generateToken(userDetails);
 
                 SocialResponse socialResponse = (SocialResponse) result.getValue();
@@ -283,14 +229,83 @@ public class JwtAuthenticationController {
                 return ResponseEntity.ok(socialResponse);
 
             } else {
-                log.warn("User with "+ userinfo.getEmail() +" email already exist in db");
-                return googleLogin(socialRequest);
-                //return new ResponseEntity<>("User with this email already exist in db", HttpStatus.NOT_ACCEPTABLE);
+                log.debug("User with "+ userinfo.getEmail() +" email already exist in db");
+                token = jwtTokenUtil.generateToken(userDetails);
+                //TODO: add to security context
+                //success
+                return ResponseEntity.ok(new JwtResponse(token));
             }
 
         } else {
             log.error("Failed to fetch social data from google");
             return new ResponseEntity<>("Failed to fetch social data from google", HttpStatus.SERVICE_UNAVAILABLE);
+        }
+    }
+
+    @PostMapping(value = "/linkedinAuth", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Auth linkedin user")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "Something wrong in Server")})
+    public ResponseEntity<?> linkedinAuth(@Valid @RequestBody SocialRequest socialRequest) {
+        String token = null;
+        log.debug("Linkedin signup started");
+        LinkedIn linkedin = new LinkedInTemplate(socialRequest.getAccessToken());
+        LinkedInProfile userinfo = linkedin.profileOperations().getUserProfile();
+        log.debug("Fetched linkedin data: ", userinfo.toString());
+        if (userinfo != null) {
+            UserDetails userDetails = null;
+
+            try{
+                userDetails = userDetailsService.loadUserByUsername(userinfo.getEmailAddress());
+            } catch (UsernameNotFoundException e) {
+                log.debug("User with email "+userinfo.getEmailAddress()+" was not found in db");
+            }
+
+            if(userDetails == null) { //signup
+
+                Rol freeStudent = new Rol();
+                freeStudent.setRole(Roles.ROLE_FREE_STUDENT);
+
+                UserViewModel user = new UserViewModel();
+                user.setGoogleId(userinfo.getId());
+                user.setFirstName(userinfo.getFirstName());
+                user.setLastName(userinfo.getLastName());
+                user.setUsername(userinfo.getEmailAddress());
+                user.setEmail(userinfo.getEmailAddress());
+                user.setAgreeWithTerms(true);
+                user.setRole(freeStudent);
+                user.setSocialUser(true);
+                user.setEnable(1);
+
+                user.setPhotoURL(userinfo.getProfilePictureUrl());
+                user.setTimeZone(socialRequest.getUserTimeZone());
+
+
+                Result result = userService.saveSocialUser(user);
+                if(!result.isValid())
+                    return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+
+                //TODO: add to security context
+                token = jwtTokenUtil.generateToken(userDetails);
+
+                SocialResponse socialResponse = (SocialResponse) result.getValue();
+                socialResponse.setToken(token);
+
+                log.debug("linkedin user has been registered: ", socialResponse);
+                return ResponseEntity.ok(socialResponse);
+
+            } else {
+                //login
+                token = jwtTokenUtil.generateToken(userDetails);
+                //TODO: add to security context
+                //success
+                return ResponseEntity.ok(new JwtResponse(token));
+            }
+
+        } else {
+            log.error("Failed to fetch social data from linkedin");
+            return new ResponseEntity<>("Failed to fetch social data from linkedin", HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
