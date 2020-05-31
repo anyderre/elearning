@@ -196,12 +196,35 @@ public class CourseService {
         }
     }
 
-    public List<Course> fetchCourseBySubSection(Long id) {
-        return courseRepository.findAllBySubSectionId(id);
+    public List<Course> fetchPublicCourseBySubSection(Long subSectionId) {
+        return courseRepository.findAllBySubSectionIdAndSchoolsIsNull(subSectionId);
+    }
+    public List<Course> fetchPrivateCourseBySubSection(Long subSectionId, String userName) {
+        User user = userRepository.findByUsername(userName);
+        List<User> schools = user.getSchools();
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User school : schools) {
+            //TODO: should be refactored: added sql query with subquesry at db level
+            //select * from Course where Course.id IN (select course_id from Course_School where Course_School.user_id = school.id)
+            List<Course> coursesBySubSection = courseRepository.findAllBySubSectionId(subSectionId);
+            for(Course course : coursesBySubSection) {
+                for(User sCourse : course.getSchools()) {
+
+                    if(school.getId() == sCourse.getId()) {
+                        courses.add(course);
+                    }
+                }
+            }
+        }
+
+        return courses;
     }
 
+
     public List<Course> fetchCourseBySubCategory(Long subCategoryId) {
-        return courseRepository.findAllBySubSectionId(subCategoryId);
+        return courseRepository.findAllBySubCategoryId(subCategoryId);
     }
     private Result ValidateModel(CourseViewModel vm){
         Result result = new Result();

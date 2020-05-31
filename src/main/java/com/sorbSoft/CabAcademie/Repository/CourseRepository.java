@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -18,7 +19,12 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Course findCourseByTitleAndIdIsNot(String title, Long id);
     Page<Course> findByTitleContainsAllIgnoreCase(String searchText, Pageable pagin);
 
+    List<Course> findAllBySubSectionIdAndSchoolsIsNull(Long subSectionId);
+
+    /*@Query("select cr from Course cr where cr.subSection.id = ?1 and cr.id IN " +
+            "(select cs.courseId from CourseSchools cs where cs.school.id = ?2)")*/
     List<Course> findAllBySubSectionId(Long subSectionId);
+
     List<Course> findAllBySubCategoryId(Long subCategoryId);
 
     /*
