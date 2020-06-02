@@ -553,13 +553,20 @@ public class UserServices {
     }
 
 
-    public UserViewModel findUserByWorkspaceName(String workspaceName) {
-        UserViewModel vm = UserFactory.getUserViewModel();
-        User userByWorkspaceName = userRepository.findUserByWorkspaceName(workspaceName);
-        if(userByWorkspaceName != null) {
-            vm = mapper.mapToViewModel(userByWorkspaceName);
+    public List<UserViewModel> findUserByWorkspaceName(String workspaceName) {
 
-            return vm;
+        List<UserViewModel> vms = new ArrayList<>();
+
+        List<User> userByWorkspaceName = userRepository.findUsersByWorkspaceName(workspaceName);
+        if(userByWorkspaceName != null && !userByWorkspaceName.isEmpty()) {
+            for (User user : userByWorkspaceName) {
+                UserViewModel vm = UserFactory.getUserViewModel();
+                vm = mapper.mapToViewModel(user);
+
+                vms.add(vm);
+            }
+
+            return vms;
         } else {
             return null;
         }

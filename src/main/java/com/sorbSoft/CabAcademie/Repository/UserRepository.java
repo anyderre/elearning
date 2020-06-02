@@ -33,5 +33,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findUserByEmailConfirmationUID(String emailConfirmationUid);
 
-    User findUserByWorkspaceName(String workspaceName);
+    List<User> findUsersByWorkspaceName(String workspaceName);
 }

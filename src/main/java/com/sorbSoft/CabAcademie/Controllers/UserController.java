@@ -186,8 +186,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/getByWorkspaceName/{workspaceName}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserViewModel> findUserByWorkspaceName(@PathVariable String workspaceName){
-        UserViewModel schoolOrOrganization = userService.findUserByWorkspaceName(workspaceName);
+    public ResponseEntity<List<UserViewModel>> findUserByWorkspaceName(@PathVariable String workspaceName){
+        List<UserViewModel> schoolOrOrganization = userService.findUserByWorkspaceName(workspaceName);
         if(schoolOrOrganization == null)
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(schoolOrOrganization, HttpStatus.OK);
