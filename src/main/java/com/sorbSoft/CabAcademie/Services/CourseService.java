@@ -227,9 +227,11 @@ public class CourseService {
     }
 
 
-    public List<Course> fetchCourseBySubCategory(Long subCategoryId) {
-        return courseRepository.findAllBySubCategoryId(subCategoryId);
+    public List<Course> fetchPublicCourseBySubCategory(Long subCategoryId) {
+        return courseRepository.findAllBySubCategoryIdAndSchoolsIsNull(subCategoryId);
     }
+
+
     private Result ValidateModel(CourseViewModel vm){
         Result result = new Result();
 

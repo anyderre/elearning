@@ -25,7 +25,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
             "(select cs.courseId from CourseSchools cs where cs.school.id = ?2)")*/
     List<Course> findAllBySubSectionId(Long subSectionId);
 
-    List<Course> findAllBySubCategoryId(Long subCategoryId);
+    List<Course> findAllBySubCategoryIdAndSchoolsIsNull(Long subCategoryId);
 
     /*
         find last created

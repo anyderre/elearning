@@ -84,16 +84,17 @@ public class CourseController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
+    //public
     @GetMapping(value = "/subCategory/{id}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getAllCoursesBySubCategory(@PathVariable Long id){
-        List<Course> courses = courseService.fetchCourseBySubCategory(id);
+    public ResponseEntity<List<Course>> getAllPublicCoursesBySubCategory(@PathVariable Long id){
+        List<Course> courses = courseService.fetchPublicCourseBySubCategory(id);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
     @GetMapping(value = "/lastCreated/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getLastAddedCourses(@PathVariable Integer amount) {
+    public ResponseEntity<List<Course>> getLastAddedPublicCourses(@PathVariable Integer amount) {
         if(amount<=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
