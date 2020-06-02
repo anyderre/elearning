@@ -553,5 +553,16 @@ public class UserServices {
     }
 
 
+    public UserViewModel findUserByWorkspaceName(String workspaceName) {
+        UserViewModel vm = UserFactory.getUserViewModel();
+        User userByWorkspaceName = userRepository.findUserByWorkspaceName(workspaceName);
+        if(userByWorkspaceName != null) {
+            vm = mapper.mapToViewModel(userByWorkspaceName);
+
+            return vm;
+        } else {
+            return null;
+        }
+    }
 }
 

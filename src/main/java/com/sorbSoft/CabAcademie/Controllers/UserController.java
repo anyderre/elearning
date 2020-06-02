@@ -184,4 +184,12 @@ public class UserController {
         httpHeaders.setLocation(feLoginUrlSuccess);
         return new ResponseEntity<>(httpHeaders, HttpStatus.SEE_OTHER);
     }
+
+    @GetMapping(value = "/getByWorkspaceName/{workspaceName}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<UserViewModel> findUserByWorkspaceName(@PathVariable String workspaceName){
+        UserViewModel schoolOrOrganization = userService.findUserByWorkspaceName(workspaceName);
+        if(schoolOrOrganization == null)
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(schoolOrOrganization, HttpStatus.OK);
+    }
 }

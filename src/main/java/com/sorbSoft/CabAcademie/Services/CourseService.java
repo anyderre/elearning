@@ -201,21 +201,25 @@ public class CourseService {
     }
     public List<Course> fetchPrivateCourseBySubSection(Long subSectionId, String userName) {
         User user = userRepository.findByUsername(userName);
-        List<User> schools = user.getSchools();
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
 
         List<Course> courses = new ArrayList<>();
 
-        for(User school : schools) {
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
             //TODO: should be refactored: added sql query with subquesry at db level
             //select * from Course where Course.id IN (select course_id from Course_School where Course_School.user_id = school.id)
             List<Course> coursesBySubSection = courseRepository.findAllBySubSectionId(subSectionId);
             for(Course course : coursesBySubSection) {
-                for(User sCourse : course.getSchools()) {
+                for(User courseSchool : course.getSchools()) {
 
-                    if(school.getId() == sCourse.getId()) {
+                    if(schoolOrOrganization.getId() == courseSchool.getId()) {
                         courses.add(course);
                     }
                 }
+
             }
         }
 

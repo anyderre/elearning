@@ -32,4 +32,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByEmailAndIdIsNot(String email, Long id);
 
     User findUserByEmailConfirmationUID(String emailConfirmationUid);
+
+    User findUserByWorkspaceName(String workspaceName);
 }
