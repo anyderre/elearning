@@ -14,73 +14,87 @@ import java.util.List;
  * Created by Dany on 15/05/2018.
  */
 public interface CourseRepository extends JpaRepository<Course, Long> {
+
     Page<Course> findAll(Pageable pagin);
+
     Course findCourseByTitle(String name);
+
     Course findCourseByTitleAndIdIsNot(String title, Long id);
+
     Page<Course> findByTitleContainsAllIgnoreCase(String searchText, Pageable pagin);
+
 
     List<Course> findAllBySubSectionIdAndSchoolsIsNull(Long subSectionId);
 
-    /*@Query("select cr from Course cr where cr.subSection.id = ?1 and cr.id IN " +
-            "(select cs.courseId from CourseSchools cs where cs.school.id = ?2)")*/
     List<Course> findAllBySubSectionId(Long subSectionId);
 
+    List<Course> findAllBySubSectionIdAndSchoolsIn(Long subSectionId, User school);
+
+
     List<Course> findAllBySubCategoryIdAndSchoolsIsNull(Long subCategoryId);
+
+    List<Course> findAllBySubCategoryIdAndSchoolsIn(Long subCategoryId, User school);
 
     /*
         find last created
      */
-    @Query("select c from Course c where c.deleted=false order by c.creationDate desc")
-    List<Course> findLastCreated(Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.deleted=false order by c.creationDate desc")
+    List<Course> findLastCreatedPublicCourses(Pageable pageable);
 
-    @Query("select c from Course c where c.category=?1 and c.deleted=false order by c.creationDate desc")
-    List<Course> findLastCreatedByCategory(Category category, Pageable pageable);
+    /*@Query("select c from Course c where :school IN c.schools   and c.deleted=false order by c.creationDate desc")
+    //TODO: finish
+    List<Course> findLastCreatedPrivateCourses(Pageable pageable, @Param("school") User school);*/
 
-    @Query("select c from Course c where c.subCategory=?1 and c.deleted=false order by c.creationDate desc")
-    List<Course> findLastCreatedBySubCategory(SubCategory subCategory, Pageable pageable);
 
-    @Query("select c from Course c where c.section=?1 and c.deleted=false order by c.creationDate desc")
-    List<Course> findLastCreatedBySection(Section section, Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.category=?1 and c.deleted=false order by c.creationDate desc")
+    List<Course> findLastCreatedByCategoryPublicCourses(Category category, Pageable pageable);
 
-    @Query("select c from Course c where c.subSection=?1 and c.deleted=false order by c.creationDate desc")
-    List<Course> findLastCreatedBySubSection(SubSection subSection, Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.subCategory=?1 and c.deleted=false order by c.creationDate desc")
+    List<Course> findLastCreatedBySubCategoryPublicCourses(SubCategory subCategory, Pageable pageable);
+
+    @Query("select c from Course c where c.schools IS EMPTY and c.section=?1 and c.deleted=false order by c.creationDate desc")
+    List<Course> findLastCreatedBySectionPublicCourses(Section section, Pageable pageable);
+
+    @Query("select c from Course c where c.schools IS EMPTY and c.subSection=?1 and c.deleted=false order by c.creationDate desc")
+    List<Course> findLastCreatedBySubSectionPublicCourses(SubSection subSection, Pageable pageable);
 
 
     /*
        find best rated
     */
-    @Query("select c from Course c where c.deleted=false order by c.ratings desc")
-    List<Course> findBestRated(Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.deleted=false order by c.ratings desc")
+    List<Course> findBestRatedPublicCourses(Pageable pageable);
 
-    @Query("select c from Course c where c.category=?1 and c.deleted=false order by c.ratings desc")
-    List<Course> findBestRatedByCategory(Category category, Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.category=?1 and c.deleted=false order by c.ratings desc")
+    List<Course> findBestRatedByCategoryPublicCourses(Category category, Pageable pageable);
 
-    @Query("select c from Course c where c.subCategory=?1 and c.deleted=false order by c.ratings desc")
-    List<Course> findBestRatedBySubCategory(SubCategory subCategory, Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.subCategory=?1 and c.deleted=false order by c.ratings desc")
+    List<Course> findBestRatedBySubCategoryPublicCourses(SubCategory subCategory, Pageable pageable);
 
-    @Query("select c from Course c where c.section=?1 and c.deleted=false order by c.ratings desc")
-    List<Course> findBestRatedBySection(Section section, Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.section=?1 and c.deleted=false order by c.ratings desc")
+    List<Course> findBestRatedBySectionPublicCourses(Section section, Pageable pageable);
 
-    @Query("select c from Course c where c.subSection=?1 and c.deleted=false order by c.ratings desc")
-    List<Course> findBestRatedBySubSection(SubSection subSection, Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.subSection=?1 and c.deleted=false order by c.ratings desc")
+    List<Course> findBestRatedBySubSectionPublicCourses(SubSection subSection, Pageable pageable);
 
 
     /*
          find featured
       */
-    @Query("select c from Course c where c.deleted=false order by c.enrolled desc")
-    List<Course> findFeatured(Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.deleted=false order by c.enrolled desc")
+    List<Course> findFeaturedPublicCourses(Pageable pageable);
 
-    @Query("select c from Course c where c.category=?1 and c.deleted=false order by c.enrolled desc")
-    List<Course> findFeaturedByCategory(Category category, Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.category=?1 and c.deleted=false order by c.enrolled desc")
+    List<Course> findFeaturedByCategoryPublicCourses(Category category, Pageable pageable);
 
-    @Query("select c from Course c where c.subCategory=?1 and c.deleted=false order by c.enrolled desc")
-    List<Course> findFeaturedBySubCategory(SubCategory subCategory, Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.subCategory=?1 and c.deleted=false order by c.enrolled desc")
+    List<Course> findFeaturedBySubCategoryPublicCourses(SubCategory subCategory, Pageable pageable);
 
-    @Query("select c from Course c where c.section=?1 and c.deleted=false order by c.enrolled desc")
-    List<Course> findFeaturedBySection(Section section, Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.section=?1 and c.deleted=false order by c.enrolled desc")
+    List<Course> findFeaturedBySectionPublicCourses(Section section, Pageable pageable);
 
-    @Query("select c from Course c where c.subSection=?1 and c.deleted=false order by c.enrolled desc")
-    List<Course> findFeaturedBySubSection(SubSection subSection, Pageable pageable);
+    @Query("select c from Course c where c.schools IS EMPTY and c.subSection=?1 and c.deleted=false order by c.enrolled desc")
+    List<Course> findFeaturedBySubSectionPublicCourses(SubSection subSection, Pageable pageable);
+
 
 }
