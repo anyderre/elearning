@@ -1,5 +1,6 @@
 package com.sorbSoft.CabAcademie.Controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Entities.JwtRequest;
@@ -10,8 +11,10 @@ import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.social.SocialRequest;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.social.SocialResponse;
 import com.sorbSoft.CabAcademie.Services.JwtUserDetailsService;
+import com.sorbSoft.CabAcademie.Services.LinkedinOAuth2Service;
 import com.sorbSoft.CabAcademie.Services.UserServices;
 import com.sorbSoft.CabAcademie.config.JwtTokenUtil;
+import com.sorbSoft.CabAcademie.model.linkedin.LinkedinUserProfile;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
@@ -33,9 +36,6 @@ import org.springframework.social.facebook.api.impl.FacebookTemplate;
 import org.springframework.social.google.api.Google;
 import org.springframework.social.google.api.impl.GoogleTemplate;
 import org.springframework.social.google.api.oauth2.UserInfo;
-import org.springframework.social.linkedin.api.LinkedIn;
-import org.springframework.social.linkedin.api.LinkedInProfile;
-import org.springframework.social.linkedin.api.impl.LinkedInTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -59,6 +59,9 @@ public class JwtAuthenticationController {
 
     @Value("${frontend.url}")
     private String FRONTEND_URL;
+
+    @Autowired
+    private LinkedinOAuth2Service linkedin;
 
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -275,19 +278,19 @@ public class JwtAuthenticationController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something wrong in Server")})
-    public ResponseEntity<?> linkedinAuth(@Valid @RequestBody SocialRequest socialRequest) {
+    public ResponseEntity<?> linkedinAuth(@Valid @RequestBody SocialRequest socialRequest) throws JsonProcessingException {
         String token = null;
         log.debug("Linkedin signup started");
-        LinkedIn linkedin = new LinkedInTemplate(socialRequest.getAccessToken());
-        LinkedInProfile userinfo = linkedin.profileOperations().getUserProfile();
-        log.debug("Fetched linkedin data: ", userinfo.toString());
-        if (userinfo != null) {
+        LinkedinUserProfile userInfo = linkedin.fetchUserProfile(socialRequest.getAccessToken());
+
+        log.debug("Fetched linkedin data: ", userInfo.toString());
+        if (userInfo != null) {
             UserDetails userDetails = null;
 
             try{
-                userDetails = userDetailsService.loadUserByUsername(userinfo.getEmailAddress());
+                userDetails = userDetailsService.loadUserByUsername(userInfo.getEmailAddress());
             } catch (UsernameNotFoundException e) {
-                log.debug("User with email "+userinfo.getEmailAddress()+" was not found in db");
+                log.debug("User with email "+userInfo.getEmailAddress()+" was not found in db");
             }
 
             if(userDetails == null) { //signup
@@ -296,17 +299,17 @@ public class JwtAuthenticationController {
                 freeStudent.setRole(Roles.ROLE_FREE_STUDENT);
 
                 UserViewModel user = new UserViewModel();
-                user.setGoogleId(userinfo.getId());
-                user.setFirstName(userinfo.getFirstName());
-                user.setLastName(userinfo.getLastName());
-                user.setUsername(userinfo.getEmailAddress());
-                user.setEmail(userinfo.getEmailAddress());
+                user.setGoogleId(userInfo.getId());
+                user.setFirstName(userInfo.getFirstName());
+                user.setLastName(userInfo.getLastName());
+                user.setUsername(userInfo.getEmailAddress());
+                user.setEmail(userInfo.getEmailAddress());
                 user.setAgreeWithTerms(true);
                 user.setRole(freeStudent);
                 user.setSocialUser(true);
                 user.setEnable(1);
 
-                user.setPhotoURL(userinfo.getProfilePictureUrl());
+                user.setPhotoURL(userInfo.getProfilePictureUrl());
                 user.setTimeZone(socialRequest.getUserTimeZone());
 
 
@@ -314,7 +317,7 @@ public class JwtAuthenticationController {
                 if(!result.isValid())
                     return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
 
-                userDetails = userDetailsService.loadUserByUsername(userinfo.getEmailAddress());
+                userDetails = userDetailsService.loadUserByUsername(userInfo.getEmailAddress());
                 //TODO: add to security context
                 token = jwtTokenUtil.generateToken(userDetails);
 
