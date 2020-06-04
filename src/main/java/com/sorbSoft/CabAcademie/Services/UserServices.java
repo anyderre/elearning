@@ -9,6 +9,8 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.UserMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
+import com.sorbSoft.CabAcademie.exception.SchoolNotFoundExcepion;
+import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -155,6 +157,31 @@ public class UserServices {
 
     }
 
+    public long countUsersInSchoolByRole(String adminUsername, Roles role) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+
+        User admin = userRepository.findByUsername(adminUsername);
+
+        if (admin == null) {
+            throw new UserNotFoundExcepion("User " + adminUsername + " doesn't exist in system");
+        }
+        List<User> schools = admin.getSchools();
+
+        if (schools == null) {
+            throw new SchoolNotFoundExcepion("Admin " + adminUsername + " doesn't belong to any school");
+        }
+
+        Rol studentRole = rolRepository.findByDescription(role.toString());
+        long studentCount = 0;
+
+        for (User school : schools) {
+            studentCount = userRepository.countUsersByRoleAndSchoolsIn(studentRole, school);
+            return studentCount;
+        }
+
+        return studentCount;
+
+    }
+
     public List<User> findAllUser(){
         return userRepository.findAll();
     }
@@ -238,6 +265,9 @@ public class UserServices {
         if (resultUser.getRole().getId() == Roles.ROLE_STUDENT.ordinal() || resultUser.getRole().getId() == Roles.ROLE_FREE_STUDENT.ordinal()){
             resultUser.setName(resultUser.getFirstName() + ' ' + resultUser.getLastName());
         }
+
+        //check
+        resultUser.setName(resultUser.getFirstName());
 
         //if user is not social
         if(!resultUser.getSocialUser()) {
@@ -422,7 +452,14 @@ public class UserServices {
                 vm.setSubCategories(new ArrayList<>());
                 vm.setSchools(new ArrayList<>());
                 vm.setOrganizations(new ArrayList<>());
-            } else if (role.getDescription().equals(Roles.ROLE_ORGANIZATION.name())){
+            } else if (role.getDescription().equals(Roles.ROLE_ADMIN.name())) {
+                vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
+                vm.setWorkspaceName("");
+                vm.setCategories(new ArrayList<>());
+                vm.setSubCategories(new ArrayList<>());
+                //vm.setSchools(new ArrayList<>());
+                //vm.setOrganizations(new ArrayList<>());
+            }else if (role.getDescription().equals(Roles.ROLE_ORGANIZATION.name())){
                 vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
                 vm.setCategories(new ArrayList<>());
                 vm.setSubCategories(new ArrayList<>());
@@ -571,5 +608,6 @@ public class UserServices {
             return null;
         }
     }
+
 }
 

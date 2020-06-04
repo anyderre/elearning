@@ -2,7 +2,12 @@ package com.sorbSoft.CabAcademie.Controllers.exception;
 
 
 import com.sorbSoft.CabAcademie.exception.EntityNotFoundException;
+
 import com.sorbSoft.CabAcademie.model.error.ApiError;
+
+import com.sorbSoft.CabAcademie.exception.SchoolNotFoundExcepion;
+import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -33,6 +38,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
+        String error = ex.getMessage();
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
+        apiError.setMessage(error);
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(SchoolNotFoundExcepion.class)
+    protected ResponseEntity<Object> handleSchoolNotFoundExcepion(SchoolNotFoundExcepion ex) {
+        String error = ex.getMessage();
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
+        apiError.setMessage(error);
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(UserNotFoundExcepion.class)
+    protected ResponseEntity<Object> handleUserNotFoundExcepion(UserNotFoundExcepion ex) {
         String error = ex.getMessage();
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
         apiError.setMessage(error);

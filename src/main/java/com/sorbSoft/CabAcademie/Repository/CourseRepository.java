@@ -97,4 +97,5 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findFeaturedBySubSectionPublicCourses(SubSection subSection, Pageable pageable);
 
 
+    long countCoursesBySchoolsIn(User school);
 }
