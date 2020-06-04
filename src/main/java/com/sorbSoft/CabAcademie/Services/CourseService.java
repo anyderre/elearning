@@ -9,6 +9,8 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CourseMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import com.sorbSoft.CabAcademie.annotation.NotUsed;
+import com.sorbSoft.CabAcademie.exception.SchoolNotFoundExcepion;
+import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -664,6 +666,28 @@ public class CourseService {
         List<Course> featured = courseRepository.findFeaturedBySubSectionPublicCourses(subSection, pageable);
 
         return featured;
+    }
+
+    public Long countAllCoursesInSchool(String adminUsername) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+        User admin = userRepository.findByUsername(adminUsername);
+
+        if (admin == null) {
+            throw new UserNotFoundExcepion("User " + adminUsername + " doesn't exist in system");
+        }
+        List<User> schools = admin.getSchools();
+
+        if (schools == null) {
+            throw new SchoolNotFoundExcepion("Admin " + adminUsername + " doesn't belong to any school");
+        }
+
+        long coursesCount = 0;
+
+        for (User school : schools) {
+            coursesCount = courseRepository.countCoursesBySchoolsIn(school);
+            return coursesCount;
+        }
+
+        return coursesCount;
     }
 
 
