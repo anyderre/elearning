@@ -11,6 +11,7 @@ import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
 import com.sorbSoft.CabAcademie.exception.SchoolNotFoundExcepion;
 import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,8 +36,9 @@ public class AdminDashboardController {
     @Autowired
     private CourseService courseService;
 
-    @GetMapping(value = "/school/students/count")
+    @GetMapping(value = "/school/students/count/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Count students in School. Statuses: all")
     public ResponseEntity<Long> getStudentsAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
         if (principal == null)
@@ -49,8 +51,9 @@ public class AdminDashboardController {
         return new ResponseEntity<>(studentsCount, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/school/professors/count")
+    @GetMapping(value = "/school/professors/count/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Count professors in School. Statuses: all")
     public ResponseEntity<Long> getProfessorAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
         if (principal == null)
@@ -65,6 +68,7 @@ public class AdminDashboardController {
 
     @GetMapping(value = "/school/courses/count/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Count courses in School. Statuses: all")
     public ResponseEntity<Long> getCoursesAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
         if (principal == null)
