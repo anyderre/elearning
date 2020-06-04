@@ -1,4 +1,4 @@
-package com.sorbSoft.CabAcademie.model;
+package com.sorbSoft.CabAcademie.model.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

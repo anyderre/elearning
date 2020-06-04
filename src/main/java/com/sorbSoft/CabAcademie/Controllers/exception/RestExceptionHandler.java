@@ -2,7 +2,7 @@ package com.sorbSoft.CabAcademie.Controllers.exception;
 
 
 import com.sorbSoft.CabAcademie.exception.EntityNotFoundException;
-import com.sorbSoft.CabAcademie.model.ApiError;
+import com.sorbSoft.CabAcademie.model.error.ApiError;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
