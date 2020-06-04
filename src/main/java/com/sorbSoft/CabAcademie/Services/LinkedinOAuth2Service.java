@@ -20,7 +20,7 @@ public class LinkedinOAuth2Service {
     private final String LINKEDIN_PROFILE_URL = "https://api.linkedin.com/v2/me";
     private final String LINKEDIN_EMAIL_URL = "https://api.linkedin.com/v2/emailAddress?q=members&projection=(elements*(handle~))";
 
-    public Pair<HttpStatus, LinkedinProfile> fetchгFirstNameAndLastNameProfile(String accessToken) throws JsonProcessingException {
+    public LinkedinProfile fetchгFirstNameAndLastNameProfile(String accessToken) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
         HttpHeaders headers = new HttpHeaders();
@@ -46,13 +46,12 @@ public class LinkedinOAuth2Service {
         }
 
 
-        return new Pair<>(responseJsonNode.getStatusCode(), toes);
+        return toes;
 
     }
 
     public LinkedinUserProfile fetchUserProfile(String accessToken) throws JsonProcessingException {
-        Pair<HttpStatus, LinkedinProfile> httpStatusListPair = fetchгFirstNameAndLastNameProfile(accessToken);
-        LinkedinProfile profile = httpStatusListPair.getValue();
+        LinkedinProfile profile = fetchгFirstNameAndLastNameProfile(accessToken);
 
 
 
