@@ -7,7 +7,6 @@ import com.sorbSoft.CabAcademie.model.linkedin.LinkedinProfile;
 import com.sorbSoft.CabAcademie.model.linkedin.LinkedinUserProfile;
 import com.sorbSoft.CabAcademie.model.linkedin.email.ElementsItem;
 import com.sorbSoft.CabAcademie.model.linkedin.email.LinkedinEmail;
-import javafx.util.Pair;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
