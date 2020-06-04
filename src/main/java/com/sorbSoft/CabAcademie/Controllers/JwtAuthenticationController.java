@@ -273,7 +273,7 @@ public class JwtAuthenticationController {
         }
     }
 
-    @PostMapping(value = "/linkedinAuth", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/linkedinLogin", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Auth linkedin user")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),

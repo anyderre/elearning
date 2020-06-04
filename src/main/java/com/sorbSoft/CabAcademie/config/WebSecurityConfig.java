@@ -192,7 +192,7 @@ public class WebSecurityConfig {
                     .antMatchers("/jitsi-auth").permitAll()
                     .antMatchers("/facebookLogin").permitAll()
                     .antMatchers("/googleLogin").permitAll()
-                    .antMatchers("/linkedinAuth").permitAll()
+                    .antMatchers("/linkedinLogin").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveStudent").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveOrganization").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveSchool").permitAll()
