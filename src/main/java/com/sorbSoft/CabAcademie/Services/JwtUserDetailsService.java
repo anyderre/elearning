@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
+@Log4j2
 public class JwtUserDetailsService implements UserDetailsService {
 
     @Autowired
@@ -37,13 +39,18 @@ public class JwtUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         if (username.isEmpty()) {
+            log.error("Username must be provided");
             throw new UsernameNotFoundException("Username must be provided");
         }
 
         com.sorbSoft.CabAcademie.Entities.User User = userRepository.findByUsername(username);
         if (User == null) {
+            log.debug("User not found with username: %s",
+                    username);
             User = userRepository.findByEmail(username);
             if (User == null) {
+                log.warn("User not found with email: %s",
+                        username);
                 throw new UsernameNotFoundException(
                         String.format("User not found with username: %s",
                                 username));
@@ -52,7 +59,7 @@ public class JwtUserDetailsService implements UserDetailsService {
 
         Set<GrantedAuthority> roles = new HashSet<>();
 //        for (Rol rol : User.getRole()) {
-            roles.add(new SimpleGrantedAuthority(User.getRole().getName()));
+            roles.add(new SimpleGrantedAuthority(User.getRole().getRole().toString()));
 //        }
 
         List<GrantedAuthority> grantedAuthorities = new ArrayList<>(roles);

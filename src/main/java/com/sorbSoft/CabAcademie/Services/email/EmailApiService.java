@@ -3,7 +3,6 @@ package com.sorbSoft.CabAcademie.Services.email;
 import biweekly.Biweekly;
 import biweekly.ICalendar;
 import biweekly.component.VEvent;
-import biweekly.property.Method;
 import com.sorbSoft.CabAcademie.Entities.Attendee;
 import com.sorbSoft.CabAcademie.Entities.TimeSlot;
 import com.sorbSoft.CabAcademie.Entities.User;
@@ -74,6 +73,9 @@ public class EmailApiService {
     @Value("${decline.api.url}")
     private String declineEndpoint;
 
+    @Value("${email.confirmation.url}")
+    private String emailConfirmationEndpoint;
+
     @Value("${email.date.time.format}")
     private String emailDateTimeFormat;
 
@@ -102,6 +104,7 @@ public class EmailApiService {
     public void init() {
         this.approveEndpoint = appUrl + this.approveEndpoint;
         this.declineEndpoint = appUrl + this.declineEndpoint;
+        this.emailConfirmationEndpoint = appUrl + this.emailConfirmationEndpoint;
 
         this.F = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
 
@@ -569,5 +572,28 @@ public class EmailApiService {
         Biweekly.write(iCalendar).go(file);
 
         return file;
+    }
+
+    public void sendUserRegistrationMail(User user) {
+        log.debug("Sending email confirmation link to user: {}", user);
+
+        String emailConfirmationLink = this.emailConfirmationEndpoint.replace("{emailConfirmationUid}", user.getEmailConfirmationUID());
+
+        final Mail mail = new Mail();
+        String title;
+        mail.setMailFrom(USER_NAME);
+        mail.setMailTo(user.getEmail());
+
+        title = "Email Confirmation";
+        mail.setMailSubject(title);
+        mail.setTemplateName("confirm_registration.vm");
+
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("title", title);
+        parameters.put("firstName", user.getFirstName());
+        parameters.put("lastName", user.getLastName());
+        parameters.put("emailConfirmationLink", emailConfirmationLink);
+
+        sendMail(mail, parameters);
     }
 }
