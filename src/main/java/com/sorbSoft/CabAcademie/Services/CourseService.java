@@ -529,8 +529,10 @@ public class CourseService {
         resultCourse.setLastUpdate(new Date());
         if (vm.getId() <= 0) {
             resultCourse.setCreationDate(new Date());
-            resultCourse.setStatus(CourseStatus.PENDING);
+        } else {
+            resultCourse.setLastUpdate(new Date());
         }
+        resultCourse.setStatus(CourseStatus.PENDING);
         return resultCourse;
     }
 
