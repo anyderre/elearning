@@ -122,7 +122,7 @@ public class CourseController {
 
     @GetMapping(value = "/private/lastCreated/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get Last Created Private Courses by Amount")
-    public ResponseEntity<List<Course>> getLastAddedPublicCourses(@PathVariable Integer amount, Principal principal) {
+    public ResponseEntity<List<Course>> getLastAddedPrivateCourses(@PathVariable Integer amount, Principal principal) {
 
         log.debug("Principal username:"+principal.getName());
 

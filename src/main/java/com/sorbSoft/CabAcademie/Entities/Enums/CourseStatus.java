@@ -1,5 +1,5 @@
 package com.sorbSoft.CabAcademie.Entities.Enums;
 
 public enum CourseStatus {
-    DRAFT, PENDING, APPROVED, DECLINE
+    DRAFT, PENDING, APPROVED, DECLINED
 }

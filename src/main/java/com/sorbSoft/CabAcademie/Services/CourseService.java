@@ -546,6 +546,10 @@ public class CourseService {
 
     //TODO: finish
     public List<Course> fetchLastAddedPrivateCourses(int amount, String userName) {
+        return fetchLastAddedPrivateCoursesByStatus(amount, userName, CourseStatus.APPROVED);
+    }
+
+    public List<Course> fetchLastAddedPrivateCoursesByStatus(int amount, String userName, CourseStatus status) {
 
         Pageable pageable = new PageRequest(0, amount);
         User user = userRepository.findByUsername(userName);
@@ -557,12 +561,24 @@ public class CourseService {
         List<Course> courses = new ArrayList<>();
 
         for(User schoolOrOrganization : schoolsAndOrganizations) {
-            List<Course> coursesBySubSectionAndSchool = courseRepository.
-                    findLastCreatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
-                            CourseStatus.APPROVED,
-                            schoolOrOrganization,
-                            pageable);
-            courses.addAll(coursesBySubSectionAndSchool);
+            if(status == null) {
+                //fetch sll statuses
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findLastCreatedPrivateCoursesByDeletedFalseAndSchoolsInOrderByCreationDateDesc(
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+
+            } else {
+                //find by status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findLastCreatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
+                                status,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+            }
+
         }
 
         return courses;
@@ -687,7 +703,7 @@ public class CourseService {
     }
 
     public Long countDeclinedCoursesInSchool(String adminUsername) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
-        return countCoursesInSchool(adminUsername, CourseStatus.DECLINE);
+        return countCoursesInSchool(adminUsername, CourseStatus.DECLINED);
     }
 
     public Long countApprovedCoursesInSchool(String adminUsername) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
@@ -717,8 +733,8 @@ public class CourseService {
                 coursesCount = courseRepository.countCoursesBySchoolsInAndStatus(school, CourseStatus.PENDING);
             }
 
-            if(status == CourseStatus.DECLINE) {
-                coursesCount = courseRepository.countCoursesBySchoolsInAndStatus(school, CourseStatus.DECLINE);
+            if(status == CourseStatus.DECLINED) {
+                coursesCount = courseRepository.countCoursesBySchoolsInAndStatus(school, CourseStatus.DECLINED);
             }
 
             if(status == CourseStatus.APPROVED) {
@@ -736,7 +752,7 @@ public class CourseService {
     }
 
     public boolean declineCourse(Long courseId, String adminUsername, String declineMessage) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion {
-        return changeCourseStatus(courseId, adminUsername, CourseStatus.DECLINE, declineMessage);
+        return changeCourseStatus(courseId, adminUsername, CourseStatus.DECLINED, declineMessage);
     }
 
     private boolean changeCourseStatus(Long courseId, String adminUsername, CourseStatus status, String declineMessage) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion {
@@ -776,10 +792,10 @@ public class CourseService {
                         return isStatusChanged;
                     }
 
-                    if(status == CourseStatus.DECLINE) {
+                    if(status == CourseStatus.DECLINED) {
 
                         course2Approve.setDeclineMessage(declineMessage);
-                        course2Approve.setStatus(CourseStatus.DECLINE);
+                        course2Approve.setStatus(CourseStatus.DECLINED);
                         course2Approve.setLastUpdate(new Date());
                         courseRepository.save(course2Approve);
                         isStatusChanged = true;
@@ -790,6 +806,24 @@ public class CourseService {
         }
 
         return isStatusChanged;
+    }
+
+    public List<Course> getLastAddedPrivateCoursesByStatus(Integer amount, String userName, String status) {
+
+        if(status.equalsIgnoreCase("all")){
+            return fetchLastAddedPrivateCoursesByStatus(amount, userName, null);
+        }
+        if(status.equalsIgnoreCase("pending")){
+            return fetchLastAddedPrivateCoursesByStatus(amount, userName, CourseStatus.PENDING);
+        }
+        if(status.equalsIgnoreCase("approved")){
+            return fetchLastAddedPrivateCoursesByStatus(amount, userName, CourseStatus.APPROVED);
+        }
+        if(status.equalsIgnoreCase("declined")){
+            return fetchLastAddedPrivateCoursesByStatus(amount, userName, CourseStatus.DECLINED);
+        }
+
+        return new ArrayList<>();
     }
 
 
