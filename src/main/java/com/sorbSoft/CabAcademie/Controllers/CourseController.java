@@ -120,8 +120,7 @@ public class CourseController {
 
     }
 
-    //TODO: finish
-    /*@GetMapping(value = "/private/lastCreated/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/private/lastCreated/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get Last Created Private Courses by Amount")
     public ResponseEntity<List<Course>> getLastAddedPublicCourses(@PathVariable Integer amount, Principal principal) {
 
@@ -135,7 +134,7 @@ public class CourseController {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
 
-    }*/
+    }
 
     @GetMapping(value = "/lastCreated/{amount}/category/{categoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get Last Created Public Courses by Amount and Category ID")

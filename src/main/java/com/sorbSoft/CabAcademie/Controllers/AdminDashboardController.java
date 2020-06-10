@@ -110,4 +110,49 @@ public class AdminDashboardController {
 
         return new ResponseEntity<>(coursesCount, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/school/courses/count/approved")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Count courses in School. Statuses: APPROVED, Role:ROLE_ADMIN")
+    public ResponseEntity<Long> getApprovedCoursesAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+
+        if (principal == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Long coursesCount = courseService.countApprovedCoursesInSchool(principal.getName());
+        if (coursesCount == null || coursesCount <= 0)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(coursesCount, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/school/courses/count/declined")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Count courses in School. Statuses: DECLINE, Role:ROLE_ADMIN")
+    public ResponseEntity<Long> getDeclinedCoursesAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+
+        if (principal == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Long coursesCount = courseService.countDeclinedCoursesInSchool(principal.getName());
+        if (coursesCount == null || coursesCount <= 0)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(coursesCount, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/school/courses/count/pending")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Count courses in School. Statuses: PENDING, Role:ROLE_ADMIN")
+    public ResponseEntity<Long> getPendingCoursesAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+
+        if (principal == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Long coursesCount = courseService.countPendingCoursesInSchool(principal.getName());
+        if (coursesCount == null || coursesCount <= 0)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(coursesCount, HttpStatus.OK);
+    }
 }

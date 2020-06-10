@@ -202,7 +202,7 @@ public class CourseService {
     }
 
     public List<Course> fetchPublicCourseBySubSection(Long subSectionId) {
-        return courseRepository.findAllBySubSectionIdAndSchoolsIsNull(subSectionId);
+        return courseRepository.findAllBySubSectionIdAndSchoolsIsNullAndStatus(subSectionId, CourseStatus.APPROVED);
     }
 
     public List<Course> fetchPrivateCourseBySubSectionAlternative(Long subSectionId, String userName) {
@@ -215,7 +215,8 @@ public class CourseService {
         List<Course> courses = new ArrayList<>();
 
         for(User schoolOrOrganization : schoolsAndOrganizations) {
-            List<Course> coursesBySubSectionAndSchool = courseRepository.findAllBySubSectionIdAndSchoolsIn(subSectionId, schoolOrOrganization);
+            List<Course> coursesBySubSectionAndSchool
+                    = courseRepository.findAllBySubSectionIdAndSchoolsInAndStatus(subSectionId, schoolOrOrganization, CourseStatus.APPROVED);
             courses.addAll(coursesBySubSectionAndSchool);
         }
 
@@ -254,7 +255,7 @@ public class CourseService {
 
 
     public List<Course> fetchPublicCourseBySubCategory(Long subCategoryId) {
-        return courseRepository.findAllBySubCategoryIdAndSchoolsIsNull(subCategoryId);
+        return courseRepository.findAllBySubCategoryIdAndSchoolsIsNullAndStatus(subCategoryId, CourseStatus.APPROVED);
     }
 
     public List<Course> fetchPrivateCourseBySubCategory(Long subCategoryId, String userName) {
@@ -267,7 +268,7 @@ public class CourseService {
         List<Course> courses = new ArrayList<>();
 
         for(User schoolOrOrganization : schoolsAndOrganizations) {
-            List<Course> coursesBySubSectionAndSchool = courseRepository.findAllBySubCategoryIdAndSchoolsIn(subCategoryId, schoolOrOrganization);
+            List<Course> coursesBySubSectionAndSchool = courseRepository.findAllBySubCategoryIdAndSchoolsInAndStatus(subCategoryId, schoolOrOrganization, CourseStatus.APPROVED);
             courses.addAll(coursesBySubSectionAndSchool);
         }
 
@@ -536,13 +537,13 @@ public class CourseService {
     public List<Course> fetchLastAddedPublicCourses(int amount) {
 
         Pageable pageable = new PageRequest(0, amount);
-        List<Course> lastCreated = courseRepository.findLastCreatedPublicCourses(pageable);
+        List<Course> lastCreated = courseRepository.findLastCreatedPublicCoursesWithStatus(CourseStatus.APPROVED, pageable);
 
         return lastCreated;
     }
 
     //TODO: finish
-    /*public List<Course> fetchLastAddedPrivateCourses(int amount, String userName) {
+    public List<Course> fetchLastAddedPrivateCourses(int amount, String userName) {
 
         Pageable pageable = new PageRequest(0, amount);
         User user = userRepository.findByUsername(userName);
@@ -554,23 +555,27 @@ public class CourseService {
         List<Course> courses = new ArrayList<>();
 
         for(User schoolOrOrganization : schoolsAndOrganizations) {
-            List<Course> coursesBySubSectionAndSchool = courseRepository.findLastCreatedPrivateCourses(pageable, schoolOrOrganization);
+            List<Course> coursesBySubSectionAndSchool = courseRepository.
+                    findLastCreatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
+                            CourseStatus.APPROVED,
+                            schoolOrOrganization,
+                            pageable);
             courses.addAll(coursesBySubSectionAndSchool);
         }
 
         return courses;
-    }*/
+    }
 
     public List<Course> fetchBestRatedPublicCourses(int amount) {
         Pageable pageable = new PageRequest(0, amount);
-        List<Course> bestRated = courseRepository.findBestRatedPublicCourses(pageable);
+        List<Course> bestRated = courseRepository.findBestRatedPublicCoursesWithStatus(CourseStatus.APPROVED, pageable);
 
         return bestRated;
     }
 
     public List<Course> fetchFeaturedPublicCourses(int amount) {
         Pageable pageable = new PageRequest(0, amount);
-        List<Course> featureed = courseRepository.findFeaturedPublicCourses(pageable);
+        List<Course> featureed = courseRepository.findFeaturedPublicCoursesWithStatus(CourseStatus.APPROVED, pageable);
 
         return featureed;
     }
@@ -578,7 +583,7 @@ public class CourseService {
     public List<Course> fetchLastAddedByCategoryPublicCourses(Integer amount, Long categoryId) {
         Pageable pageable = new PageRequest(0, amount);
         Category category = categoryRepository.findOne(categoryId);
-        List<Course> lastCreated = courseRepository.findLastCreatedByCategoryPublicCourses(category, pageable);
+        List<Course> lastCreated = courseRepository.findLastCreatedByCategoryPublicCoursesWithStatus(category, CourseStatus.APPROVED, pageable);
 
         return lastCreated;
     }
@@ -586,7 +591,7 @@ public class CourseService {
     public List<Course> fetchLastAddedBySubCategoryPublicCourses(Integer amount, Long subCategoryId) {
         Pageable pageable = new PageRequest(0, amount);
         SubCategory subCategory = subCategoryRepository.findOne(subCategoryId);
-        List<Course> lastCreated = courseRepository.findLastCreatedBySubCategoryPublicCourses(subCategory, pageable);
+        List<Course> lastCreated = courseRepository.findLastCreatedBySubCategoryPublicCoursesWithStatus(subCategory, CourseStatus.APPROVED, pageable);
 
         return lastCreated;
     }
@@ -594,7 +599,7 @@ public class CourseService {
     public List<Course> fetchLastAddedBySectionPublicCourses(Integer amount, Long sectionId) {
         Pageable pageable = new PageRequest(0, amount);
         Section section = sectionRepository.findOne(sectionId);
-        List<Course> lastCreated = courseRepository.findLastCreatedBySectionPublicCourses(section, pageable);
+        List<Course> lastCreated = courseRepository.findLastCreatedBySectionPublicCoursesWithStatus(section, CourseStatus.APPROVED, pageable);
 
         return lastCreated;
     }
@@ -602,7 +607,7 @@ public class CourseService {
     public List<Course> fetchLastAddedBySubSectionPublicCourses(Integer amount, Long subSectionId) {
         Pageable pageable = new PageRequest(0, amount);
         SubSection subSection = subSectionRepository.findOne(subSectionId);
-        List<Course> lastCreated = courseRepository.findLastCreatedBySubSectionPublicCourses(subSection, pageable);
+        List<Course> lastCreated = courseRepository.findLastCreatedBySubSectionPublicCoursesWithStatus(subSection, CourseStatus.APPROVED, pageable);
 
         return lastCreated;
     }
@@ -610,7 +615,7 @@ public class CourseService {
     public List<Course> fetchBestRatedByCategoryPublicCourses(Integer amount, Long categoryId) {
         Pageable pageable = new PageRequest(0, amount);
         Category category = categoryRepository.findOne(categoryId);
-        List<Course> bestRated = courseRepository.findBestRatedByCategoryPublicCourses(category, pageable);
+        List<Course> bestRated = courseRepository.findBestRatedByCategoryPublicCoursesWithStatus(category, CourseStatus.APPROVED, pageable);
 
         return bestRated;
     }
@@ -618,7 +623,7 @@ public class CourseService {
     public List<Course> fetchBestRatedBySubCategoryPublicCourses(Integer amount, Long subCategoryId) {
         Pageable pageable = new PageRequest(0, amount);
         SubCategory subCategory = subCategoryRepository.findOne(subCategoryId);
-        List<Course> bestRated = courseRepository.findBestRatedBySubCategoryPublicCourses(subCategory, pageable);
+        List<Course> bestRated = courseRepository.findBestRatedBySubCategoryPublicCoursesWithStatus(subCategory, CourseStatus.APPROVED, pageable);
 
         return bestRated;
     }
@@ -626,7 +631,7 @@ public class CourseService {
     public List<Course> fetchBestRatedBySectionPublicCourses(Integer amount, Long sectionId) {
         Pageable pageable = new PageRequest(0, amount);
         Section section = sectionRepository.findOne(sectionId);
-        List<Course> bestRated = courseRepository.findBestRatedBySectionPublicCourses(section, pageable);
+        List<Course> bestRated = courseRepository.findBestRatedBySectionPublicCoursesWithStatus(section, CourseStatus.APPROVED, pageable);
 
         return bestRated;
     }
@@ -634,7 +639,7 @@ public class CourseService {
     public List<Course> fetchBestRatedBySubSectionPublicCourses(Integer amount, Long subSectionId) {
         Pageable pageable = new PageRequest(0, amount);
         SubSection subSection = subSectionRepository.findOne(subSectionId);
-        List<Course> bestRated = courseRepository.findBestRatedBySubSectionPublicCourses(subSection, pageable);
+        List<Course> bestRated = courseRepository.findBestRatedBySubSectionPublicCoursesWithStatus(subSection, CourseStatus.APPROVED, pageable);
 
         return bestRated;
     }
@@ -642,7 +647,7 @@ public class CourseService {
     public List<Course> fetchFeaturedByCategoryPublicCourses(Integer amount, Long categoryId) {
         Pageable pageable = new PageRequest(0, amount);
         Category category = categoryRepository.findOne(categoryId);
-        List<Course> featured = courseRepository.findFeaturedByCategoryPublicCourses(category, pageable);
+        List<Course> featured = courseRepository.findFeaturedByCategoryPublicCoursesWithStatus(category, CourseStatus.APPROVED, pageable);
 
         return featured;
     }
@@ -650,7 +655,7 @@ public class CourseService {
     public List<Course> fetchFeaturedBySubCategoryPublicCourses(Integer amount, Long subCategoryId) {
         Pageable pageable = new PageRequest(0, amount);
         SubCategory subCategory = subCategoryRepository.findOne(subCategoryId);
-        List<Course> featured = courseRepository.findFeaturedBySubCategoryPublicCourses(subCategory, pageable);
+        List<Course> featured = courseRepository.findFeaturedBySubCategoryPublicCoursesWithStatus(subCategory, CourseStatus.APPROVED, pageable);
 
         return featured;
     }
@@ -658,7 +663,7 @@ public class CourseService {
     public List<Course> fetchFeaturedBySectionPublicCourses(Integer amount, Long sectionId) {
         Pageable pageable = new PageRequest(0, amount);
         Section section = sectionRepository.findOne(sectionId);
-        List<Course> featured = courseRepository.findFeaturedBySectionPublicCourses(section, pageable);
+        List<Course> featured = courseRepository.findFeaturedBySectionPublicCoursesWithStatus(section, CourseStatus.APPROVED, pageable);
 
         return featured;
     }
@@ -666,12 +671,28 @@ public class CourseService {
     public List<Course> fetchFeaturedBySubSectionPublicCourses(Integer amount, Long subSectionId) {
         Pageable pageable = new PageRequest(0, amount);
         SubSection subSection = subSectionRepository.findOne(subSectionId);
-        List<Course> featured = courseRepository.findFeaturedBySubSectionPublicCourses(subSection, pageable);
+        List<Course> featured = courseRepository.findFeaturedBySubSectionPublicCoursesWithStatus(subSection, CourseStatus.APPROVED, pageable);
 
         return featured;
     }
 
     public Long countAllCoursesInSchool(String adminUsername) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+        return countCoursesInSchool(adminUsername, null);
+    }
+
+    public Long countPendingCoursesInSchool(String adminUsername) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+        return countCoursesInSchool(adminUsername, CourseStatus.PENDING);
+    }
+
+    public Long countDeclinedCoursesInSchool(String adminUsername) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+        return countCoursesInSchool(adminUsername, CourseStatus.DECLINE);
+    }
+
+    public Long countApprovedCoursesInSchool(String adminUsername) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+        return countCoursesInSchool(adminUsername, CourseStatus.APPROVED);
+    }
+
+    public Long countCoursesInSchool(String adminUsername, CourseStatus status) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
         User admin = userRepository.findByUsername(adminUsername);
 
         if (admin == null) {
@@ -686,12 +707,27 @@ public class CourseService {
         long coursesCount = 0;
 
         for (User school : schools) {
-            coursesCount = courseRepository.countCoursesBySchoolsIn(school);
+            if(status == null) {
+                coursesCount = courseRepository.countCoursesBySchoolsIn(school);
+            }
+
+            if(status == CourseStatus.PENDING) {
+                coursesCount = courseRepository.countCoursesBySchoolsInAndStatus(school, CourseStatus.PENDING);
+            }
+
+            if(status == CourseStatus.DECLINE) {
+                coursesCount = courseRepository.countCoursesBySchoolsInAndStatus(school, CourseStatus.DECLINE);
+            }
+
+            if(status == CourseStatus.APPROVED) {
+                coursesCount = courseRepository.countCoursesBySchoolsInAndStatus(school, CourseStatus.APPROVED);
+            }
             return coursesCount;
         }
 
         return coursesCount;
     }
+
 
     public boolean approveCourse(Long courseId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion {
         return changeCourseStatus(courseId, adminUsername, CourseStatus.APPROVED, "");
