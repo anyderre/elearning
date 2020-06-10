@@ -2,6 +2,7 @@ package com.sorbSoft.CabAcademie.Services;
 
 
 import com.sorbSoft.CabAcademie.Entities.*;
+import com.sorbSoft.CabAcademie.Entities.Enums.CourseStatus;
 import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Repository.*;
 import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CourseFactory;
@@ -9,6 +10,7 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CourseMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import com.sorbSoft.CabAcademie.annotation.NotUsed;
+import com.sorbSoft.CabAcademie.exception.CourseNotFoundExcepion;
 import com.sorbSoft.CabAcademie.exception.SchoolNotFoundExcepion;
 import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import org.mapstruct.factory.Mappers;
@@ -526,6 +528,7 @@ public class CourseService {
         resultCourse.setLastUpdate(new Date());
         if (vm.getId() <= 0) {
             resultCourse.setCreationDate(new Date());
+            resultCourse.setStatus(CourseStatus.PENDING);
         }
         return resultCourse;
     }
@@ -688,6 +691,67 @@ public class CourseService {
         }
 
         return coursesCount;
+    }
+
+    public boolean approveCourse(Long courseId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion {
+        return changeCourseStatus(courseId, adminUsername, CourseStatus.APPROVED, "");
+    }
+
+    public boolean declineCourse(Long courseId, String adminUsername, String declineMessage) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion {
+        return changeCourseStatus(courseId, adminUsername, CourseStatus.DECLINE, declineMessage);
+    }
+
+    private boolean changeCourseStatus(Long courseId, String adminUsername, CourseStatus status, String declineMessage) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion {
+        User admin = userRepository.findByUsername(adminUsername);
+        boolean isStatusChanged = false;
+
+        if (admin == null) {
+            throw new UserNotFoundExcepion("User " + adminUsername + " doesn't exist in system");
+        }
+
+        List<User> adminSchools = admin.getSchools();
+        if (adminSchools == null || adminSchools.isEmpty()) {
+            throw new SchoolNotFoundExcepion("Admin " + adminUsername + " doesn't belong to any school");
+        }
+
+        Course course2Approve = courseRepository.findOne(courseId);
+        if (course2Approve == null) {
+            throw new CourseNotFoundExcepion("Course with id: " + courseId + " was not found in db");
+        }
+
+        List<User> courseSchools = course2Approve.getSchools();
+        if (courseSchools == null || courseSchools.isEmpty()) {
+            throw new SchoolNotFoundExcepion("Course with id: " + courseId + " doesn't belong to any school");
+        }
+
+        //check if admin belong to school course
+        for(User adminSchool : adminSchools) {
+            for(User courseSchool : courseSchools) {
+                if(adminSchool.equals(courseSchool)) {
+
+                    if(status == CourseStatus.APPROVED) {
+
+                        course2Approve.setStatus(CourseStatus.APPROVED);
+                        course2Approve.setLastUpdate(new Date());
+                        courseRepository.save(course2Approve);
+                        isStatusChanged = true;
+                        return isStatusChanged;
+                    }
+
+                    if(status == CourseStatus.DECLINE) {
+
+                        course2Approve.setDeclineMessage(declineMessage);
+                        course2Approve.setStatus(CourseStatus.DECLINE);
+                        course2Approve.setLastUpdate(new Date());
+                        courseRepository.save(course2Approve);
+                        isStatusChanged = true;
+                        return isStatusChanged;
+                    }
+                }
+            }
+        }
+
+        return isStatusChanged;
     }
 
 

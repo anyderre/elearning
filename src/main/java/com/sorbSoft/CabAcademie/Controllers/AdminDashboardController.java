@@ -2,27 +2,23 @@ package com.sorbSoft.CabAcademie.Controllers;
 
 import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
-import com.sorbSoft.CabAcademie.Entities.User;
-import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.CourseService;
-import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
-import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
-import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
+import com.sorbSoft.CabAcademie.exception.CourseNotFoundExcepion;
 import com.sorbSoft.CabAcademie.exception.SchoolNotFoundExcepion;
 import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
+import com.sorbSoft.CabAcademie.payload.CourseApproveRequest;
+import com.sorbSoft.CabAcademie.payload.CourseDeclineRequest;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.security.Principal;
-import java.util.List;
 
 
 @RestController
@@ -36,9 +32,43 @@ public class AdminDashboardController {
     @Autowired
     private CourseService courseService;
 
+    @PostMapping(value = "/course/approve")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Approve course, Role:ROLE_ADMIN")
+    public ResponseEntity<MessageResponse> approveCourse(@Valid @RequestBody CourseApproveRequest approveRq, Principal principal) throws CourseNotFoundExcepion, UserNotFoundExcepion, SchoolNotFoundExcepion {
+
+        if (approveRq.getCourseId() == null || approveRq.getCourseId() <= 0 || principal == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        boolean isApproved = courseService.approveCourse(approveRq.getCourseId(), principal.getName());
+
+        if(isApproved) {
+            return new ResponseEntity<>(MessageResponse.of("Course has been Approved"), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(MessageResponse.of("Not Approved. Probably Admin's and Course's schools do not match"), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PostMapping(value = "/course/decline")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Decline course, Role:ROLE_ADMIN")
+    public ResponseEntity<MessageResponse> declineCourse(@Valid @RequestBody CourseDeclineRequest declineRq, Principal principal) throws CourseNotFoundExcepion, UserNotFoundExcepion, SchoolNotFoundExcepion {
+
+        if (declineRq.getCourseId() == null || declineRq.getCourseId() <= 0 || principal == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        boolean isApproved = courseService.declineCourse(declineRq.getCourseId(), principal.getName(), declineRq.getDeclineMessage());
+
+        if(isApproved) {
+            return new ResponseEntity<>(MessageResponse.of("Course has been Declined"), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(MessageResponse.of("Course Not Declined. Probably Admin's and Course's schools do not match"), HttpStatus.NOT_FOUND);
+        }
+    }
+
     @GetMapping(value = "/school/students/count/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @ApiOperation(value = "Count students in School. Statuses: all")
+    @ApiOperation(value = "Count students in School. Statuses: all, Role:ROLE_ADMIN")
     public ResponseEntity<Long> getStudentsAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
         if (principal == null)
@@ -53,7 +83,7 @@ public class AdminDashboardController {
 
     @GetMapping(value = "/school/professors/count/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @ApiOperation(value = "Count professors in School. Statuses: all")
+    @ApiOperation(value = "Count professors in School. Statuses: all, Role:ROLE_ADMIN")
     public ResponseEntity<Long> getProfessorAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
         if (principal == null)
@@ -68,7 +98,7 @@ public class AdminDashboardController {
 
     @GetMapping(value = "/school/courses/count/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @ApiOperation(value = "Count courses in School. Statuses: all")
+    @ApiOperation(value = "Count courses in School. Statuses: all, Role:ROLE_ADMIN")
     public ResponseEntity<Long> getCoursesAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
         if (principal == null)

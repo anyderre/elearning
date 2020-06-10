@@ -1,6 +1,7 @@
 package com.sorbSoft.CabAcademie.Controllers.exception;
 
 
+import com.sorbSoft.CabAcademie.exception.CourseNotFoundExcepion;
 import com.sorbSoft.CabAcademie.exception.EntityNotFoundException;
 
 import com.sorbSoft.CabAcademie.model.error.ApiError;
@@ -35,7 +36,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
-
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
         String error = ex.getMessage();
@@ -44,8 +44,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+
     @ExceptionHandler(SchoolNotFoundExcepion.class)
     protected ResponseEntity<Object> handleSchoolNotFoundExcepion(SchoolNotFoundExcepion ex) {
+        String error = ex.getMessage();
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
+        apiError.setMessage(error);
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(CourseNotFoundExcepion.class)
+    protected ResponseEntity<Object> handleCourseNotFoundExcepion(CourseNotFoundExcepion ex) {
         String error = ex.getMessage();
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
         apiError.setMessage(error);
