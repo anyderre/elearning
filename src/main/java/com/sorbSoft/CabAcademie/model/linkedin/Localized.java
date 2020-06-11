@@ -1,25 +1,15 @@
 package com.sorbSoft.CabAcademie.model.linkedin;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
 
+@Data
 public class Localized{
 
 	@JsonProperty("en_US")
 	private String enUS;
 
-	public void setEnUS(String enUS){
-		this.enUS = enUS;
-	}
+	@JsonProperty("ru_RU")
+	private String ruRu;
 
-	public String getEnUS(){
-		return enUS;
-	}
-
-	@Override
- 	public String toString(){
-		return 
-			"Localized{" + 
-			"en_US = '" + enUS + '\'' + 
-			"}";
-		}
 }

@@ -297,6 +297,7 @@ public class JwtAuthenticationController {
             if(userDetails == null) { //signup
 
                 Rol freeStudent = new Rol();
+                freeStudent.setId(6L);
                 freeStudent.setRole(Roles.ROLE_FREE_STUDENT);
 
                 UserViewModel user = new UserViewModel();
@@ -312,6 +313,7 @@ public class JwtAuthenticationController {
 
                 user.setPhotoURL(userInfo.getProfilePictureUrl());
                 user.setTimeZone(socialRequest.getUserTimeZone());
+                user.setPassword(userInfo.getEmailAddress()+userInfo.getFirstName());
 
 
                 Result result = userService.saveSocialUser(user);
@@ -319,21 +321,34 @@ public class JwtAuthenticationController {
                     return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
 
                 userDetails = userDetailsService.loadUserByUsername(userInfo.getEmailAddress());
-                //TODO: add to security context
+
                 token = jwtTokenUtil.generateToken(userDetails);
 
-                SocialResponse socialResponse = (SocialResponse) result.getValue();
-                socialResponse.setToken(token);
+                com.sorbSoft.CabAcademie.Entities.User userbyUsername = userService.findUserbyUsername(userInfo.getEmailAddress());
 
-                log.debug("linkedin user has been registered: ", socialResponse);
+                SocialResponse socialResponse = new SocialResponse();
+                socialResponse.setUser(userbyUsername);
+                socialResponse.setToken(token);
+                socialResponse.setType("Registration");
+
+                log.debug("Linkedin user has been registered: ", socialResponse);
                 return ResponseEntity.ok(socialResponse);
 
             } else {
-                //login
+                log.debug("User with "+ userInfo.getEmailAddress() +" email already exist in db");
+
+                com.sorbSoft.CabAcademie.Entities.User userbyUsername = userService.findUserbyUsername(userInfo.getEmailAddress());
+
                 token = jwtTokenUtil.generateToken(userDetails);
-                //TODO: add to security context
+
+                SocialResponse socialResponse = new SocialResponse();
+                socialResponse.setUser(userbyUsername);
+                socialResponse.setToken(token);
+                socialResponse.setType("Login");
+
+                log.debug("Linkedin user has been logged In: ", socialResponse);
                 //success
-                return ResponseEntity.ok(new JwtResponse(token));
+                return ResponseEntity.ok(socialResponse);
             }
 
         } else {
