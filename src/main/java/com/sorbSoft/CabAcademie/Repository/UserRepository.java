@@ -37,4 +37,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findUsersByWorkspaceName(String workspaceName);
 
     long countUsersByRoleAndSchoolsIn(Rol role, User school);
+
+    long countUsersByRoleAndSchoolsIsNull(Rol role);
 }

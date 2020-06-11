@@ -157,6 +157,16 @@ public class UserServices {
 
     }
 
+    public long countFreeUsersByRole(Roles role) {
+
+        Rol studentRole = rolRepository.findByDescription(role.toString());
+
+        long studentCount = userRepository.countUsersByRoleAndSchoolsIsNull(studentRole);
+
+        return studentCount;
+
+    }
+
     public long countUsersInSchoolByRole(String adminUsername, Roles role) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
         User admin = userRepository.findByUsername(adminUsername);

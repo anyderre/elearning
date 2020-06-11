@@ -44,6 +44,9 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("select c from Course c where c.schools IS EMPTY and c.status=?1 and c.deleted=false order by c.creationDate desc")
     List<Course> findLastCreatedPublicCoursesWithStatus(CourseStatus status, Pageable pageable);
 
+    @Query("select c from Course c where c.schools IS EMPTY and c.deleted=false order by c.creationDate desc")
+    List<Course> findLastCreatedPublicCoursesWithAnyStatus(Pageable pageable);
+
    //private
     List<Course> findLastCreatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(CourseStatus status, User school, Pageable pageable);
 
@@ -103,4 +106,8 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     long countCoursesBySchoolsIn(User school);
     long countCoursesBySchoolsInAndStatus(User school, CourseStatus status);
+
+    long countCoursesBySchoolsIsNull();
+
+    long countCoursesBySchoolsIsNullAndStatus(CourseStatus status);
 }

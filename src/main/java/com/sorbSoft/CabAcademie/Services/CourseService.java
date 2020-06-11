@@ -538,8 +538,19 @@ public class CourseService {
 
     public List<Course> fetchLastAddedPublicCourses(int amount) {
 
+        return fetchLastAddedPublicCoursesByStatus(amount, CourseStatus.APPROVED);
+    }
+
+    public List<Course> fetchLastAddedPublicCoursesByStatus(int amount, CourseStatus status) {
+
         Pageable pageable = new PageRequest(0, amount);
-        List<Course> lastCreated = courseRepository.findLastCreatedPublicCoursesWithStatus(CourseStatus.APPROVED, pageable);
+        List<Course> lastCreated = null;
+
+        if(status == null) {
+            lastCreated = courseRepository.findLastCreatedPublicCoursesWithAnyStatus(pageable);
+        } else {
+            lastCreated = courseRepository.findLastCreatedPublicCoursesWithStatus(status, pageable);
+        }
 
         return lastCreated;
     }
@@ -562,7 +573,7 @@ public class CourseService {
 
         for(User schoolOrOrganization : schoolsAndOrganizations) {
             if(status == null) {
-                //fetch sll statuses
+                //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
                         findLastCreatedPrivateCoursesByDeletedFalseAndSchoolsInOrderByCreationDateDesc(
                                 schoolOrOrganization,
@@ -583,6 +594,8 @@ public class CourseService {
 
         return courses;
     }
+
+
 
     public List<Course> fetchBestRatedPublicCourses(int amount) {
         Pageable pageable = new PageRequest(0, amount);
@@ -747,6 +760,48 @@ public class CourseService {
     }
 
 
+    public boolean approveCourse(Long courseId) throws CourseNotFoundExcepion {
+        return changeCourseStatus(courseId, CourseStatus.APPROVED, "");
+    }
+
+    public boolean declineCourse(Long courseId, String declineMessage) throws CourseNotFoundExcepion {
+        return changeCourseStatus(courseId, CourseStatus.DECLINED, declineMessage);
+    }
+
+    private boolean changeCourseStatus(Long courseId, CourseStatus status, String declineMessage) throws CourseNotFoundExcepion {
+
+        boolean isStatusChanged = false;
+
+        Course course2Approve = courseRepository.findOne(courseId);
+        if (course2Approve == null) {
+            throw new CourseNotFoundExcepion("Course with id: " + courseId + " was not found in db");
+        }
+
+        if(status == CourseStatus.APPROVED) {
+
+            course2Approve.setStatus(CourseStatus.APPROVED);
+            course2Approve.setLastUpdate(new Date());
+            courseRepository.save(course2Approve);
+            isStatusChanged = true;
+            return isStatusChanged;
+        }
+
+        if(status == CourseStatus.DECLINED) {
+
+            course2Approve.setDeclineMessage(declineMessage);
+            course2Approve.setStatus(CourseStatus.DECLINED);
+            course2Approve.setLastUpdate(new Date());
+            courseRepository.save(course2Approve);
+            isStatusChanged = true;
+            return isStatusChanged;
+        }
+
+
+        return isStatusChanged;
+    }
+
+
+
     public boolean approveCourse(Long courseId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion {
         return changeCourseStatus(courseId, adminUsername, CourseStatus.APPROVED, "");
     }
@@ -824,6 +879,47 @@ public class CourseService {
         }
 
         return new ArrayList<>();
+    }
+
+    public Long countAllPublicCourses() {
+        return countPublicCourses(null);
+    }
+
+    public long countApprovedPublicCourses(){
+        return countPublicCourses(CourseStatus.APPROVED);
+    }
+
+    public long countDeclinedPublicCourses(){
+        return countPublicCourses(CourseStatus.DECLINED);
+    }
+
+    public long countPendingPublicCourses(){
+        return countPublicCourses(CourseStatus.PENDING);
+    }
+
+    public Long countPublicCourses(CourseStatus status) {
+
+        long coursesCount = 0;
+
+
+            if(status == null) {
+                return courseRepository.countCoursesBySchoolsIsNull();
+            }
+
+            if(status == CourseStatus.PENDING) {
+                return courseRepository.countCoursesBySchoolsIsNullAndStatus(CourseStatus.PENDING);
+            }
+
+            if(status == CourseStatus.DECLINED) {
+                return courseRepository.countCoursesBySchoolsIsNullAndStatus(CourseStatus.DECLINED);
+            }
+
+            if(status == CourseStatus.APPROVED) {
+                return courseRepository.countCoursesBySchoolsIsNullAndStatus(CourseStatus.APPROVED);
+            }
+
+
+        return coursesCount;
     }
 
 
