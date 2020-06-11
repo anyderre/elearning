@@ -7,6 +7,7 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
+import com.sorbSoft.CabAcademie.exception.WorkspaceNameIsAlreadyTaken;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,7 +99,7 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    private ResponseEntity<MessageResponse> saveUser(UserViewModel user) {
+    private ResponseEntity<MessageResponse> saveUser(UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
         if (userRepository.existsByUsernameAndIdIsNot(user.getUsername(), user.getId())) {
             return ResponseEntity
                     .badRequest()
@@ -119,28 +120,28 @@ public class UserController {
 
 
     @PostMapping("/saveStudent")
-    public  ResponseEntity<MessageResponse> saveStudent(@Valid @RequestBody UserViewModel user){
+    public  ResponseEntity<MessageResponse> saveStudent(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
         return saveUser(user);
     }
 
     @PostMapping("/saveOrganization")
-    public  ResponseEntity<MessageResponse> saveOrganization(@Valid @RequestBody UserViewModel user){
+    public  ResponseEntity<MessageResponse> saveOrganization(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
         return saveUser(user);
     }
 
 
     @PostMapping("/saveSchool")
-    public  ResponseEntity<MessageResponse> saveSchool(@Valid @RequestBody UserViewModel user){
+    public  ResponseEntity<MessageResponse> saveSchool(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
         return saveUser(user);
     }
 
     @PostMapping("/saveTeacher")
-    public  ResponseEntity<MessageResponse> saveTeacher(@Valid @RequestBody UserViewModel user){
+    public  ResponseEntity<MessageResponse> saveTeacher(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
         return saveUser(user);
     }
 
     @PostMapping("/save")
-    public  ResponseEntity<MessageResponse> saveOtherUser(@Valid @RequestBody UserViewModel user){
+    public  ResponseEntity<MessageResponse> saveOtherUser(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
         return saveUser(user);
     }
 

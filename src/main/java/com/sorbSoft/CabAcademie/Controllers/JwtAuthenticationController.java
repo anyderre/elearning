@@ -14,6 +14,7 @@ import com.sorbSoft.CabAcademie.Services.JwtUserDetailsService;
 import com.sorbSoft.CabAcademie.Services.LinkedinOAuth2Service;
 import com.sorbSoft.CabAcademie.Services.UserServices;
 import com.sorbSoft.CabAcademie.config.JwtTokenUtil;
+import com.sorbSoft.CabAcademie.exception.WorkspaceNameIsAlreadyTaken;
 import com.sorbSoft.CabAcademie.model.linkedin.LinkedinUserProfile;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -111,7 +112,7 @@ public class JwtAuthenticationController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something wrong in Server")})
-    public ResponseEntity<?> facebookSignUp(@Valid @RequestBody SocialRequest socialRequest) {
+    public ResponseEntity<?> facebookSignUp(@Valid @RequestBody SocialRequest socialRequest) throws WorkspaceNameIsAlreadyTaken {
         String token = null;
         log.debug("FB signup started");
         Facebook facebook = new FacebookTemplate(socialRequest.getAccessToken());
@@ -195,7 +196,7 @@ public class JwtAuthenticationController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something wrong in Server")})
-    public ResponseEntity<?> googleAuth(@Valid @RequestBody SocialRequest socialRequest) {
+    public ResponseEntity<?> googleAuth(@Valid @RequestBody SocialRequest socialRequest) throws WorkspaceNameIsAlreadyTaken {
         String token = null;
         log.debug("Google signup started");
         Google google = new GoogleTemplate(socialRequest.getAccessToken());
@@ -278,7 +279,7 @@ public class JwtAuthenticationController {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "Something wrong in Server")})
-    public ResponseEntity<?> linkedinAuth(@Valid @RequestBody SocialRequest socialRequest) throws JsonProcessingException {
+    public ResponseEntity<?> linkedinAuth(@Valid @RequestBody SocialRequest socialRequest) throws JsonProcessingException, WorkspaceNameIsAlreadyTaken {
         String token = null;
         log.debug("Linkedin signup started");
         LinkedinUserProfile userInfo = linkedin.fetchUserProfile(socialRequest.getAccessToken());

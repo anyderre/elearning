@@ -1,13 +1,9 @@
 package com.sorbSoft.CabAcademie.Controllers.exception;
 
 
-import com.sorbSoft.CabAcademie.exception.CourseNotFoundExcepion;
-import com.sorbSoft.CabAcademie.exception.EntityNotFoundException;
+import com.sorbSoft.CabAcademie.exception.*;
 
 import com.sorbSoft.CabAcademie.model.error.ApiError;
-
-import com.sorbSoft.CabAcademie.exception.SchoolNotFoundExcepion;
-import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.Ordered;
@@ -99,6 +95,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
         apiError.setMessage(error);
         apiError.setDebugMessage(debugError);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(WorkspaceNameIsAlreadyTaken.class)
+    protected ResponseEntity<Object> handleWorkspaceNameIsAlreadyTaken(WorkspaceNameIsAlreadyTaken ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
 
         return buildResponseEntity(apiError);
     }

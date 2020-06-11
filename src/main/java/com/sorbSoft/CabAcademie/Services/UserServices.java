@@ -11,6 +11,7 @@ import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
 import com.sorbSoft.CabAcademie.exception.SchoolNotFoundExcepion;
 import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
+import com.sorbSoft.CabAcademie.exception.WorkspaceNameIsAlreadyTaken;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -58,7 +59,7 @@ public class UserServices {
     private UserMapper mapper
             = Mappers.getMapper(UserMapper.class);
 
-    public Result saveUser (UserViewModel vm){
+    public Result saveUser (UserViewModel vm) throws WorkspaceNameIsAlreadyTaken {
         vm = prepareEntity(vm);
         Result result = ValidateModel(vm);
         if (!result.isValid()) {
@@ -96,7 +97,7 @@ public class UserServices {
         return result;
     }
 
-    public Result saveSocialUser(UserViewModel vm) {
+    public Result saveSocialUser(UserViewModel vm) throws WorkspaceNameIsAlreadyTaken {
 
         Result result = new Result();
         result = saveUser(vm);
@@ -305,7 +306,7 @@ public class UserServices {
         return info;
     }
 
-    private Result ValidateModel(UserViewModel vm){
+    private Result ValidateModel(UserViewModel vm) throws WorkspaceNameIsAlreadyTaken {
         Result result = new Result();
 
         if (vm.getRole().getId() <= 0) {
@@ -331,6 +332,10 @@ public class UserServices {
             if (vm.getWorkspaceName().trim().length() < 2) {
                 result.add("You should specify at least two characters for the workspace name");
                 return result;
+            }
+            List<User> schools = userRepository.findUsersByWorkspaceName(vm.getWorkspaceName());
+            if(schools!=null || !schools.isEmpty() || schools.size()!=0) {
+                throw new WorkspaceNameIsAlreadyTaken("Workspace name '"+vm.getWorkspaceName()+"' is already taken");
             }
         }
         if (vm.getUsername().isEmpty()) {
