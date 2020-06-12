@@ -6,9 +6,7 @@ import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Services.CourseService;
 import com.sorbSoft.CabAcademie.Services.UserServices;
-import com.sorbSoft.CabAcademie.exception.CourseNotFoundExcepion;
-import com.sorbSoft.CabAcademie.exception.SchoolNotFoundExcepion;
-import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
+import com.sorbSoft.CabAcademie.exception.*;
 import com.sorbSoft.CabAcademie.payload.CourseApproveRequest;
 import com.sorbSoft.CabAcademie.payload.CourseDeclineRequest;
 import io.swagger.annotations.ApiOperation;
@@ -82,8 +80,6 @@ public class AdminDashboardController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Long studentsCount = userService.countUsersInSchoolByRole(principal.getName(), Roles.ROLE_STUDENT);
-        if (studentsCount == null || studentsCount <= 0)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(studentsCount, HttpStatus.OK);
     }
@@ -97,8 +93,6 @@ public class AdminDashboardController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Long professorsCount = userService.countUsersInSchoolByRole(principal.getName(), Roles.ROLE_PROFESSOR);
-        if (professorsCount == null || professorsCount <= 0)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(professorsCount, HttpStatus.OK);
     }
@@ -112,8 +106,6 @@ public class AdminDashboardController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Long coursesCount = courseService.countAllCoursesInSchool(principal.getName());
-        if (coursesCount == null || coursesCount <= 0)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(coursesCount, HttpStatus.OK);
     }
@@ -127,8 +119,6 @@ public class AdminDashboardController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Long coursesCount = courseService.countApprovedCoursesInSchool(principal.getName());
-        if (coursesCount == null || coursesCount <= 0)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(coursesCount, HttpStatus.OK);
     }
@@ -142,8 +132,6 @@ public class AdminDashboardController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Long coursesCount = courseService.countDeclinedCoursesInSchool(principal.getName());
-        if (coursesCount == null || coursesCount <= 0)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(coursesCount, HttpStatus.OK);
     }
@@ -157,8 +145,6 @@ public class AdminDashboardController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         Long coursesCount = courseService.countPendingCoursesInSchool(principal.getName());
-        if (coursesCount == null || coursesCount <= 0)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity<>(coursesCount, HttpStatus.OK);
     }
@@ -190,4 +176,431 @@ public class AdminDashboardController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
 
     }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses in School, Status: all, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesAnyStatus(
+            @PathVariable Integer amount,
+            Principal principal) {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.getLastAddedPrivateCoursesAnyStatus(amount, principal.getName());
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/pending" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses in School, Status: PENDING, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesWithStatusPending(
+            @PathVariable Integer amount,
+            Principal principal) {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.getLastAddedPrivateCoursesPending(amount, principal.getName());
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/approved" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses in School, Status: APPROVED, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesWithStatusApproved(
+            @PathVariable Integer amount,
+            Principal principal) {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.getLastAddedPrivateCoursesApproved(amount, principal.getName());
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/declined" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses in School, Status: DECLINED, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesWithStatusDeclined(
+            @PathVariable Integer amount,
+            Principal principal) {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.getLastAddedPrivateCoursesDeclined(amount, principal.getName());
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    //START: Last Added By Category
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/category/{categoryId}/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses By Category in School, Status: all, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesByCategoryAnyStatus(
+            @PathVariable Integer amount,
+            @PathVariable Long categoryId,
+            Principal principal) throws CategoryNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesByCategoryAndStatus(amount, principal.getName(), categoryId, null);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/category/{categoryId}/pending" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses By Category in School, Status: PENDING, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesByCategoryWithStatusPending(
+            @PathVariable Integer amount,
+            @PathVariable Long categoryId,
+            Principal principal) throws CategoryNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesByCategoryAndStatus(amount, principal.getName(), categoryId, CourseStatus.PENDING);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/category/{categoryId}/approved" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses By Category in School, Status: APPROVED, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesByCategoryWithStatusApproved(
+            @PathVariable Integer amount,
+            @PathVariable Long categoryId,
+            Principal principal) throws CategoryNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesByCategoryAndStatus(amount, principal.getName(), categoryId, CourseStatus.APPROVED);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/category/{categoryId}/declined" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses by Category in School, Status: DECLINED, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesByCategoryWithStatusDeclined(
+            @PathVariable Integer amount,
+            @PathVariable Long categoryId,
+            Principal principal)
+            throws CategoryNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesByCategoryAndStatus(amount, principal.getName(), categoryId, CourseStatus.DECLINED);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    //END: Last Added By Category
+
+    //START: Last Added By SubCategory
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/subCategory/{subCategoryId}/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses By SubCategory in School, Status: all, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesBySubCategoryAnyStatus(
+            @PathVariable Integer amount,
+            @PathVariable Long subCategoryId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubCategoryNotFoundException {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesBySubCategoryAndStaus(amount, principal.getName(), subCategoryId, null);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/subCategory/{subCategoryId}/pending" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses By SubCategory in School, Status: PENDING, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesBySubCategoryWithStatusPending(
+            @PathVariable Integer amount,
+            @PathVariable Long subCategoryId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubCategoryNotFoundException {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesBySubCategoryAndStaus(amount, principal.getName(), subCategoryId, CourseStatus.PENDING);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/subCategory/{subCategoryId}/approved" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses By SubCategory in School, Status: APPROVED, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesBySubCategoryWithStatusApproved(
+            @PathVariable Integer amount,
+            @PathVariable Long subCategoryId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubCategoryNotFoundException {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesBySubCategoryAndStaus(amount, principal.getName(), subCategoryId, CourseStatus.APPROVED);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/subCategory/{subCategoryId}/declined" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses by SubCategory in School, Status: DECLINED, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesBySubCategoryWithStatusDeclined(
+            @PathVariable Integer amount,
+            @PathVariable Long subCategoryId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubCategoryNotFoundException {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesBySubCategoryAndStaus(amount, principal.getName(), subCategoryId, CourseStatus.DECLINED);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+    //END: Last Added By SubCategory
+
+
+    //START: Last Added By Section
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/section/{sectionId}/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses By Section in School, Status: all, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesBySectionAnyStatus(
+            @PathVariable Integer amount,
+            @PathVariable Long sectionId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SectionNotFoundException {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesBySectionAndStatus(amount, principal.getName(), sectionId, null);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/section/{sectionId}/pending" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses By Section in School, Status: PENDING, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesBySectionWithStatusPending(
+            @PathVariable Integer amount,
+            @PathVariable Long sectionId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SectionNotFoundException {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesBySectionAndStatus(amount, principal.getName(), sectionId, CourseStatus.PENDING);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/section/{sectionId}/approved" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses By Section in School, Status: APPROVED, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesBySectionWithStatusApproved(
+            @PathVariable Integer amount,
+            @PathVariable Long sectionId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SectionNotFoundException {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesBySectionAndStatus(amount, principal.getName(), sectionId, CourseStatus.APPROVED);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/section/{sectionId}/declined" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses by Section in School, Status: DECLINED, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesBySectionWithStatusDeclined(
+            @PathVariable Integer amount,
+            @PathVariable Long sectionId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SectionNotFoundException {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesBySectionAndStatus(amount, principal.getName(), sectionId, CourseStatus.DECLINED);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+    //START: Last Added By Section
+
+    //START: Last Added By SubSection
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/subSection/{subSectionId}/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses By SubSection in School, Status: all, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesBySubSectionAnyStatus(
+            @PathVariable Integer amount,
+            @PathVariable Long subSectionId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubSectionNotFoundException {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesBySubSectionAndStatus(amount, principal.getName(), subSectionId, null);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/subSection/{subSectionId}/pending" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses By SubSection in School, Status: PENDING, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesBySubSectionWithStatusPending(
+            @PathVariable Integer amount,
+            @PathVariable Long subSectionId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubSectionNotFoundException {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesBySubSectionAndStatus(amount, principal.getName(), subSectionId, CourseStatus.PENDING);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/subSection/{subSectionId}/approved" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses By SubSection in School, Status: APPROVED, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesBySubSectionWithStatusApproved(
+            @PathVariable Integer amount,
+            @PathVariable Long subSectionId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubSectionNotFoundException {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesBySubSectionAndStatus(amount, principal.getName(), subSectionId, CourseStatus.APPROVED);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+
+    @GetMapping(value = "/school/courses/lastCreated/{amount}/subSection/{subSectionId}/declined" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get Last Created Courses by SubSection in School, Status: DECLINED, Role:ROLE_ADMIN")
+    public ResponseEntity<List<Course>> getLastAddedPrivateCoursesBySubSectionWithStatusDeclined(
+            @PathVariable Integer amount,
+            @PathVariable Long subSectionId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubSectionNotFoundException {
+
+        log.debug("Principal username:"+principal.getName());
+
+
+        if(amount<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<Course> courses = courseService.fetchLastAddedPrivateCoursesBySubSectionAndStatus(amount, principal.getName(), subSectionId, CourseStatus.DECLINED);
+        if(courses == null || courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+
+    }
+    //START: Last Added By SubSection
 }

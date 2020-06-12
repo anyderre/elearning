@@ -861,6 +861,22 @@ public class CourseService {
         return isStatusChanged;
     }
 
+    public List<Course> getLastAddedPrivateCoursesAnyStatus(Integer amount, String userName) {
+        return fetchLastAddedPrivateCoursesByStatus(amount, userName, null);
+    }
+
+    public List<Course> getLastAddedPrivateCoursesApproved(Integer amount, String userName) {
+        return fetchLastAddedPrivateCoursesByStatus(amount, userName, CourseStatus.APPROVED);
+    }
+
+    public List<Course> getLastAddedPrivateCoursesDeclined(Integer amount, String userName) {
+        return fetchLastAddedPrivateCoursesByStatus(amount, userName, CourseStatus.DECLINED);
+    }
+
+    public List<Course> getLastAddedPrivateCoursesPending(Integer amount, String userName) {
+        return fetchLastAddedPrivateCoursesByStatus(amount, userName, CourseStatus.PENDING);
+    }
+
     public List<Course> getLastAddedPrivateCoursesByStatus(Integer amount, String userName, String status) {
 
         if(status.equalsIgnoreCase("all")){
