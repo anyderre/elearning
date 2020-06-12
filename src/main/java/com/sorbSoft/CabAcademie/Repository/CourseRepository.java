@@ -114,6 +114,26 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findBestRatedBySubSectionPublicCoursesWithStatus(SubSection subSection, CourseStatus status, Pageable pageable);
 
 
+    //private featured courses
+    List<Course> findFeaturedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(CourseStatus status, User school, Pageable pageable);
+
+    List<Course> findFeaturedPrivateCoursesByCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(Category category, CourseStatus status, User school, Pageable pageable);
+
+    List<Course> findFeaturedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(Category category, User school, Pageable pageable);
+
+    List<Course> findFeaturedPrivateCoursesBySubCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(SubCategory subCategory, CourseStatus status, User school, Pageable pageable);
+
+    List<Course> findFeaturedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(SubCategory subCategory, User school, Pageable pageable);
+
+    List<Course> findFeaturedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(Section section, User school, Pageable pageable);
+
+    List<Course> findFeaturedPrivateCoursesBySectionAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(Section section, CourseStatus status, User school, Pageable pageable);
+
+    List<Course> findFeaturedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(SubSection subSection, User school, Pageable pageable);
+
+    List<Course> findFeaturedPrivateCoursesBySubSectionAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(SubSection subSection, CourseStatus status, User school, Pageable pageable);
+
+    List<Course> findFeaturedPrivateCoursesByDeletedFalseAndSchoolsInOrderByEnrolledDesc(User school, Pageable pageable);
     /*
          find featured
       */

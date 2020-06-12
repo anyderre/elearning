@@ -1310,6 +1310,247 @@ public class CourseService {
         return fetchBestRatedPrivateCoursesByStatusAndSubSection(amount, userName, subSectionId, CourseStatus.APPROVED);
     }
 
+    public List<Course> fetchFeaturedPrivateCoursesByStatus(Integer amount, String userName, CourseStatus status) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+            if(status == null) {
+                //fetch courses with any status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findFeaturedPrivateCoursesByDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+
+            } else {
+                //find by status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findFeaturedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                                status,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+            }
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchFeaturedPrivateCourses(Integer amount, String userName) throws UserNotFoundExcepion, SchoolNotFoundExcepion {
+        return fetchFeaturedPrivateCoursesByStatus(amount, userName, CourseStatus.APPROVED);
+    }
+
+    public List<Course> fetchFeaturedPrivateCoursesByStatusAndCategory(Integer amount, String userName, Long categoryId, CourseStatus status) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CategoryNotFoundException {
+
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        Category category = categoryRepository.getOne(categoryId);
+
+        if(category == null) {
+            throw new CategoryNotFoundException("Category with id:"+categoryId+" was not found");
+        }
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+            if(status == null) {
+                //fetch courses with any status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findFeaturedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                                category,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+
+            } else {
+                //find by status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findFeaturedPrivateCoursesByCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                                category,
+                                status,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+            }
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchFeaturedByCategoryPrivateCourses(Integer amount, Long categoryId, String userName) throws CategoryNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        return fetchFeaturedPrivateCoursesByStatusAndCategory(amount, userName, categoryId, CourseStatus.APPROVED);
+    }
+
+    public List<Course> fetchFeaturedPrivateCoursesByStatusAndSubCategory(Integer amount, String userName, Long subCategoryId, CourseStatus status) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubCategoryNotFoundException {
+
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        SubCategory subCategory = subCategoryRepository.getOne(subCategoryId);
+
+        if(subCategory == null) {
+            throw new SubCategoryNotFoundException("SubCategory with id:"+subCategoryId+" was not found");
+        }
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+            if(status == null) {
+                //fetch courses with any status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findFeaturedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                                subCategory,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+
+            } else {
+                //find by status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findFeaturedPrivateCoursesBySubCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                                subCategory,
+                                status,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+            }
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchFeaturedBySubCategoryPrivateCourses(Integer amount, Long subCategoryId, String userName) throws SubCategoryNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        return fetchFeaturedPrivateCoursesByStatusAndSubCategory(amount, userName, subCategoryId, CourseStatus.APPROVED);
+    }
+
+    public List<Course> fetchFeaturedPrivateCoursesByStatusAndSection(Integer amount, String userName, Long sectionId, CourseStatus status) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SectionNotFoundException {
+
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        Section section = sectionRepository.getOne(sectionId);
+
+        if(section == null) {
+            throw new SectionNotFoundException("Section with id:"+sectionId+" was not found");
+        }
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+            if(status == null) {
+                //fetch courses with any status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findFeaturedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                                section,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+
+            } else {
+                //find by status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findFeaturedPrivateCoursesBySectionAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                                section,
+                                status,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+            }
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchFeaturedBySectionPrivateCourses(Integer amount, Long sectionId, String userName) throws SectionNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        return fetchFeaturedPrivateCoursesByStatusAndSection(amount, userName, sectionId, CourseStatus.APPROVED);
+    }
+
+    public List<Course> fetchFeaturedPrivateCoursesByStatusAndSubSection(Integer amount, String userName, Long subSectionId, CourseStatus status) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubSectionNotFoundException {
+
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        SubSection subSection = subSectionRepository.getOne(subSectionId);
+
+        if(subSection == null) {
+            throw new SubSectionNotFoundException("SubSection with id:"+subSectionId+" was not found");
+        }
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+            if(status == null) {
+                //fetch courses with any status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findFeaturedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                                subSection,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+
+            } else {
+                //find by status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findFeaturedPrivateCoursesBySubSectionAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                                subSection,
+                                status,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+            }
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchFeaturedBySubSectionPrivateCourses(Integer amount, Long subSectionId, String userName) throws SubSectionNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        return fetchFeaturedPrivateCoursesByStatusAndSubSection(amount, userName, subSectionId, CourseStatus.APPROVED);
+    }
+
 
     // TODO: Update number of enrolled
     // TODO: Update rating

@@ -263,64 +263,84 @@ public class CoursePrivateController {
 
 
 
-    @GetMapping(value = "/featured/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get Featured Public Courses by Amount")
-    public ResponseEntity<List<Course>> getFeaturedCoursesPublicCourses(@PathVariable Integer amount) {
+    @GetMapping(value = "/private/featured/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Featured Private Courses by Amount")
+    public ResponseEntity<List<Course>> getFeaturedCoursesPrivateCourses(
+            @PathVariable Integer amount,
+            Principal principal)
+            throws UserNotFoundExcepion, SchoolNotFoundExcepion {
+
         if(amount<=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchFeaturedPublicCourses(amount);
+        List<Course> courses = courseService.fetchFeaturedPrivateCourses(amount, principal.getName());
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/featured/{amount}/category/{categoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get Featured Public Courses by Amount and Category ID")
-    public ResponseEntity<List<Course>> getFeaturedByCategoryPublicCourses(@PathVariable Integer amount, @PathVariable Long categoryId) {
+    @GetMapping(value = "/private/featured/{amount}/category/{categoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Featured Private Courses by Amount and Category ID")
+    public ResponseEntity<List<Course>> getFeaturedByCategoryPrivateCourses(
+            @PathVariable Integer amount,
+            @PathVariable Long categoryId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CategoryNotFoundException {
+
         if(amount<=0 || categoryId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchFeaturedByCategoryPublicCourses(amount, categoryId);
+        List<Course> courses = courseService.fetchFeaturedByCategoryPrivateCourses(amount, categoryId, principal.getName());
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
 
     }
 
-    @GetMapping(value = "/featured/{amount}/subCategory/{subCategoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get Featured Public Courses by Amount and Sub Category ID")
-    public ResponseEntity<List<Course>> getFeaturedBySubCategoryPublicCourses(@PathVariable Integer amount, @PathVariable Long subCategoryId) {
+    @GetMapping(value = "/private/featured/{amount}/subCategory/{subCategoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Featured Private Courses by Amount and Sub Category ID")
+    public ResponseEntity<List<Course>> getFeaturedBySubCategoryPrivateCourses(
+            @PathVariable Integer amount,
+            @PathVariable Long subCategoryId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubCategoryNotFoundException {
+
         if(amount<=0 || subCategoryId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchFeaturedBySubCategoryPublicCourses(amount, subCategoryId);
+        List<Course> courses = courseService.fetchFeaturedBySubCategoryPrivateCourses(amount, subCategoryId, principal.getName());
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
 
     }
 
-    @GetMapping(value = "/featured/{amount}/section/{sectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get Featured Public Courses by Amount and Section ID")
-    public ResponseEntity<List<Course>> getFeaturedBySectionPublicCourses(@PathVariable Integer amount, @PathVariable Long sectionId) {
+    @GetMapping(value = "/private/featured/{amount}/section/{sectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Featured Private Courses by Amount and Section ID")
+    public ResponseEntity<List<Course>> getFeaturedBySectionPublicCourses(
+            @PathVariable Integer amount,
+            @PathVariable Long sectionId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SectionNotFoundException {
+
         if(amount<=0 || sectionId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchFeaturedBySectionPublicCourses(amount, sectionId);
+        List<Course> courses = courseService.fetchFeaturedBySectionPrivateCourses(amount, sectionId, principal.getName());
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
 
     }
 
-    @GetMapping(value = "/featured/{amount}/subSection/{subSectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get Featured Public Courses by Amount and Sub Section ID")
-    public ResponseEntity<List<Course>> getFeaturedBySubSectionPublicCourses(@PathVariable Integer amount, @PathVariable Long subSectionId) {
+    @GetMapping(value = "/private/featured/{amount}/subSection/{subSectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Featured Private Courses by Amount and Sub Section ID")
+    public ResponseEntity<List<Course>> getFeaturedBySubSectionPrivateCourses(
+            @PathVariable Integer amount,
+            @PathVariable Long subSectionId,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubSectionNotFoundException {
+
         if(amount<=0 || subSectionId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchFeaturedBySubSectionPublicCourses(amount, subSectionId);
+        List<Course> courses = courseService.fetchFeaturedBySubSectionPrivateCourses(amount, subSectionId, principal.getName());
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
