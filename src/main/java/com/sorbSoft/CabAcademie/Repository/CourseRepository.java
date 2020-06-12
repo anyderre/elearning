@@ -47,16 +47,20 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     @Query("select c from Course c where c.schools IS EMPTY and c.deleted=false order by c.creationDate desc")
     List<Course> findLastCreatedPublicCoursesWithAnyStatus(Pageable pageable);
 
-   //private
+   //private last created
     List<Course> findLastCreatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(CourseStatus status, User school, Pageable pageable);
 
     List<Course> findLastCreatedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(Category category, User school, Pageable pageable);
+    List<Course> findLastCreatedPrivateCoursesByCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(Category category, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findLastCreatedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(SubCategory subCategory, User school, Pageable pageable);
+    List<Course> findLastCreatedPrivateCoursesBySubCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(SubCategory subCategory, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findLastCreatedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(Section section, User school, Pageable pageable);
+    List<Course> findLastCreatedPrivateCoursesBySectionAndStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(Section section, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findLastCreatedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(SubSection subSection, User school, Pageable pageable);
+    List<Course> findLastCreatedPrivateCoursesBySubSectionAndStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(SubSection subSection, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findLastCreatedPrivateCoursesByDeletedFalseAndSchoolsInOrderByCreationDateDesc(User school, Pageable pageable);
 
@@ -75,7 +79,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
 
 
-    //private find best rated
+    //private best rated
     List<Course> findBestRatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(CourseStatus status, User school, Pageable pageable);
 
     List<Course> findBestRatedPrivateCoursesByCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(Category category, CourseStatus status, User school, Pageable pageable);
