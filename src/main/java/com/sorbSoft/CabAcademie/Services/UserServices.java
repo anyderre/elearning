@@ -334,7 +334,7 @@ public class UserServices {
                 return result;
             }
             List<User> schools = userRepository.findUsersByWorkspaceName(vm.getWorkspaceName());
-            if(schools!=null || !schools.isEmpty() || schools.size()!=0) {
+            if(schools!=null && !schools.isEmpty()) {
                 throw new WorkspaceNameIsAlreadyTaken("Workspace name '"+vm.getWorkspaceName()+"' is already taken");
             }
         }
