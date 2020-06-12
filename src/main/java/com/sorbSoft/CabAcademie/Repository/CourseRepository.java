@@ -50,6 +50,14 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
    //private
     List<Course> findLastCreatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(CourseStatus status, User school, Pageable pageable);
 
+    List<Course> findLastCreatedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(Category category, User school, Pageable pageable);
+
+    List<Course> findLastCreatedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(SubCategory subCategory, User school, Pageable pageable);
+
+    List<Course> findLastCreatedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(Section section, User school, Pageable pageable);
+
+    List<Course> findLastCreatedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(SubSection subSection, User school, Pageable pageable);
+
     List<Course> findLastCreatedPrivateCoursesByDeletedFalseAndSchoolsInOrderByCreationDateDesc(User school, Pageable pageable);
 
 
@@ -66,8 +74,29 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findLastCreatedBySubSectionPublicCoursesWithStatus(SubSection subSection, CourseStatus status, Pageable pageable);
 
 
+
+    //private find best rated
+    List<Course> findBestRatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(CourseStatus status, User school, Pageable pageable);
+
+    List<Course> findBestRatedPrivateCoursesByCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(Category category, CourseStatus status, User school, Pageable pageable);
+
+    List<Course> findBestRatedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByRatingsDesc(Category category, User school, Pageable pageable);
+
+    List<Course> findBestRatedPrivateCoursesBySubCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(SubCategory subCategory, CourseStatus status, User school, Pageable pageable);
+
+    List<Course> findBestRatedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByRatingsDesc(SubCategory subCategory, User school, Pageable pageable);
+
+    List<Course> findBestRatedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByRatingsDesc(Section section, User school, Pageable pageable);
+
+    List<Course> findBestRatedPrivateCoursesBySectionAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(Section section, CourseStatus status, User school, Pageable pageable);
+
+    List<Course> findBestRatedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByRatingsDesc(SubSection subSection, User school, Pageable pageable);
+
+    List<Course> findBestRatedPrivateCoursesBySubSectionAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(SubSection subSection, CourseStatus status, User school, Pageable pageable);
+
+    List<Course> findBestRatedPrivateCoursesByDeletedFalseAndSchoolsInOrderByRatingsDesc(User school, Pageable pageable);
     /*
-       find best rated
+       public best rated
     */
     @Query("select c from Course c where c.schools IS EMPTY and c.status=?1 and c.deleted=false order by c.ratings desc")
     List<Course> findBestRatedPublicCoursesWithStatus(CourseStatus status, Pageable pageable);

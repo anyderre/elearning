@@ -10,9 +10,7 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CourseMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import com.sorbSoft.CabAcademie.annotation.NotUsed;
-import com.sorbSoft.CabAcademie.exception.CourseNotFoundExcepion;
-import com.sorbSoft.CabAcademie.exception.SchoolNotFoundExcepion;
-import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
+import com.sorbSoft.CabAcademie.exception.*;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -920,6 +918,396 @@ public class CourseService {
 
 
         return coursesCount;
+    }
+
+    public List<Course> fetchLastAddedPrivateCoursesByCategory(Integer amount, Long categoryId, String userName) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CategoryNotFoundException {
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        Category category = categoryRepository.getOne(categoryId);
+
+        if(category == null) {
+            throw new CategoryNotFoundException("Category with id:"+categoryId+" was not found");
+        }
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findLastCreatedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
+                                category,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchLastAddedPrivateCoursesBySubCategory(Integer amount, Long subCategoryId, String userName) throws SubCategoryNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        SubCategory subCategory = subCategoryRepository.getOne(subCategoryId);
+
+        if(subCategory == null) {
+            throw new SubCategoryNotFoundException("SubCategory with id:"+subCategoryId+" was not found");
+        }
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+
+            List<Course> coursesBySubSectionAndSchool = courseRepository.
+                    findLastCreatedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
+                            subCategory,
+                            schoolOrOrganization,
+                            pageable);
+            courses.addAll(coursesBySubSectionAndSchool);
+
+
+        }
+
+        return courses;
+    }
+
+    private void validateIfUserWasFound(User user, String userName) throws UserNotFoundExcepion {
+        if (user == null) {
+            throw new UserNotFoundExcepion("User " + userName + " doesn't exist in system");
+        }
+    }
+
+    private void validateIfSchoolOrOrganizationExists(User user, String userName) throws SchoolNotFoundExcepion {
+        if (user.getSchools() == null && user.getOrganizations() == null) {
+            throw new SchoolNotFoundExcepion("User " + userName + " doesn't belong to any school");
+        }
+    }
+
+    public List<Course> fetchLastAddedPrivateCoursesBySection(Integer amount, Long sectionId, String userName) throws SectionNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        Section section = sectionRepository.getOne(sectionId);
+
+        if(section == null) {
+            throw new SectionNotFoundException("Section with id:"+sectionId+" was not found");
+        }
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+
+            List<Course> coursesBySubSectionAndSchool = courseRepository.
+                    findLastCreatedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
+                            section,
+                            schoolOrOrganization,
+                            pageable);
+            courses.addAll(coursesBySubSectionAndSchool);
+
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchLastAddedPrivateCoursesBySubSection(Integer amount, Long subSectionId, String userName) throws SubSectionNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        SubSection subSection = subSectionRepository.getOne(subSectionId);
+
+        if(subSection == null) {
+            throw new SubSectionNotFoundException("SubSection with id:"+subSectionId+" was not found");
+        }
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+
+            List<Course> coursesBySubSectionAndSchool = courseRepository.
+                    findLastCreatedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
+                            subSection,
+                            schoolOrOrganization,
+                            pageable);
+            courses.addAll(coursesBySubSectionAndSchool);
+
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchBestRatedPrivateCoursesByStatus(Integer amount, String userName, CourseStatus status) throws UserNotFoundExcepion, SchoolNotFoundExcepion {
+
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+            if(status == null) {
+                //fetch courses with any status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findBestRatedPrivateCoursesByDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+
+            } else {
+                //find by status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findBestRatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                                status,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+            }
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchBestRatedPrivateCourses(Integer amount, String userName) throws UserNotFoundExcepion, SchoolNotFoundExcepion {
+        return fetchBestRatedPrivateCoursesByStatus(amount, userName, CourseStatus.APPROVED);
+    }
+
+    public List<Course> fetchBestRatedPrivateCoursesByStatusAndCategory(Integer amount, String userName, Long categoryId, CourseStatus status) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CategoryNotFoundException {
+
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        Category category = categoryRepository.getOne(categoryId);
+
+        if(category == null) {
+            throw new CategoryNotFoundException("Category with id:"+categoryId+" was not found");
+        }
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+            if(status == null) {
+                //fetch courses with any status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findBestRatedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                                category,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+
+            } else {
+                //find by status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findBestRatedPrivateCoursesByCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                                category,
+                                status,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+            }
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchBestRatedPrivateCoursesByCategory(Integer amount, Long categoryId, String userName) throws CategoryNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        return fetchBestRatedPrivateCoursesByStatusAndCategory(amount, userName, categoryId, CourseStatus.APPROVED);
+    }
+
+    public List<Course> fetchBestRatedPrivateCoursesByStatusAndSubCategory(Integer amount, String userName, Long subCategoryId, CourseStatus status) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubCategoryNotFoundException {
+
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        SubCategory subCategory = subCategoryRepository.getOne(subCategoryId);
+
+        if(subCategory == null) {
+            throw new SubCategoryNotFoundException("SubCategory with id:"+subCategoryId+" was not found");
+        }
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+            if(status == null) {
+                //fetch courses with any status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findBestRatedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                                subCategory,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+
+            } else {
+                //find by status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findBestRatedPrivateCoursesBySubCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                                subCategory,
+                                status,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+            }
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchBestRatedPrivateCoursesBySubCategory(Integer amount, Long subCategoryId, String userName) throws SubCategoryNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        return fetchBestRatedPrivateCoursesByStatusAndSubCategory(amount, userName, subCategoryId, CourseStatus.APPROVED);
+    }
+
+    public List<Course> fetchBestRatedPrivateCoursesByStatusAndSection(Integer amount, String userName, Long sectionId, CourseStatus status) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SectionNotFoundException {
+
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        Section section = sectionRepository.getOne(sectionId);
+
+        if(section == null) {
+            throw new SectionNotFoundException("Section with id:"+sectionId+" was not found");
+        }
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+            if(status == null) {
+                //fetch courses with any status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findBestRatedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                                section,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+
+            } else {
+                //find by status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findBestRatedPrivateCoursesBySectionAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                                section,
+                                status,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+            }
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchBestRatedPrivateCoursesBySection(Integer amount, Long sectionId, String userName) throws SectionNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        return fetchBestRatedPrivateCoursesByStatusAndSection(amount, userName, sectionId, CourseStatus.APPROVED);
+    }
+
+    public List<Course> fetchBestRatedPrivateCoursesByStatusAndSubSection(Integer amount, String userName, Long subSectionId, CourseStatus status) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubSectionNotFoundException {
+
+        Pageable pageable = new PageRequest(0, amount);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        SubSection subSection = subSectionRepository.getOne(subSectionId);
+
+        if(subSection == null) {
+            throw new SubSectionNotFoundException("SubSection with id:"+subSectionId+" was not found");
+        }
+
+        List<User> schoolsAndOrganizations = new ArrayList<>();
+        schoolsAndOrganizations.addAll(user.getSchools());
+        schoolsAndOrganizations.addAll(user.getOrganizations());
+
+        List<Course> courses = new ArrayList<>();
+
+        for(User schoolOrOrganization : schoolsAndOrganizations) {
+            if(status == null) {
+                //fetch courses with any status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findBestRatedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                                subSection,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+
+            } else {
+                //find by status
+                List<Course> coursesBySubSectionAndSchool = courseRepository.
+                        findBestRatedPrivateCoursesBySubSectionAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                                subSection,
+                                status,
+                                schoolOrOrganization,
+                                pageable);
+                courses.addAll(coursesBySubSectionAndSchool);
+            }
+
+        }
+
+        return courses;
+    }
+
+    public List<Course> fetchBestRatedPrivateCoursesBySubSection(Integer amount, Long subSectionId, String userName) throws SubSectionNotFoundException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        return fetchBestRatedPrivateCoursesByStatusAndSubSection(amount, userName, subSectionId, CourseStatus.APPROVED);
     }
 
 

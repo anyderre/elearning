@@ -109,6 +109,46 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(CategoryNotFoundException.class)
+    protected ResponseEntity<Object> handleCategoryNotFoundException(CategoryNotFoundException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(SubCategoryNotFoundException.class)
+    protected ResponseEntity<Object> handleSubCategoryNotFoundException(SubCategoryNotFoundException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(SectionNotFoundException.class)
+    protected ResponseEntity<Object> handleSectionNotFoundException(SectionNotFoundException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(SubSectionNotFoundException.class)
+    protected ResponseEntity<Object> handleSubSectionNotFoundException(SubSectionNotFoundException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         log.warn(apiError.getMessage());
