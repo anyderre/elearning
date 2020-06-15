@@ -18,10 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -81,13 +78,28 @@ public class UserServices {
     private  Result save (UserViewModel vm) {
         Result result = new Result();
         try {
-            User user = getEntity(vm);
-            userRepository.save(user);
 
-            //if not social
-            if(!vm.isSocialUser()) {
-                emailAPI.sendUserRegistrationMail(user);
+           User user = null;
+
+            if(isSchool(vm) || isOrganization(vm)) {
+
+                User school = saveSchool(vm);
+
+                User admin = makeAndSaveSchoolAdmin(vm, school);
+
+                user = admin;
+                emailAPI.sendUserRegistrationMail(admin);
+
+            } else {
+                user = getEntity(vm);
+                userRepository.save(user);
+                //if not social
+                if(!vm.isSocialUser()) {
+                    emailAPI.sendUserRegistrationMail(user);
+                }
             }
+
+
             result.addValue(user);
         } catch (Exception ex)  {
             result.add(ex.getMessage());
@@ -95,6 +107,42 @@ public class UserServices {
         }
 
         return result;
+    }
+
+    private User makeAndSaveSchoolAdmin(UserViewModel vm, User user) {
+
+        User admin = getEntity(vm);
+        Rol role = new Rol();
+        role.setId(1L);
+        role.setRole(Roles.ROLE_ADMIN);
+        admin.setRole(role);
+
+        if(isSchool(vm)) {
+            admin.setSchools(Arrays.asList(user));
+        }
+        if(isOrganization(vm)) {
+            admin.setOrganizations(Arrays.asList(user));
+        }
+        admin.setWorkspaceName("");
+
+        return userRepository.save(admin);
+    }
+
+    private User saveSchool(UserViewModel vm) {
+        User user = getEntity(vm);
+        user.setEmail("school_"+user.getEmail());
+        user.setUsername("school_"+user.getUsername());
+        user.setEnable(1);
+
+        return userRepository.save(user);
+    }
+
+    private boolean isSchool(UserViewModel vm) {
+        return vm.getRole().getId() == 2; //--> School
+    }
+
+    private boolean isOrganization(UserViewModel vm) { //--> Organization
+        return vm.getRole().getId() == 7;
     }
 
     public Result saveSocialUser(UserViewModel vm) throws WorkspaceNameIsAlreadyTaken {
