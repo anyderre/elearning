@@ -20,6 +20,7 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -48,6 +49,9 @@ public class EmailApiService {
 
     @Value("${spring.mail.username}")
     private String USER_NAME;
+
+    @Value("${spring.mail.from}")
+    private String MAIL_FROM;
 
     @Value("${spring.mail.password}")
     private String PASSWORD;
@@ -139,7 +143,7 @@ public class EmailApiService {
         MimeMessageHelper messageHelper = new MimeMessageHelper(message, true, "UTF-8");
 
 
-        messageHelper.setFrom(mail.getMailFrom(), "CabAcademie");
+        messageHelper.setFrom(mail.getMailFrom(), MAIL_FROM);
         messageHelper.setTo(mail.getMailTo());
         messageHelper.setSubject(mail.getMailSubject());
 
@@ -197,6 +201,7 @@ public class EmailApiService {
 
 
     //from, to, approveUid, declineUid, appointment type, date from, date to
+    @Async
     public void sendAppointmentRequestToTeacherMail(final TimeSlot timeSlot, final Attendee attendee) {
 
         User teacher = timeSlot.getTeacher();
@@ -245,6 +250,7 @@ public class EmailApiService {
         sendMail(mail, parameters);
     }
 
+    @Async
     public void sendAppointmentRequestNotificationToStudentMail(final TimeSlot booked, final Attendee attendee) {
         User teacher = booked.getTeacher();
         User student = attendee.getUser();
@@ -289,6 +295,7 @@ public class EmailApiService {
         sendMail(mail, parameters);
     }
 
+    @Async
     public void sendApproveNotificationToTeacher(final TimeSlot timeSlot, final Attendee attendee) {
         User teacher = timeSlot.getTeacher();
         User student = attendee.getUser();
@@ -337,6 +344,7 @@ public class EmailApiService {
         sendMailWithICal(mail, parameters, ical);
     }
 
+    @Async
     public void sendApproveNotificationToStudent(TimeSlot timeSlot, Attendee attendee) {
         User teacher = timeSlot.getTeacher();
         User student = attendee.getUser();
@@ -467,6 +475,7 @@ public class EmailApiService {
         return ical;
     }
 
+    @Async
     public void sendDeclineNotificationToTeacher(TimeSlot timeSlot, Attendee attendee) {
         User teacher = timeSlot.getTeacher();
         User student = attendee.getUser();
@@ -508,6 +517,7 @@ public class EmailApiService {
         sendMailWithICal(mail, parameters, ical);
     }
 
+    @Async
     public void sendDeclineNotificationToStudent(TimeSlot timeSlot, Attendee attendee) {
         User teacher = timeSlot.getTeacher();
         User student = attendee.getUser();
@@ -574,6 +584,7 @@ public class EmailApiService {
         return file;
     }
 
+    @Async
     public void sendUserRegistrationMail(User user) {
         log.debug("Sending email confirmation link to user: {}", user);
 
