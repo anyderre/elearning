@@ -198,6 +198,8 @@ public class WebSecurityConfig {
                     .antMatchers(HttpMethod.POST, "/api/user/saveSchool").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveTeacher").permitAll()
                     .antMatchers(HttpMethod.GET, "/api/user/confirm/email/**").permitAll()
+                    .antMatchers(HttpMethod.POST,"/api/user/reset-password**").permitAll()
+                    .antMatchers(HttpMethod.POST, "/api/user/setup-new-password/**").permitAll()
                     .antMatchers("/api/course/paginate**").permitAll()
                     .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
                     .antMatchers(HttpMethod.GET, PRE_SIGN_UP_URL).permitAll()

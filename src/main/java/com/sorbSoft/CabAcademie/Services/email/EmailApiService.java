@@ -83,6 +83,12 @@ public class EmailApiService {
     @Value("${email.date.time.format}")
     private String emailDateTimeFormat;
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
+    @Value("${reset.password.url}")
+    private String resetPasswordUrl;
+
     private SimpleDateFormat F;
 
     @Autowired
@@ -109,6 +115,7 @@ public class EmailApiService {
         this.approveEndpoint = appUrl + this.approveEndpoint;
         this.declineEndpoint = appUrl + this.declineEndpoint;
         this.emailConfirmationEndpoint = appUrl + this.emailConfirmationEndpoint;
+        this.resetPasswordUrl = frontendUrl + this.resetPasswordUrl;
 
         this.F = new SimpleDateFormat("yyyy-MM-dd hh:mm a");
 
@@ -604,6 +611,30 @@ public class EmailApiService {
         parameters.put("firstName", user.getFirstName());
         parameters.put("lastName", user.getLastName());
         parameters.put("emailConfirmationLink", emailConfirmationLink);
+
+        sendMail(mail, parameters);
+    }
+
+    @Async
+    public void sendResetPasswordEmail(User user) {
+        log.debug("Sending reset password link to user: {}", user);
+
+        String passwordResetToken = this.resetPasswordUrl.replace("{code}", user.getPasswordResetToken());
+
+        final Mail mail = new Mail();
+        String title;
+        mail.setMailFrom(USER_NAME);
+        mail.setMailTo(user.getEmail());
+
+        title = "Reset Password Notification";
+        mail.setMailSubject(title);
+        mail.setTemplateName("reset_password.vm");
+
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("title", title);
+        parameters.put("firstName", user.getFirstName());
+        parameters.put("lastName", user.getLastName());
+        parameters.put("passwordResetToken", passwordResetToken);
 
         sendMail(mail, parameters);
     }

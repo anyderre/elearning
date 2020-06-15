@@ -149,6 +149,26 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(EmptyValueException.class)
+    protected ResponseEntity<Object> handleEmptyValueException(EmptyValueException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(PasswordsDoNotMatchException.class)
+    protected ResponseEntity<Object> handlePasswordsDoNotMatchException(PasswordsDoNotMatchException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         log.warn(apiError.getMessage());

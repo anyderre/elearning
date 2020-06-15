@@ -1,6 +1,9 @@
 package com.sorbSoft.CabAcademie.Services;
 
+import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
+import com.sorbSoft.CabAcademie.exception.EmptyValueException;
+import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
 
@@ -80,6 +83,18 @@ public class GenericValidator {
             return result;
         }
         return result;
+    }
+
+    public void validateNull(String value, String valueName) throws EmptyValueException {
+        if (value == null || value.isEmpty()) {
+            throw new EmptyValueException(valueName + " can't be null or empty");
+        }
+    }
+
+    public void validateNull(User user, String requestProperty, String valueName) throws UserNotFoundExcepion {
+        if(user == null) {
+            throw new UserNotFoundExcepion("User with "+valueName+": "+requestProperty+" has not been found in db");
+        }
     }
 
 

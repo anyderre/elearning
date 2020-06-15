@@ -9,9 +9,8 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.UserMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
-import com.sorbSoft.CabAcademie.exception.SchoolNotFoundExcepion;
-import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
-import com.sorbSoft.CabAcademie.exception.WorkspaceNameIsAlreadyTaken;
+import com.sorbSoft.CabAcademie.exception.*;
+import com.sorbSoft.CabAcademie.payload.SetupNewPasswordRequest;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -52,6 +51,9 @@ public class UserServices {
 
     @Autowired
     private EmailApiService emailAPI;
+
+    @Autowired
+    private GenericValidator validator;
 
     private UserMapper mapper
             = Mappers.getMapper(UserMapper.class);
@@ -672,5 +674,39 @@ public class UserServices {
         }
     }
 
+    public void sendResetPasswordEmail(String email) throws UserNotFoundExcepion, EmptyValueException {
+        User user = userRepository.findByEmail(email);
+        validator.validateNull(user, email, "email");
+
+        user.setPasswordResetToken(generateUid());
+        userRepository.save(user);
+
+        emailAPI.sendResetPasswordEmail(user);
+    }
+
+    public void setupNewPassword(SetupNewPasswordRequest resetRq) throws EmptyValueException, PasswordsDoNotMatchException, UserNotFoundExcepion {
+
+        String code = resetRq.getCode();
+        String password = resetRq.getPassword();
+        String confirmPassword = resetRq.getConfirmPassword();
+
+        validator.validateNull(code, "Reset token");
+        validator.validateNull(password, "Password");
+        validator.validateNull(confirmPassword, "Confirm Password");
+
+        if(password.equals(confirmPassword)){
+
+            User user = userRepository.findOneByPasswordResetToken(code);
+            validator.validateNull(user, "", "token");
+
+            user.setPassword(bCryptPasswordEncoder.encode(password));
+            user.setPasswordResetToken("");
+
+            userRepository.save(user);
+        } else {
+            throw new PasswordsDoNotMatchException("Password and confirm password do not match");
+        }
+
+    }
 }
 

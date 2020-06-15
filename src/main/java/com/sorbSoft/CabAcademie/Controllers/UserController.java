@@ -7,16 +7,19 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
+import com.sorbSoft.CabAcademie.exception.EmptyValueException;
+import com.sorbSoft.CabAcademie.exception.PasswordsDoNotMatchException;
+import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import com.sorbSoft.CabAcademie.exception.WorkspaceNameIsAlreadyTaken;
+import com.sorbSoft.CabAcademie.payload.SetupNewPasswordRequest;
+import com.sorbSoft.CabAcademie.payload.ResetPasswordRequest;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -192,5 +195,24 @@ public class UserController {
         if(schoolOrOrganization == null)
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(schoolOrOrganization, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/reset-password" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> resetPassword(@Valid @RequestBody ResetPasswordRequest resetRq) throws UserNotFoundExcepion, EmptyValueException {
+
+        if(resetRq.getEmail()==null || resetRq.getEmail().isEmpty())
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        userService.sendResetPasswordEmail(resetRq.getEmail());
+
+        return new ResponseEntity(MessageResponse.of("Reset password email sent"),HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/setup-new-password" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> setupNewPassword(@Valid @RequestBody SetupNewPasswordRequest resetRq) throws UserNotFoundExcepion, PasswordsDoNotMatchException, EmptyValueException {
+
+        userService.setupNewPassword(resetRq);
+
+        return new ResponseEntity(MessageResponse.of("Password changed"),HttpStatus.OK);
     }
 }

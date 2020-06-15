@@ -39,4 +39,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     long countUsersByRoleAndSchoolsIn(Rol role, User school);
 
     long countUsersByRoleAndSchoolsIsNull(Rol role);
+
+    User findOneByPasswordResetToken(String token);
 }
