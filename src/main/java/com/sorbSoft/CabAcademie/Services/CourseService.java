@@ -115,17 +115,20 @@ public class CourseService {
         Result result = new Result();
         Course course = null;
         try {
-            course = courseRepository.save(getEntity(vm));
-            if (vm.getId() > 0) {
+            course = getEntity(vm);
+
+            if (vm.getId() > 0 || course.getOverview() != null) {
                 Overview overviewEntity = course.getOverview();
                 course.setOverview(null);
                 Course savedCourse = courseRepository.save(course);
                 if (overviewEntity != null) {
                     overviewEntity.setCourse(savedCourse);
                     Overview overview = overviewRepository.save(overviewEntity);
-                    course.setOverview(overview);
-                    courseRepository.save(course);
+                    savedCourse.setOverview(overview);
+                    courseRepository.save(savedCourse);
                 }
+            } else {
+                course = courseRepository.save(course);
             }
         } catch (Exception ex)  {
             result.add(ex.getMessage());
