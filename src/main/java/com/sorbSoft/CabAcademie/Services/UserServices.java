@@ -11,12 +11,17 @@ import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
 import com.sorbSoft.CabAcademie.exception.*;
 import com.sorbSoft.CabAcademie.payload.SetupNewPasswordRequest;
+import lombok.extern.log4j.Log4j2;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,6 +30,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
+@Log4j2
 public class UserServices {
 
     @Autowired
@@ -707,6 +713,138 @@ public class UserServices {
             throw new PasswordsDoNotMatchException("Password and confirm password do not match");
         }
 
+    }
+
+    public void batchSignupUsers(MultipartFile usersCsvFile, String adminName) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CsvParseException, EmptyValueException, WorkspaceNameIsAlreadyTaken, SaveUserException, RoleNotAllowedException, RoleFormatException {
+        User admin = userRepository.findByUsername(adminName);
+        validator.validateNull(admin, adminName, "userName");
+
+
+        List<UserViewModel> userViewModels = parseUsersFromCSVFile(usersCsvFile);
+        setSchoolOrOrg(userViewModels, admin);
+
+        for(UserViewModel vm : userViewModels) {
+            Result result = null;
+
+            result = saveUser(vm);
+
+            if(!result.isValid()) {
+                String email = vm.getEmail();
+                int emailSize = email.length();
+                email = email.substring(0,4)+"**"+email.substring(emailSize-5,emailSize);
+                throw new SaveUserException(result.lista.get(0).getMessage()+", Email:"+email+" UserName:"+vm.getUsername());
+            }
+
+        }
+    }
+
+    private void setSchoolOrOrg(List<UserViewModel> userViewModels, User admin) throws SchoolNotFoundExcepion, RoleNotAllowedException {
+        List<User> schools = admin.getSchools();
+        List<User> orgs = admin.getOrganizations();
+
+        if(schools != null && !schools.isEmpty()) {
+            for(User school : schools){
+                setSchool(userViewModels, school);
+                break;
+            }
+        } else if(orgs != null && !orgs.isEmpty()) {
+            for(User org : orgs){
+                setOrg(userViewModels, org);
+                break;
+            }
+        } else {
+            log.error("Admin "+admin.getUsername()+" doesn't belong to any school or org");
+            throw new SchoolNotFoundExcepion("Admin "+admin.getUsername()+" doesn't belong to any school or org");
+        }
+    }
+
+    private void setSchool(List<UserViewModel> vms, User school) throws RoleNotAllowedException {
+        for(UserViewModel vm : vms) {
+            //student || professor
+            if(vm.getRole().getId() == 3 || vm.getRole().getId() == 4) {
+                vm.setSchools(Arrays.asList(school));
+            } else {
+                throw new RoleNotAllowedException("Role id:"+vm.getRole().getId()+" of userName:"+vm.getUsername()+" is not allowed for School batch signup");
+            }
+        }
+    }
+
+    private void setOrg(List<UserViewModel> vms, User organization) throws RoleNotAllowedException {
+        for(UserViewModel vm : vms) {
+            //employee or instructor
+            if(vm.getRole().getId() == 8 || vm.getRole().getId() == 10) {
+                vm.setOrganizations(Arrays.asList(organization));
+            } else {
+                throw new RoleNotAllowedException("Role id:"+vm.getRole().getId()+" of userName:"+vm.getUsername()+" is not allowed for Organization batch signup");
+            }
+        }
+    }
+
+    private List<UserViewModel> parseUsersFromCSVFile(final MultipartFile file) throws CsvParseException, EmptyValueException, RoleNotAllowedException, RoleFormatException {
+        final List<UserViewModel> vms = new ArrayList<>();
+        int CSV_LENGTH = 8;
+        try (final BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            String line;
+            int lineNumber = 1;
+            while ((line = br.readLine()) != null) {
+                final String[] data = line.split(";");
+
+                if (data.length == CSV_LENGTH) {
+
+                    validator.validateNull(data[0], "First name at line:" + lineNumber);
+                    validator.validateNull(data[1], "Last name at line:" + lineNumber);
+                    validator.validateNull(data[2], "Username at line:" + lineNumber);
+                    validator.validateNull(data[3], "email at line:" + lineNumber);
+                    validator.validateNull(data[4], "password at line:" + lineNumber);
+                    validator.validateNull(data[5], "country at line:" + lineNumber);
+                    validator.validateNull(data[6], "Role id at line:" + lineNumber);
+                    validator.validateNull(data[7], "Time zone at line:" + lineNumber);
+
+
+                    long roleId;
+                    try {
+                        roleId = Long.parseLong(data[6]);
+                    } catch (NumberFormatException e) {
+                        throw new RoleFormatException("Can't parse roleId:" + data[6] + " to number at line:" + lineNumber);
+                    }
+
+                    validateAllowedRoles(roleId, lineNumber);
+
+                    final UserViewModel user = new UserViewModel();
+                    user.setFirstName(data[0]);
+                    user.setLastName(data[1]);
+                    user.setUsername(data[2]);
+                    user.setEmail(data[3]);
+                    user.setPassword(data[4]);
+                    user.setCountry(data[5]);
+                    user.setAgreeWithTerms(true);
+
+                    Rol rol = new Rol();
+                    rol.setId(Long.parseLong(data[6]));
+                    user.setRole(rol);
+
+                    user.setTimeZone(data[7]);
+                    vms.add(user);
+
+                    lineNumber++;
+                } else {
+                    throw new CsvParseException("Csv parameters amount at line:" + lineNumber + " is not equal:" + CSV_LENGTH);
+                }
+            }
+            return vms;
+
+        } catch (final IOException e) {
+            log.error("Failed to parse CSV file {}", e);
+            throw new CsvParseException("Failed to parse CSV file. Reason:" + e.getMessage());
+        }
+    }
+
+    private void validateAllowedRoles(long roleId, int lineNumber) throws RoleNotAllowedException {
+        if(roleId == 3 || roleId == 4 || roleId == 8 || roleId == 10) {
+
+        } else {
+            throw new RoleNotAllowedException("Role id:"+roleId+" at line:"+lineNumber+" is not allowed for batch signup");
+        }
     }
 }
 

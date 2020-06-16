@@ -169,6 +169,46 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(CsvParseException.class)
+    protected ResponseEntity<Object> handleCsvParseException(CsvParseException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(SaveUserException.class)
+    protected ResponseEntity<Object> handleSaveUserException(SaveUserException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.CONFLICT);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(RoleNotAllowedException.class)
+    protected ResponseEntity<Object> handleRoleNotAllowedException(RoleNotAllowedException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(RoleFormatException.class)
+    protected ResponseEntity<Object> handleRoleFormatException(RoleFormatException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         log.warn(apiError.getMessage());

@@ -5,6 +5,7 @@ import com.sorbSoft.CabAcademie.Entities.Enums.CourseStatus;
 import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Services.CourseService;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
 import com.sorbSoft.CabAcademie.exception.*;
 import com.sorbSoft.CabAcademie.payload.CourseApproveRequest;
@@ -17,6 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.security.Principal;
@@ -602,5 +604,23 @@ public class AdminDashboardController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
 
     }
-    //START: Last Added By SubSection
+    //END: Last Added By SubSection
+
+    @PostMapping("/signup-users-batch")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Batch Signup Users at School, Role:ROLE_ADMIN")
+    public ResponseEntity<MessageResponse> signupUsersBatch(
+
+            @RequestPart(value = "file") MultipartFile file,
+            Principal principal)
+
+            throws SaveUserException, UserNotFoundExcepion, EmptyValueException,
+            CsvParseException, SchoolNotFoundExcepion, WorkspaceNameIsAlreadyTaken,
+            RoleNotAllowedException, RoleFormatException {
+
+        log.debug("Principal username:"+principal.getName());
+        userService.batchSignupUsers(file, principal.getName());
+
+        return new ResponseEntity<>(MessageResponse.of("Users created"),HttpStatus.CREATED);
+    }
 }
