@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 import javax.annotation.PostConstruct;
 import java.util.TimeZone;
@@ -13,6 +14,7 @@ import java.util.TimeZone;
 @SpringBootApplication
 @EntityScan(basePackages = "com.sorbSoft.CabAcademie")
 @EnableJpaRepositories(basePackages="com.sorbSoft.CabAcademie")
+@EnableAsync
 public class CabAcademieApplication{
 
 	public static void main(String[] args) {

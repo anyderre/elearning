@@ -1,8 +1,10 @@
 package com.sorbSoft.CabAcademie.Controllers.exception;
 
 
-import com.sorbSoft.CabAcademie.exception.EntityNotFoundException;
-import com.sorbSoft.CabAcademie.model.ApiError;
+import com.sorbSoft.CabAcademie.exception.*;
+
+import com.sorbSoft.CabAcademie.model.error.ApiError;
+
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
@@ -30,9 +32,33 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
-
     @ExceptionHandler(EntityNotFoundException.class)
     protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
+        String error = ex.getMessage();
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
+        apiError.setMessage(error);
+        return buildResponseEntity(apiError);
+    }
+
+
+    @ExceptionHandler(SchoolNotFoundExcepion.class)
+    protected ResponseEntity<Object> handleSchoolNotFoundExcepion(SchoolNotFoundExcepion ex) {
+        String error = ex.getMessage();
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
+        apiError.setMessage(error);
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(CourseNotFoundExcepion.class)
+    protected ResponseEntity<Object> handleCourseNotFoundExcepion(CourseNotFoundExcepion ex) {
+        String error = ex.getMessage();
+        ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
+        apiError.setMessage(error);
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(UserNotFoundExcepion.class)
+    protected ResponseEntity<Object> handleUserNotFoundExcepion(UserNotFoundExcepion ex) {
         String error = ex.getMessage();
         ApiError apiError = new ApiError(HttpStatus.NOT_FOUND);
         apiError.setMessage(error);
@@ -55,7 +81,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
         apiError.setMessage(error);
-
+        //apiError.setDebugMessage(ex.getStackTrace().toString());
         return buildResponseEntity(apiError);
     }
 
@@ -69,6 +95,116 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
         apiError.setMessage(error);
         apiError.setDebugMessage(debugError);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(WorkspaceNameIsAlreadyTaken.class)
+    protected ResponseEntity<Object> handleWorkspaceNameIsAlreadyTaken(WorkspaceNameIsAlreadyTaken ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(CategoryNotFoundException.class)
+    protected ResponseEntity<Object> handleCategoryNotFoundException(CategoryNotFoundException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(SubCategoryNotFoundException.class)
+    protected ResponseEntity<Object> handleSubCategoryNotFoundException(SubCategoryNotFoundException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(SectionNotFoundException.class)
+    protected ResponseEntity<Object> handleSectionNotFoundException(SectionNotFoundException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(SubSectionNotFoundException.class)
+    protected ResponseEntity<Object> handleSubSectionNotFoundException(SubSectionNotFoundException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(EmptyValueException.class)
+    protected ResponseEntity<Object> handleEmptyValueException(EmptyValueException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(PasswordsDoNotMatchException.class)
+    protected ResponseEntity<Object> handlePasswordsDoNotMatchException(PasswordsDoNotMatchException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(CsvParseException.class)
+    protected ResponseEntity<Object> handleCsvParseException(CsvParseException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(SaveUserException.class)
+    protected ResponseEntity<Object> handleSaveUserException(SaveUserException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.CONFLICT);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(RoleNotAllowedException.class)
+    protected ResponseEntity<Object> handleRoleNotAllowedException(RoleNotAllowedException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(RoleFormatException.class)
+    protected ResponseEntity<Object> handleRoleFormatException(RoleFormatException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST);
+        apiError.setMessage(error);
 
         return buildResponseEntity(apiError);
     }

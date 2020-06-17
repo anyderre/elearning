@@ -9,16 +9,20 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.UserMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
+import com.sorbSoft.CabAcademie.exception.*;
+import com.sorbSoft.CabAcademie.payload.SetupNewPasswordRequest;
+import lombok.extern.log4j.Log4j2;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +30,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional
+@Log4j2
 public class UserServices {
 
     @Autowired
@@ -53,10 +58,13 @@ public class UserServices {
     @Autowired
     private EmailApiService emailAPI;
 
+    @Autowired
+    private GenericValidator validator;
+
     private UserMapper mapper
             = Mappers.getMapper(UserMapper.class);
 
-    public Result saveUser (UserViewModel vm){
+    public Result saveUser (UserViewModel vm) throws WorkspaceNameIsAlreadyTaken {
         vm = prepareEntity(vm);
         Result result = ValidateModel(vm);
         if (!result.isValid()) {
@@ -78,13 +86,28 @@ public class UserServices {
     private  Result save (UserViewModel vm) {
         Result result = new Result();
         try {
-            User user = getEntity(vm);
-            userRepository.save(user);
 
-            //if not social
-            if(!vm.isSocialUser()) {
-                emailAPI.sendUserRegistrationMail(user);
+           User user = null;
+
+            if(isSchool(vm) || isOrganization(vm)) {
+
+                User school = saveSchool(vm);
+
+                User admin = makeAndSaveSchoolAdmin(vm, school);
+
+                user = admin;
+                emailAPI.sendUserRegistrationMail(admin);
+
+            } else {
+                user = getEntity(vm);
+                userRepository.save(user);
+                //if not social
+                if(!vm.isSocialUser()) {
+                    emailAPI.sendUserRegistrationMail(user);
+                }
             }
+
+
             result.addValue(user);
         } catch (Exception ex)  {
             result.add(ex.getMessage());
@@ -94,7 +117,43 @@ public class UserServices {
         return result;
     }
 
-    public Result saveSocialUser(UserViewModel vm) {
+    private User makeAndSaveSchoolAdmin(UserViewModel vm, User user) {
+
+        User admin = getEntity(vm);
+        Rol role = new Rol();
+        role.setId(1L);
+        role.setRole(Roles.ROLE_ADMIN);
+        admin.setRole(role);
+
+        if(isSchool(vm)) {
+            admin.setSchools(Arrays.asList(user));
+        }
+        if(isOrganization(vm)) {
+            admin.setOrganizations(Arrays.asList(user));
+        }
+        admin.setWorkspaceName("");
+
+        return userRepository.save(admin);
+    }
+
+    private User saveSchool(UserViewModel vm) {
+        User user = getEntity(vm);
+        user.setEmail("school_"+user.getEmail());
+        user.setUsername("school_"+user.getUsername());
+        user.setEnable(1);
+
+        return userRepository.save(user);
+    }
+
+    private boolean isSchool(UserViewModel vm) {
+        return vm.getRole().getId() == 2; //--> School
+    }
+
+    private boolean isOrganization(UserViewModel vm) { //--> Organization
+        return vm.getRole().getId() == 7;
+    }
+
+    public Result saveSocialUser(UserViewModel vm) throws WorkspaceNameIsAlreadyTaken {
 
         Result result = new Result();
         result = saveUser(vm);
@@ -152,6 +211,41 @@ public class UserServices {
 
     public User findUserbyUsername(String username){
         return userRepository.findByUsername(username);
+
+    }
+
+    public long countFreeUsersByRole(Roles role) {
+
+        Rol studentRole = rolRepository.findByDescription(role.toString());
+
+        long studentCount = userRepository.countUsersByRoleAndSchoolsIsNull(studentRole);
+
+        return studentCount;
+
+    }
+
+    public long countUsersInSchoolByRole(String adminUsername, Roles role) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+
+        User admin = userRepository.findByUsername(adminUsername);
+
+        if (admin == null) {
+            throw new UserNotFoundExcepion("User " + adminUsername + " doesn't exist in system");
+        }
+        List<User> schools = admin.getSchools();
+
+        if (schools == null) {
+            throw new SchoolNotFoundExcepion("Admin " + adminUsername + " doesn't belong to any school");
+        }
+
+        Rol studentRole = rolRepository.findByDescription(role.toString());
+        long studentCount = 0;
+
+        for (User school : schools) {
+            studentCount = userRepository.countUsersByRoleAndSchoolsIn(studentRole, school);
+            return studentCount;
+        }
+
+        return studentCount;
 
     }
 
@@ -239,6 +333,9 @@ public class UserServices {
             resultUser.setName(resultUser.getFirstName() + ' ' + resultUser.getLastName());
         }
 
+        //check
+        resultUser.setName(resultUser.getFirstName());
+
         //if user is not social
         if(!resultUser.getSocialUser()) {
             resultUser.setEmailConfirmationUID(generateUid());
@@ -265,7 +362,7 @@ public class UserServices {
         return info;
     }
 
-    private Result ValidateModel(UserViewModel vm){
+    private Result ValidateModel(UserViewModel vm) throws WorkspaceNameIsAlreadyTaken {
         Result result = new Result();
 
         if (vm.getRole().getId() <= 0) {
@@ -291,6 +388,10 @@ public class UserServices {
             if (vm.getWorkspaceName().trim().length() < 2) {
                 result.add("You should specify at least two characters for the workspace name");
                 return result;
+            }
+            List<User> schools = userRepository.findUsersByWorkspaceName(vm.getWorkspaceName());
+            if(schools!=null && !schools.isEmpty()) {
+                throw new WorkspaceNameIsAlreadyTaken("Workspace name '"+vm.getWorkspaceName()+"' is already taken");
             }
         }
         if (vm.getUsername().isEmpty()) {
@@ -422,7 +523,14 @@ public class UserServices {
                 vm.setSubCategories(new ArrayList<>());
                 vm.setSchools(new ArrayList<>());
                 vm.setOrganizations(new ArrayList<>());
-            } else if (role.getDescription().equals(Roles.ROLE_ORGANIZATION.name())){
+            } else if (role.getDescription().equals(Roles.ROLE_ADMIN.name())) {
+                vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
+                vm.setWorkspaceName("");
+                vm.setCategories(new ArrayList<>());
+                vm.setSubCategories(new ArrayList<>());
+                //vm.setSchools(new ArrayList<>());
+                //vm.setOrganizations(new ArrayList<>());
+            }else if (role.getDescription().equals(Roles.ROLE_ORGANIZATION.name())){
                 vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
                 vm.setCategories(new ArrayList<>());
                 vm.setSubCategories(new ArrayList<>());
@@ -569,6 +677,176 @@ public class UserServices {
             return vms;
         } else {
             return null;
+        }
+    }
+
+    public void sendResetPasswordEmail(String email) throws UserNotFoundExcepion, EmptyValueException {
+        User user = userRepository.findByEmail(email);
+        validator.validateNull(user, email, "email");
+
+        user.setPasswordResetToken(generateUid());
+        userRepository.save(user);
+
+        emailAPI.sendResetPasswordEmail(user);
+    }
+
+    public void setupNewPassword(SetupNewPasswordRequest resetRq) throws EmptyValueException, PasswordsDoNotMatchException, UserNotFoundExcepion {
+
+        String code = resetRq.getCode();
+        String password = resetRq.getPassword();
+        String confirmPassword = resetRq.getConfirmPassword();
+
+        validator.validateNull(code, "Reset token");
+        validator.validateNull(password, "Password");
+        validator.validateNull(confirmPassword, "Confirm Password");
+
+        if(password.equals(confirmPassword)){
+
+            User user = userRepository.findOneByPasswordResetToken(code);
+            validator.validateNull(user, "", "token");
+
+            user.setPassword(bCryptPasswordEncoder.encode(password));
+            user.setPasswordResetToken("");
+            user.setIsDefaultPasswordChanged(true);
+
+            userRepository.save(user);
+        } else {
+            throw new PasswordsDoNotMatchException("Password and confirm password do not match");
+        }
+
+    }
+
+    public void batchSignupUsers(MultipartFile usersCsvFile, String adminName) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CsvParseException, EmptyValueException, WorkspaceNameIsAlreadyTaken, SaveUserException, RoleNotAllowedException, RoleFormatException {
+        User admin = userRepository.findByUsername(adminName);
+        validator.validateNull(admin, adminName, "userName");
+
+
+        List<UserViewModel> userViewModels = parseUsersFromCSVFile(usersCsvFile);
+        setSchoolOrOrg(userViewModels, admin);
+
+        for(UserViewModel vm : userViewModels) {
+            Result result = null;
+
+            result = saveUser(vm);
+
+            if(!result.isValid()) {
+                String email = vm.getEmail();
+                int emailSize = email.length();
+                email = email.substring(0,4)+"**"+email.substring(emailSize-5,emailSize);
+                throw new SaveUserException(result.lista.get(0).getMessage()+", Email:"+email+" UserName:"+vm.getUsername());
+            }
+
+        }
+    }
+
+    private void setSchoolOrOrg(List<UserViewModel> userViewModels, User admin) throws SchoolNotFoundExcepion, RoleNotAllowedException {
+        List<User> schools = admin.getSchools();
+        List<User> orgs = admin.getOrganizations();
+
+        if(schools != null && !schools.isEmpty()) {
+            for(User school : schools){
+                setSchool(userViewModels, school);
+                break;
+            }
+        } else if(orgs != null && !orgs.isEmpty()) {
+            for(User org : orgs){
+                setOrg(userViewModels, org);
+                break;
+            }
+        } else {
+            log.error("Admin "+admin.getUsername()+" doesn't belong to any school or org");
+            throw new SchoolNotFoundExcepion("Admin "+admin.getUsername()+" doesn't belong to any school or org");
+        }
+    }
+
+    private void setSchool(List<UserViewModel> vms, User school) throws RoleNotAllowedException {
+        for(UserViewModel vm : vms) {
+            //student || professor
+            if(vm.getRole().getId() == 3 || vm.getRole().getId() == 4) {
+                vm.setSchools(Arrays.asList(school));
+            } else {
+                throw new RoleNotAllowedException("Role id:"+vm.getRole().getId()+" of userName:"+vm.getUsername()+" is not allowed for School batch signup");
+            }
+        }
+    }
+
+    private void setOrg(List<UserViewModel> vms, User organization) throws RoleNotAllowedException {
+        for(UserViewModel vm : vms) {
+            //employee or instructor
+            if(vm.getRole().getId() == 8 || vm.getRole().getId() == 10) {
+                vm.setOrganizations(Arrays.asList(organization));
+            } else {
+                throw new RoleNotAllowedException("Role id:"+vm.getRole().getId()+" of userName:"+vm.getUsername()+" is not allowed for Organization batch signup");
+            }
+        }
+    }
+
+    private List<UserViewModel> parseUsersFromCSVFile(final MultipartFile file) throws CsvParseException, EmptyValueException, RoleNotAllowedException, RoleFormatException {
+        final List<UserViewModel> vms = new ArrayList<>();
+        int CSV_LENGTH = 8;
+        try (final BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            String line;
+            int lineNumber = 1;
+            while ((line = br.readLine()) != null) {
+                final String[] data = line.split(";");
+
+                if (data.length == CSV_LENGTH) {
+
+                    validator.validateNull(data[0], "First name at line:" + lineNumber);
+                    validator.validateNull(data[1], "Last name at line:" + lineNumber);
+                    validator.validateNull(data[2], "Username at line:" + lineNumber);
+                    validator.validateNull(data[3], "email at line:" + lineNumber);
+                    validator.validateNull(data[4], "password at line:" + lineNumber);
+                    validator.validateNull(data[5], "country at line:" + lineNumber);
+                    validator.validateNull(data[6], "Role id at line:" + lineNumber);
+                    validator.validateNull(data[7], "Time zone at line:" + lineNumber);
+
+
+                    long roleId;
+                    try {
+                        roleId = Long.parseLong(data[6]);
+                    } catch (NumberFormatException e) {
+                        throw new RoleFormatException("Can't parse roleId:" + data[6] + " to number at line:" + lineNumber);
+                    }
+
+                    validateAllowedRoles(roleId, lineNumber);
+
+                    final UserViewModel user = new UserViewModel();
+                    user.setFirstName(data[0]);
+                    user.setLastName(data[1]);
+                    user.setUsername(data[2]);
+                    user.setEmail(data[3]);
+                    user.setPassword(data[4]);
+                    user.setCountry(data[5]);
+                    user.setAgreeWithTerms(true);
+                    user.setIsDefaultPasswordChanged(false);
+
+
+                    Rol rol = new Rol();
+                    rol.setId(Long.parseLong(data[6]));
+                    user.setRole(rol);
+
+                    user.setTimeZone(data[7]);
+                    vms.add(user);
+
+                    lineNumber++;
+                } else {
+                    throw new CsvParseException("Csv parameters amount at line:" + lineNumber + " is not equal:" + CSV_LENGTH);
+                }
+            }
+            return vms;
+
+        } catch (final IOException e) {
+            log.error("Failed to parse CSV file {}", e);
+            throw new CsvParseException("Failed to parse CSV file. Reason:" + e.getMessage());
+        }
+    }
+
+    private void validateAllowedRoles(long roleId, int lineNumber) throws RoleNotAllowedException {
+        if(roleId == 3 || roleId == 4 || roleId == 8 || roleId == 10) {
+
+        } else {
+            throw new RoleNotAllowedException("Role id:"+roleId+" at line:"+lineNumber+" is not allowed for batch signup");
         }
     }
 }

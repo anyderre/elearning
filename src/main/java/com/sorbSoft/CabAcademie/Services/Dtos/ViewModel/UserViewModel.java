@@ -68,4 +68,6 @@ public class UserViewModel {
 
     private String timeZone;
 
+    private Boolean isDefaultPasswordChanged;
+
 }
