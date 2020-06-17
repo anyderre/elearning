@@ -28,3 +28,6 @@ OR
 
 *2. Run CabAcademieApplication.java from IDE
 
+### IV. Stripe
+
+login/password: cabacadamie@gmail.com/sS08062020
