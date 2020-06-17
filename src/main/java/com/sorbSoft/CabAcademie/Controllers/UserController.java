@@ -13,6 +13,7 @@ import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import com.sorbSoft.CabAcademie.exception.WorkspaceNameIsAlreadyTaken;
 import com.sorbSoft.CabAcademie.payload.SetupNewPasswordRequest;
 import com.sorbSoft.CabAcademie.payload.ResetPasswordRequest;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -154,6 +156,8 @@ public class UserController {
     }
 
     @PostMapping("/saveByAdmin")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Add user by School/Org Admin, Role:ROLE_ADMIN")
     public  ResponseEntity<MessageResponse> saveByAdmin(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
         user.setIsDefaultPasswordChanged(false);
         return saveUser(user);
