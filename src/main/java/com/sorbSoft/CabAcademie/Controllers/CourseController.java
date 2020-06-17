@@ -75,35 +75,12 @@ public class CourseController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/private/subSection/{id}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get Private Courses by Sub Section")
-    public ResponseEntity<List<Course>> getAllPrivateCoursesBySubSection(@PathVariable Long id, Principal principal){
-
-        log.debug("Principal username:"+principal.getName());
-        List<Course> courses = courseService.fetchPrivateCourseBySubSectionAlternative(id, principal.getName());
-        if(courses.isEmpty())
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
-        return new ResponseEntity<>(courses, HttpStatus.OK);
-    }
-
     @GetMapping(value = "/subCategory/{id}" , consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get Public Courses by Sub Category")
     public ResponseEntity<List<Course>> getAllPublicCoursesBySubCategory(@PathVariable Long id){
         List<Course> courses = courseService.fetchPublicCourseBySubCategory(id);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
-        return new ResponseEntity<>(courses, HttpStatus.OK);
-    }
-
-    @GetMapping(value = "/private/subCategory/{id}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get Private Courses by Sub Category")
-    public ResponseEntity<List<Course>> getAllPrivateCoursesBySubCategory(@PathVariable Long id, Principal principal){
-
-        log.debug("Principal username:"+principal.getName());
-
-        List<Course> courses = courseService.fetchPrivateCourseBySubCategory(id, principal.getName());
-        if(courses.isEmpty())
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.NO_CONTENT);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
@@ -119,23 +96,6 @@ public class CourseController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
 
     }
-
-    //TODO: finish
-    /*@GetMapping(value = "/private/lastCreated/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    @ApiOperation(value = "Get Last Created Private Courses by Amount")
-    public ResponseEntity<List<Course>> getLastAddedPublicCourses(@PathVariable Integer amount, Principal principal) {
-
-        log.debug("Principal username:"+principal.getName());
-
-        if(amount<=0)
-            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-
-        List<Course> courses = courseService.fetchLastAddedPrivateCourses(amount, principal.getName());
-        if(courses.isEmpty())
-            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
-        return new ResponseEntity<>(courses, HttpStatus.OK);
-
-    }*/
 
     @GetMapping(value = "/lastCreated/{amount}/category/{categoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Get Last Created Public Courses by Amount and Category ID")
@@ -188,11 +148,6 @@ public class CourseController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
 
     }
-
-
-
-
-
 
 
     @GetMapping(value = "/bestRated/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)

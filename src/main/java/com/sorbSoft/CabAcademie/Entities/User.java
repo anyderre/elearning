@@ -124,4 +124,10 @@ public class User {
 
     @Column(name = "email_confirmation_uid")
     private String emailConfirmationUID;
+
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
+
+    @Column(name = "is_default_password_changed")
+    private Boolean isDefaultPasswordChanged;
 }

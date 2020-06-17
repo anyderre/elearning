@@ -1,4 +1,4 @@
-package com.sorbSoft.CabAcademie.model;
+package com.sorbSoft.CabAcademie.model.error;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
