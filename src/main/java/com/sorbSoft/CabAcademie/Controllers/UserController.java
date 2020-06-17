@@ -124,27 +124,38 @@ public class UserController {
 
     @PostMapping("/saveStudent")
     public  ResponseEntity<MessageResponse> saveStudent(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+        user.setIsDefaultPasswordChanged(true);
         return saveUser(user);
     }
 
     @PostMapping("/saveOrganization")
     public  ResponseEntity<MessageResponse> saveOrganization(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+        user.setIsDefaultPasswordChanged(true);
         return saveUser(user);
     }
 
 
     @PostMapping("/saveSchool")
     public  ResponseEntity<MessageResponse> saveSchool(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+        user.setIsDefaultPasswordChanged(true);
         return saveUser(user);
     }
 
     @PostMapping("/saveTeacher")
     public  ResponseEntity<MessageResponse> saveTeacher(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+        user.setIsDefaultPasswordChanged(true);
         return saveUser(user);
     }
 
     @PostMapping("/save")
     public  ResponseEntity<MessageResponse> saveOtherUser(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+        user.setIsDefaultPasswordChanged(true);
+        return saveUser(user);
+    }
+
+    @PostMapping("/saveByAdmin")
+    public  ResponseEntity<MessageResponse> saveByAdmin(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+        user.setIsDefaultPasswordChanged(false);
         return saveUser(user);
     }
 

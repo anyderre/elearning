@@ -127,4 +127,7 @@ public class User {
 
     @Column(name = "password_reset_token")
     private String passwordResetToken;
+
+    @Column(name = "is_default_password_changed")
+    private Boolean isDefaultPasswordChanged;
 }

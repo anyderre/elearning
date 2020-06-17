@@ -707,6 +707,7 @@ public class UserServices {
 
             user.setPassword(bCryptPasswordEncoder.encode(password));
             user.setPasswordResetToken("");
+            user.setIsDefaultPasswordChanged(true);
 
             userRepository.save(user);
         } else {
@@ -818,6 +819,8 @@ public class UserServices {
                     user.setPassword(data[4]);
                     user.setCountry(data[5]);
                     user.setAgreeWithTerms(true);
+                    user.setIsDefaultPasswordChanged(false);
+
 
                     Rol rol = new Rol();
                     rol.setId(Long.parseLong(data[6]));
