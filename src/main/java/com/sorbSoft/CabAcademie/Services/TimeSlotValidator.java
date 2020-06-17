@@ -9,6 +9,7 @@ import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotAddRequestModel;
 import com.sorbSoft.CabAcademie.Utils.DateUtils;
+import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 @Service
+@Log4j2
 public class TimeSlotValidator {
 
     @Autowired
@@ -29,7 +31,7 @@ public class TimeSlotValidator {
     private GenericValidator validator;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userR;
 
     public Result validateAddNewSlotByTeacher(SlotAddRequestModel vm) {
 
@@ -202,10 +204,10 @@ public class TimeSlotValidator {
         Date from = DateUtils.removeSeconds(vm.getDateFrom());
         Date to = DateUtils.removeSeconds(vm.getDateTo());
 
+        User user = userR.findById(vm.getTeacherId());
+
         DateTime curFrom = new DateTime(from);
         DateTime curTo = new DateTime(to);
-
-        User user = userRepository.findById(vm.getTeacherId());
 
         List<TimeSlot> dbSlots = slotsRepo.findByTeacher(user);
 
@@ -215,6 +217,7 @@ public class TimeSlotValidator {
 
             if (DateUtils.isOverlapped(curFrom, curTo, dbFrom, dbTo)) {
                 result.add("Your dates " + curFrom + "-" + curTo + " overlap with db dates " + dbFrom + "-" + dbTo + " for user " + user.getId());
+                log.debug("Your dates " + curFrom + "-" + curTo + " overlap with db dates " + dbFrom + "-" + dbTo + " for user " + user.getId());
                 return result;
             }
         }

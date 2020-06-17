@@ -29,7 +29,8 @@ import static com.sorbSoft.CabAcademie.config.JwtTokenUtil.SIGN_UP_URL;
 
 
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+@Configuration
 public class WebSecurityConfig {
 
     @Autowired
@@ -95,7 +96,36 @@ public class WebSecurityConfig {
     };
 
     @Configuration
+    @Order(1)
+    //@EnableGlobalMethodSecurity(prePostEnabled = true)
+    public class SwaggerSecurityConfig extends WebSecurityConfigurerAdapter {
+
+        @Override
+        protected void configure(HttpSecurity http) throws Exception {
+            http.antMatcher("/swagger**").
+                    authorizeRequests().
+                    antMatchers("/swagger**").authenticated().
+                    and().httpBasic().and().csrf().disable();
+
+            http.antMatcher("/v2/api-docs").
+                    authorizeRequests().
+                    antMatchers("/v2/api-docs").authenticated().
+                    and().httpBasic().and().csrf().disable();
+        }
+
+        @Override
+        public void configure(AuthenticationManagerBuilder auth)
+                throws Exception {
+            auth.inMemoryAuthentication()
+                    .withUser(SWAGGER_USER_NAME)
+                    .password(SWAGGER_PASSWORD)
+                    .roles("USER");
+        }
+    }
+
+    @Configuration
     @Order(2)
+    //@EnableGlobalMethodSecurity(prePostEnabled = true)
     public class RestApiSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
@@ -154,11 +184,23 @@ public class WebSecurityConfig {
                     .antMatchers(HttpMethod.GET, SUB_CATEGORIES_URLS).permitAll()
                     .antMatchers(HttpMethod.GET, SECTIONS_URLS).permitAll()
                     .antMatchers(HttpMethod.GET, SUB_SECTIONS_URLS).permitAll()
+                    .antMatchers(HttpMethod.GET, "/api/subSection/allBySection/**").permitAll()
+
+                    .antMatchers(HttpMethod.GET, "/api/course/public/subSection/**").permitAll()
+
                     .antMatchers("/authenticate").permitAll()
+                    .antMatchers("/jitsi-auth").permitAll()
+                    .antMatchers("/facebookLogin").permitAll()
+                    .antMatchers("/googleLogin").permitAll()
+                    .antMatchers("/linkedinLogin").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveStudent").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveOrganization").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveSchool").permitAll()
                     .antMatchers(HttpMethod.POST, "/api/user/saveTeacher").permitAll()
+                    .antMatchers(HttpMethod.GET, "/api/user/confirm/email/**").permitAll()
+                    .antMatchers(HttpMethod.POST,"/api/user/reset-password**").permitAll()
+                    .antMatchers(HttpMethod.POST, "/api/user/setup-new-password/**").permitAll()
+                    .antMatchers("/api/course/paginate**").permitAll()
                     .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
                     .antMatchers(HttpMethod.GET, PRE_SIGN_UP_URL).permitAll()
                     .anyRequest().authenticated()
@@ -173,33 +215,6 @@ public class WebSecurityConfig {
 
             // Add a filter to validate the tokens with every request
             httpSecurity.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-        }
-    }
-
-    @Configuration
-    @Order(1)
-    public class SwaggerSecurityConfig extends WebSecurityConfigurerAdapter {
-
-        @Override
-        protected void configure(HttpSecurity http) throws Exception {
-            http.antMatcher("/swagger**").
-                    authorizeRequests().
-                    antMatchers("/swagger**").authenticated().
-                    and().httpBasic().and().csrf().disable();
-
-            http.antMatcher("/v2/api-docs").
-                    authorizeRequests().
-                    antMatchers("/v2/api-docs").authenticated().
-                    and().httpBasic().and().csrf().disable();
-        }
-
-        @Override
-        public void configure(AuthenticationManagerBuilder auth)
-                throws Exception {
-            auth.inMemoryAuthentication()
-                    .withUser(SWAGGER_USER_NAME)
-                    .password(SWAGGER_PASSWORD)
-                    .roles("USER");
         }
     }
 }

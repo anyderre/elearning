@@ -2,6 +2,7 @@ package com.sorbSoft.CabAcademie.Entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.sorbSoft.CabAcademie.Entities.Enums.CourseStatus;
 import lombok.Data;
 import org.hibernate.annotations.*;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -129,4 +130,9 @@ public class Course implements Serializable {
             joinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     private List<User> schools;
+
+    @Enumerated(EnumType.STRING)
+    private CourseStatus status;
+
+    private String declineMessage;
 }

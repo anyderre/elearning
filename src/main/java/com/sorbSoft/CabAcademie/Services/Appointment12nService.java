@@ -19,7 +19,7 @@ import java.util.*;
 
 @Service
 @Transactional
-public class OneToManyAppointmeentService {
+public class Appointment12nService {
 
     @Value("${minimum.time.slot.size.minutes}")
     private Long MIN_SLOT_SIZE_MINUTES;

@@ -3,26 +3,24 @@ package com.sorbSoft.CabAcademie.Controllers;
 
 import com.sorbSoft.CabAcademie.Entities.Course;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
-import com.sorbSoft.CabAcademie.Entities.LanguageEntity;
 import com.sorbSoft.CabAcademie.Services.CourseService;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
+import com.sorbSoft.CabAcademie.config.JwtTokenUtil;
+import io.swagger.annotations.ApiOperation;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -30,9 +28,13 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "/api/course")
+@Log4j2
 public class CourseController {
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private JwtTokenUtil tokenUtil;
 
     @GetMapping(value = "/{id}")
     public ResponseEntity<CourseViewModel> getCourseViewModel(@PathVariable Long id){
@@ -63,28 +65,32 @@ public class CourseController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/subSection/{id}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getAllCoursesBySubSection(@PathVariable Long id){
-        List<Course> courses = courseService.fetchCourseBySubSection(id);
+    @GetMapping(value = "/public/subSection/{subSectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get Public Courses by Sub Section")
+    public ResponseEntity<List<Course>> getAllPublicCoursesBySubSection(@PathVariable Long subSectionId){
+
+        List<Course> courses = courseService.fetchPublicCourseBySubSection(subSectionId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
     @GetMapping(value = "/subCategory/{id}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getAllCoursesBySubCategory(@PathVariable Long id){
-        List<Course> courses = courseService.fetchCourseBySubCategory(id);
+    @ApiOperation(value = "Get Public Courses by Sub Category")
+    public ResponseEntity<List<Course>> getAllPublicCoursesBySubCategory(@PathVariable Long id){
+        List<Course> courses = courseService.fetchPublicCourseBySubCategory(id);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
     @GetMapping(value = "/lastCreated/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getLastAddedCourses(@PathVariable Integer amount) {
+    @ApiOperation(value = "Get Last Created Public Courses by Amount")
+    public ResponseEntity<List<Course>> getLastAddedPublicCourses(@PathVariable Integer amount) {
         if(amount<=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchLastAddedCourses(amount);
+        List<Course> courses = courseService.fetchLastAddedPublicCourses(amount);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -92,11 +98,12 @@ public class CourseController {
     }
 
     @GetMapping(value = "/lastCreated/{amount}/category/{categoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getLastAddedByCategory(@PathVariable Integer amount, @PathVariable Long categoryId) {
+    @ApiOperation(value = "Get Last Created Public Courses by Amount and Category ID")
+    public ResponseEntity<List<Course>> getLastAddedByCategoryPublicCourses(@PathVariable Integer amount, @PathVariable Long categoryId) {
         if(amount<=0 || categoryId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchLastAddedByCategory(amount, categoryId);
+        List<Course> courses = courseService.fetchLastAddedByCategoryPublicCourses(amount, categoryId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -104,11 +111,12 @@ public class CourseController {
     }
 
     @GetMapping(value = "/lastCreated/{amount}/subCategory/{subCategoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getLastAddedBySubCategory(@PathVariable Integer amount, @PathVariable Long subCategoryId) {
+    @ApiOperation(value = "Get Last Created Public Courses by Amount and Sub Category ID")
+    public ResponseEntity<List<Course>> getLastAddedBySubCategoryPublicCourses(@PathVariable Integer amount, @PathVariable Long subCategoryId) {
         if(amount<=0 || subCategoryId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchLastAddedBySubCategory(amount, subCategoryId);
+        List<Course> courses = courseService.fetchLastAddedBySubCategoryPublicCourses(amount, subCategoryId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -116,11 +124,12 @@ public class CourseController {
     }
 
     @GetMapping(value = "/lastCreated/{amount}/section/{sectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getLastAddedBySection(@PathVariable Integer amount, @PathVariable Long sectionId) {
+    @ApiOperation(value = "Get Last Created Public Courses by Amount and Section ID")
+    public ResponseEntity<List<Course>> getLastAddedBySectionPublicCourses(@PathVariable Integer amount, @PathVariable Long sectionId) {
         if(amount<=0 || sectionId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchLastAddedBySection(amount, sectionId);
+        List<Course> courses = courseService.fetchLastAddedBySectionPublicCourses(amount, sectionId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -128,11 +137,12 @@ public class CourseController {
     }
 
     @GetMapping(value = "/lastCreated/{amount}/subSection/{subSectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getLastAddedBySubSection(@PathVariable Integer amount, @PathVariable Long subSectionId) {
+    @ApiOperation(value = "Get Last Created Public Courses by Amount and Sub Section ID")
+    public ResponseEntity<List<Course>> getLastAddedBySubSectionPublicCourses(@PathVariable Integer amount, @PathVariable Long subSectionId) {
         if(amount<=0 || subSectionId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchLastAddedBySubSection(amount, subSectionId);
+        List<Course> courses = courseService.fetchLastAddedBySubSectionPublicCourses(amount, subSectionId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -140,28 +150,25 @@ public class CourseController {
     }
 
 
-
-
-
-
-
     @GetMapping(value = "/bestRated/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getBestRatedCourses(@PathVariable Integer amount) {
+    @ApiOperation(value = "Get Best Rated Public Courses by Amount")
+    public ResponseEntity<List<Course>> getBestRatedCoursesPublicCourses(@PathVariable Integer amount) {
         if(amount<=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchBestRatedCourses(amount);
+        List<Course> courses = courseService.fetchBestRatedPublicCourses(amount);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
     @GetMapping(value = "/bestRated/{amount}/category/{categoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getBestRatedByCategory(@PathVariable Integer amount, @PathVariable Long categoryId) {
+    @ApiOperation(value = "Get Best Rated Public Courses by Amount and Category ID")
+    public ResponseEntity<List<Course>> getBestRatedByCategoryPublicCourses(@PathVariable Integer amount, @PathVariable Long categoryId) {
         if(amount<=0 || categoryId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchBestRatedByCategory(amount, categoryId);
+        List<Course> courses = courseService.fetchBestRatedByCategoryPublicCourses(amount, categoryId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -169,11 +176,12 @@ public class CourseController {
     }
 
     @GetMapping(value = "/bestRated/{amount}/subCategory/{subCategoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getBestRatedBySubCategory(@PathVariable Integer amount, @PathVariable Long subCategoryId) {
+    @ApiOperation(value = "Get Best Rated Public Courses by Amount and Sub Category ID")
+    public ResponseEntity<List<Course>> getBestRatedBySubCategoryPublicCourses(@PathVariable Integer amount, @PathVariable Long subCategoryId) {
         if(amount<=0 || subCategoryId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchBestRatedBySubCategory(amount, subCategoryId);
+        List<Course> courses = courseService.fetchBestRatedBySubCategoryPublicCourses(amount, subCategoryId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -181,11 +189,12 @@ public class CourseController {
     }
 
     @GetMapping(value = "/bestRated/{amount}/section/{sectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getBestRatedBySection(@PathVariable Integer amount, @PathVariable Long sectionId) {
+    @ApiOperation(value = "Get Best Rated Public Courses by Amount and Section ID")
+    public ResponseEntity<List<Course>> getBestRatedBySectionPublicCourses(@PathVariable Integer amount, @PathVariable Long sectionId) {
         if(amount<=0 || sectionId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchBestRatedBySection(amount, sectionId);
+        List<Course> courses = courseService.fetchBestRatedBySectionPublicCourses(amount, sectionId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -193,11 +202,12 @@ public class CourseController {
     }
 
     @GetMapping(value = "/bestRated/{amount}/subSection/{subSectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getBestRatedBySubSection(@PathVariable Integer amount, @PathVariable Long subSectionId) {
+    @ApiOperation(value = "Get Best Rated Public Courses by Amount and Sub Section ID")
+    public ResponseEntity<List<Course>> getBestRatedBySubSectionPublicCourses(@PathVariable Integer amount, @PathVariable Long subSectionId) {
         if(amount<=0 || subSectionId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchBestRatedBySubSection(amount, subSectionId);
+        List<Course> courses = courseService.fetchBestRatedBySubSectionPublicCourses(amount, subSectionId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -209,22 +219,24 @@ public class CourseController {
 
 
     @GetMapping(value = "/featured/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getFeaturedCourses(@PathVariable Integer amount) {
+    @ApiOperation(value = "Get Featured Public Courses by Amount")
+    public ResponseEntity<List<Course>> getFeaturedCoursesPublicCourses(@PathVariable Integer amount) {
         if(amount<=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchFeaturedCourses(amount);
+        List<Course> courses = courseService.fetchFeaturedPublicCourses(amount);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
     @GetMapping(value = "/featured/{amount}/category/{categoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getFeaturedByCategory(@PathVariable Integer amount, @PathVariable Long categoryId) {
+    @ApiOperation(value = "Get Featured Public Courses by Amount and Category ID")
+    public ResponseEntity<List<Course>> getFeaturedByCategoryPublicCourses(@PathVariable Integer amount, @PathVariable Long categoryId) {
         if(amount<=0 || categoryId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchFeaturedByCategory(amount, categoryId);
+        List<Course> courses = courseService.fetchFeaturedByCategoryPublicCourses(amount, categoryId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -232,11 +244,12 @@ public class CourseController {
     }
 
     @GetMapping(value = "/featured/{amount}/subCategory/{subCategoryId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getFeaturedBySubCategory(@PathVariable Integer amount, @PathVariable Long subCategoryId) {
+    @ApiOperation(value = "Get Featured Public Courses by Amount and Sub Category ID")
+    public ResponseEntity<List<Course>> getFeaturedBySubCategoryPublicCourses(@PathVariable Integer amount, @PathVariable Long subCategoryId) {
         if(amount<=0 || subCategoryId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchFeaturedBySubCategory(amount, subCategoryId);
+        List<Course> courses = courseService.fetchFeaturedBySubCategoryPublicCourses(amount, subCategoryId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -244,11 +257,12 @@ public class CourseController {
     }
 
     @GetMapping(value = "/featured/{amount}/section/{sectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getFeaturedBySection(@PathVariable Integer amount, @PathVariable Long sectionId) {
+    @ApiOperation(value = "Get Featured Public Courses by Amount and Section ID")
+    public ResponseEntity<List<Course>> getFeaturedBySectionPublicCourses(@PathVariable Integer amount, @PathVariable Long sectionId) {
         if(amount<=0 || sectionId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchFeaturedBySection(amount, sectionId);
+        List<Course> courses = courseService.fetchFeaturedBySectionPublicCourses(amount, sectionId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -256,11 +270,12 @@ public class CourseController {
     }
 
     @GetMapping(value = "/featured/{amount}/subSection/{subSectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Course>> getFeaturedBySubSection(@PathVariable Integer amount, @PathVariable Long subSectionId) {
+    @ApiOperation(value = "Get Featured Public Courses by Amount and Sub Section ID")
+    public ResponseEntity<List<Course>> getFeaturedBySubSectionPublicCourses(@PathVariable Integer amount, @PathVariable Long subSectionId) {
         if(amount<=0 || subSectionId <=0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        List<Course> courses = courseService.fetchFeaturedBySubSection(amount, subSectionId);
+        List<Course> courses = courseService.fetchFeaturedBySubSectionPublicCourses(amount, subSectionId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
@@ -282,7 +297,14 @@ public class CourseController {
     }
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public  ResponseEntity<MessageResponse> saveCourse(@Valid @RequestBody CourseViewModel vm){
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
+    public  ResponseEntity<MessageResponse> saveCourse(@Valid @RequestBody CourseViewModel vm, Principal principal, HttpServletRequest request){
         Result result = courseService.saveCourse(vm);
         if(!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);

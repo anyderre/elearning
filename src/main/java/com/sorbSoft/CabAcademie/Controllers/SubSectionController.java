@@ -64,6 +64,18 @@ public class SubSectionController {
         return new ResponseEntity<>(subSections, HttpStatus.OK);
     }
 
+    @GetMapping(value = "/allBySection/{section_id}")
+    public ResponseEntity<List<SubSection>> getAllSubSectionsBySectionId(@PathVariable("section_id") Long id){
+
+        if(id<=0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        List<SubSection> subSections= subSectionService.fetchBySectionId(id);
+        if(subSections.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(subSections, HttpStatus.OK);
+    }
+
     @GetMapping(value = "/all/filtered")
     public ResponseEntity<List<SubSection>> getAllSubSectionsFiltered(@RequestParam(value = "subSectionId",  required = false) Long subSectionId){
         List <SubSection> subSections = subSectionService.getAllFiltered(subSectionId);

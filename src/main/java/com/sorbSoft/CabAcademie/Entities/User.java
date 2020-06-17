@@ -41,8 +41,9 @@ public class User {
     @NotEmpty(message = "UserName is required")
     @Size(min = 4, max = 30)
     private String username;
-    @Column(name="enabled", nullable = false, columnDefinition = "int default 1")
-    private int enable = 1;
+
+    @Column(name="enabled", columnDefinition = "int default 1")
+    private int enable;
     @NotNull(message="Password invalid")
     @NotEmpty(message = "Password is required")
     @Size(max=60)
@@ -55,7 +56,8 @@ public class User {
     @NotNull
     @Size(max = 2147483647)
     private String bio;
-    @NotNull
+
+
     private String country;
     @NotNull
     private String workspaceName;
@@ -104,4 +106,28 @@ public class User {
     private boolean agreeWithTerms;
     @NotNull
     private boolean deleted = false;
+
+    @Column(name = "time_zone")
+    private String timeZone; //0:00, +1:00, +2:00
+
+    @Column(name = "facebook_id")
+    private String facebookId;
+
+    @Column(name = "google_id")
+    private String googleId;
+
+    @Column(name = "linkedin_id")
+    private String linkedinId;
+
+    @Column(name = "social_user")
+    private Boolean socialUser;
+
+    @Column(name = "email_confirmation_uid")
+    private String emailConfirmationUID;
+
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
+
+    @Column(name = "is_default_password_changed")
+    private Boolean isDefaultPasswordChanged;
 }

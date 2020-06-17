@@ -197,4 +197,8 @@ public class SubSectionService {
         }
         return vm;
     }
+
+    public List<SubSection> fetchBySectionId(Long sectionId) {
+        return subSectionRepository.findSubSectionBySectionId(sectionId);
+    }
 }

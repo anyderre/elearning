@@ -17,4 +17,6 @@ public class SlotsGetRequestModel {
 
     private Date dateTo;
 
+    private Long requesterId;
+
 }

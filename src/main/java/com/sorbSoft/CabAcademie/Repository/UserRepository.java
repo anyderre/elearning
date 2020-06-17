@@ -1,5 +1,6 @@
 package com.sorbSoft.CabAcademie.Repository;
 
+import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -30,4 +31,14 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Boolean existsByUsernameAndIdIsNot(String username, Long id);
 
     Boolean existsByEmailAndIdIsNot(String email, Long id);
+
+    User findUserByEmailConfirmationUID(String emailConfirmationUid);
+
+    List<User> findUsersByWorkspaceName(String workspaceName);
+
+    long countUsersByRoleAndSchoolsIn(Rol role, User school);
+
+    long countUsersByRoleAndSchoolsIsNull(Rol role);
+
+    User findOneByPasswordResetToken(String token);
 }
