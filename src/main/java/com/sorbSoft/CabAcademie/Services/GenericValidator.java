@@ -91,7 +91,7 @@ public class GenericValidator {
         }
     }
 
-    public void validateNull(User user, String requestProperty, String valueName) throws UserNotFoundExcepion {
+    public void validateNull(User user, String valueName, String requestProperty) throws UserNotFoundExcepion {
         if(user == null) {
             throw new UserNotFoundExcepion("User with "+valueName+": "+requestProperty+" has not been found in db");
         }

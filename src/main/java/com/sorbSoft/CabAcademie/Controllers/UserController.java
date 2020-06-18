@@ -11,6 +11,7 @@ import com.sorbSoft.CabAcademie.exception.EmptyValueException;
 import com.sorbSoft.CabAcademie.exception.PasswordsDoNotMatchException;
 import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import com.sorbSoft.CabAcademie.exception.WorkspaceNameIsAlreadyTaken;
+import com.sorbSoft.CabAcademie.payload.ChangePasswordRequest;
 import com.sorbSoft.CabAcademie.payload.SetupNewPasswordRequest;
 import com.sorbSoft.CabAcademie.payload.ResetPasswordRequest;
 import io.swagger.annotations.ApiOperation;
@@ -227,6 +228,16 @@ public class UserController {
     public ResponseEntity<MessageResponse> setupNewPassword(@Valid @RequestBody SetupNewPasswordRequest resetRq) throws UserNotFoundExcepion, PasswordsDoNotMatchException, EmptyValueException {
 
         userService.setupNewPassword(resetRq);
+
+        return new ResponseEntity(MessageResponse.of("Password changed"),HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/change-password" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> setupNewPassword(
+            @Valid @RequestBody ChangePasswordRequest resetRq,
+            Principal principal) throws UserNotFoundExcepion, PasswordsDoNotMatchException, EmptyValueException {
+
+        userService.changePassword(resetRq, principal.getName());
 
         return new ResponseEntity(MessageResponse.of("Password changed"),HttpStatus.OK);
     }

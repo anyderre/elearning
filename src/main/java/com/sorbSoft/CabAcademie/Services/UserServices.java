@@ -10,6 +10,7 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
 import com.sorbSoft.CabAcademie.exception.*;
+import com.sorbSoft.CabAcademie.payload.ChangePasswordRequest;
 import com.sorbSoft.CabAcademie.payload.SetupNewPasswordRequest;
 import lombok.extern.log4j.Log4j2;
 import org.mapstruct.factory.Mappers;
@@ -703,7 +704,7 @@ public class UserServices {
         if(password.equals(confirmPassword)){
 
             User user = userRepository.findOneByPasswordResetToken(code);
-            validator.validateNull(user, "", "token");
+            validator.validateNull(user, "token", "");
 
             user.setPassword(bCryptPasswordEncoder.encode(password));
             user.setPasswordResetToken("");
@@ -712,6 +713,37 @@ public class UserServices {
             userRepository.save(user);
         } else {
             throw new PasswordsDoNotMatchException("Password and confirm password do not match");
+        }
+
+    }
+
+    public void changePassword(ChangePasswordRequest resetRq, String userName) throws EmptyValueException, PasswordsDoNotMatchException, UserNotFoundExcepion {
+
+        String oldPassword = resetRq.getOldPassword();
+        String newPassword = resetRq.getNewPassword();
+        String confirmPassword = resetRq.getConfirmPassword();
+
+        validator.validateNull(oldPassword, "Old password");
+        validator.validateNull(newPassword, "New Password");
+        validator.validateNull(confirmPassword, "Confirm Password");
+
+        if(newPassword.equals(confirmPassword)){
+
+            User user = userRepository.findByUsername(userName);
+            validator.validateNull(user, "userName", userName);
+
+            String currentPasswordEncoded = user.getPassword();
+
+            if(bCryptPasswordEncoder.matches(oldPassword, currentPasswordEncoded)){
+                user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+                user.setIsDefaultPasswordChanged(true);
+
+                userRepository.save(user);
+            } else {
+                throw new PasswordsDoNotMatchException("Old Password and current user password do not match");
+            }
+        } else {
+            throw new PasswordsDoNotMatchException("New Password and confirm password do not match");
         }
 
     }
