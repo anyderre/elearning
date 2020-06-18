@@ -233,7 +233,7 @@ public class UserController {
     }
 
     @PostMapping(value = "/change-password" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<MessageResponse> setupNewPassword(
+    public ResponseEntity<MessageResponse> changePassword(
             @Valid @RequestBody ChangePasswordRequest resetRq,
             Principal principal) throws UserNotFoundExcepion, PasswordsDoNotMatchException, EmptyValueException {
 
