@@ -417,6 +417,18 @@ public class CourseController {
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 
+    @PostMapping(value = "/saveByAdmin", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Save Course at status Approved")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') ")
+    public  ResponseEntity<MessageResponse> saveApprovedCourseByAdmin(@Valid @RequestBody CourseViewModel vm, Principal principal, HttpServletRequest request){
+        vm.setStatus(CourseStatus.APPROVED);
+        Result result = courseService.saveCourse(vm);
+        if(!result.isValid())
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of("Course successfully saved"), HttpStatus.OK);
+    }
+
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Save Course at status Pending (available for Admin approve")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
@@ -427,7 +439,7 @@ public class CourseController {
             "or hasRole('ROLE_ORGANIZATION') " +
             "or hasRole('ROLE_INSTRUCTOR')")
     public  ResponseEntity<MessageResponse> saveCourse(@Valid @RequestBody CourseViewModel vm, Principal principal, HttpServletRequest request){
-        vm.setStatus(CourseStatus.DRAFT);
+        vm.setStatus(CourseStatus.PENDING);
         Result result = courseService.saveCourse(vm);
         if(!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);

@@ -92,9 +92,15 @@ public class GenericValidator {
         }
     }
 
-    public void validateNull(User user, String valueName, String requestProperty) throws UserNotFoundExcepion {
+    public void validateNull(User user, String valueName, String byValue) throws UserNotFoundExcepion {
         if(user == null) {
-            throw new UserNotFoundExcepion("User with "+valueName+": "+requestProperty+" has not been found in db");
+            throw new UserNotFoundExcepion("User with "+valueName+": "+byValue+" has not been found in db");
+        }
+    }
+
+    public void validateNull(User user, String valueName, Long byValue) throws UserNotFoundExcepion {
+        if(user == null) {
+            throw new UserNotFoundExcepion("User with "+valueName+": "+byValue+" has not been found in db");
         }
     }
 
