@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sorbSoft.CabAcademie.Entities.Enums.CourseStatus;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.*;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,7 +29,7 @@ import java.util.Locale;
  * Created by Dany on 13/05/2018.
  */
 @Entity
-@Data
+@Getter @Setter @NoArgsConstructor
 @Table(name = "course")
 @Where(clause = "deleted=false")
 public class Course implements Serializable {

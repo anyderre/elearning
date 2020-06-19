@@ -1,5 +1,6 @@
 package com.sorbSoft.CabAcademie.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sorbSoft.CabAcademie.Entities.Enums.OrganizationType;
 import com.sorbSoft.CabAcademie.Entities.Enums.SubscriptionPlanLevel;
 import lombok.Data;
@@ -57,6 +58,7 @@ public class User {
     @NotNull(message="Password invalid")
     @NotEmpty(message = "Password is required")
     @Size(max=60)
+    @JsonIgnore
     private String password;
 
     @NotNull
@@ -95,13 +97,6 @@ public class User {
     private List<SubCategory> subCategories;
 
     @Fetch(value = FetchMode.SUBSELECT)
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_courses",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "course_id", referencedColumnName = "id"))
-    private List<Course> courses;
-
-    @Fetch(value = FetchMode.SUBSELECT)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="user_schools"
@@ -135,9 +130,11 @@ public class User {
     private Boolean socialUser;
 
     @Column(name = "email_confirmation_uid")
+    @JsonIgnore
     private String emailConfirmationUID;
 
     @Column(name = "password_reset_token")
+    @JsonIgnore
     private String passwordResetToken;
 
     @Column(name = "is_default_password_changed")

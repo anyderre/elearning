@@ -1,5 +1,6 @@
 package com.sorbSoft.CabAcademie.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.*;
 
@@ -19,12 +20,16 @@ import java.util.Set;
 @Table(name = "overview")
 @Where(clause = "deleted=false")
 public class Overview implements Serializable {
+
     @Id()
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "course_id", nullable = false)
+    @JsonIgnore
     private Course course;
+
     @Fetch(value = FetchMode.SUBSELECT)
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinTable(name = "overview_requirements",

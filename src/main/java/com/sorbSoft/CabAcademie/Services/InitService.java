@@ -157,7 +157,7 @@ public class InitService {
             admin.setWorkspaceName("");
             admin.setCategories(new ArrayList<>());
             admin.setSubCategories(new ArrayList<>());
-            admin.setCourses(new ArrayList<>());
+            //admin.setCourses(new ArrayList<>());
             admin.setOrganizations(new ArrayList<>());
             admin.setSchools(new ArrayList<>());
             userRepository.save(admin);
@@ -185,7 +185,7 @@ public class InitService {
             admin.setWorkspaceName("");
             admin.setCategories(new ArrayList<>());
             admin.setSubCategories(new ArrayList<>());
-            admin.setCourses(new ArrayList<>());
+            //admin.setCourses(new ArrayList<>());
             admin.setOrganizations(new ArrayList<>());
             admin.setSchools(new ArrayList<>());
             userRepository.save(admin);
@@ -213,7 +213,7 @@ public class InitService {
             admin.setWorkspaceName("");
             admin.setCategories(new ArrayList<>());
             admin.setSubCategories(new ArrayList<>());
-            admin.setCourses(new ArrayList<>());
+            //admin.setCourses(new ArrayList<>());
             admin.setOrganizations(new ArrayList<>());
             admin.setSchools(new ArrayList<>());
             userRepository.save(admin);

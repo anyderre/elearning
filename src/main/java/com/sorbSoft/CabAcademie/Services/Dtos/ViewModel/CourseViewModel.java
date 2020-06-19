@@ -2,6 +2,7 @@ package com.sorbSoft.CabAcademie.Services.Dtos.ViewModel;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.sorbSoft.CabAcademie.Entities.*;
+import com.sorbSoft.CabAcademie.Entities.Enums.CourseStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -49,4 +50,8 @@ public class CourseViewModel {
     private List<User> allSchools;
 
     private List<Video> videos;
+
+    private CourseStatus status;
+
+    private String declineMessage;
 }

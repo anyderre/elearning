@@ -15,9 +15,9 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -68,6 +68,9 @@ public class CourseService {
     @Autowired
     private OverviewRepository overviewRepository;
 
+    @Autowired
+    private GenericValidator validator;
+
     private final CourseMapper mapper = Mappers.getMapper(CourseMapper.class);
 
     public List<Course> fetchAllCourses(){
@@ -109,6 +112,66 @@ public class CourseService {
     //and this
     public boolean exists(Long id) {
         return courseRepository.exists(id);
+    }
+
+    public List<CourseViewModel> fetchAllCoursesByUser(Long userId) throws UserNotFoundExcepion {
+        validator.validateNull(userId, "userId");
+        User user = userRepository.findById(userId);
+
+        validateIfUserWasFound(user, "id: "+userId);
+
+        List<Course> courses = courseRepository.findAllByUser(user);
+
+        List<CourseViewModel> vms = new ArrayList<>(courses.size());
+
+        courses.forEach(c ->  vms.add(mapper.mapToViewModel(c)) );
+
+        return vms;
+    }
+
+    public List<CourseViewModel> fetchAllCoursesByUserAndAmount(Long userId, Integer amount) throws UserNotFoundExcepion {
+
+        validator.validateNull(userId, "userId");
+        validator.validateNull(amount, "amount");
+
+        User user = userRepository.findById(userId);
+
+        validateIfUserWasFound(user, "id: "+userId);
+
+        Pageable pageable = new PageRequest(0, amount);
+        List<Course> courses = courseRepository.findAllByUser(user, pageable);
+
+        List<CourseViewModel> vms = new ArrayList<>(courses.size());
+
+        courses.forEach(c ->  vms.add(mapper.mapToViewModel(c)) );
+
+        return vms;
+    }
+
+    public long countUserCourses(Long userId) throws UserNotFoundExcepion {
+
+        validator.validateNull(userId, "userId");
+
+        User user = userRepository.findById(userId);
+
+        validateIfUserWasFound(user, "id: "+userId);
+
+        return courseRepository.countCoursesByUser(user);
+    }
+
+    public long countUserCoursesWithStatus(Long userId, CourseStatus status) throws UserNotFoundExcepion, EmptyValueException {
+
+        validator.validateNull(userId, "userId");
+
+        if(status == null) {
+            throw new EmptyValueException("Course status can't be null");
+        }
+
+        User user = userRepository.findById(userId);
+
+        validateIfUserWasFound(user, "id: "+userId);
+
+        return courseRepository.countCoursesByUserAndStatus(user, status);
     }
 
     private  Result save (CourseViewModel vm) {
@@ -533,7 +596,10 @@ public class CourseService {
         } else {
             resultCourse.setLastUpdate(new Date());
         }
-        resultCourse.setStatus(CourseStatus.PENDING);
+
+        if(vm.getSection()!=null) {
+            resultCourse.setStatus(vm.getStatus());
+        }
         return resultCourse;
     }
 
@@ -760,6 +826,35 @@ public class CourseService {
         return coursesCount;
     }
 
+    public boolean makeCourseStatusPending(Long courseId, String userName) throws CourseNotFoundExcepion, UserNotFoundExcepion, CourseAccessDeniedException {
+        User user = userRepository.findByUsername(userName);
+        validateIfUserWasFound(user, userName);
+
+        Course course = courseRepository.findOne(courseId);
+        validateIfCourseWasFound(course, courseId);
+
+        if(course.getUser().getUsername().equals(user.getUsername())) {
+            return changeCourseStatus(courseId, CourseStatus.PENDING, "");
+        } else {
+            throw new CourseAccessDeniedException("You are not an owner of course which you are trying to publish");
+        }
+
+    }
+
+    public boolean makeCourseStatusDraft(Long courseId, String userName) throws CourseNotFoundExcepion, UserNotFoundExcepion, CourseAccessDeniedException {
+        User user = userRepository.findByUsername(userName);
+        validateIfUserWasFound(user, userName);
+
+        Course course = courseRepository.findOne(courseId);
+        validateIfCourseWasFound(course, courseId);
+
+        if(course.getUser().getUsername().equals(user.getUsername())) {
+            return changeCourseStatus(courseId, CourseStatus.DRAFT, "");
+        } else {
+            throw new CourseAccessDeniedException("You are not an owner of course which you are trying to make draft");
+        }
+
+    }
 
     public boolean approveCourse(Long courseId) throws CourseNotFoundExcepion {
         return changeCourseStatus(courseId, CourseStatus.APPROVED, "");
@@ -776,6 +871,24 @@ public class CourseService {
         Course course2Approve = courseRepository.findOne(courseId);
         if (course2Approve == null) {
             throw new CourseNotFoundExcepion("Course with id: " + courseId + " was not found in db");
+        }
+
+        if(status == CourseStatus.DRAFT) {
+
+            course2Approve.setStatus(CourseStatus.DRAFT);
+            course2Approve.setLastUpdate(new Date());
+            courseRepository.save(course2Approve);
+            isStatusChanged = true;
+            return isStatusChanged;
+        }
+
+        if(status == CourseStatus.PENDING) {
+
+            course2Approve.setStatus(CourseStatus.PENDING);
+            course2Approve.setLastUpdate(new Date());
+            courseRepository.save(course2Approve);
+            isStatusChanged = true;
+            return isStatusChanged;
         }
 
         if(status == CourseStatus.APPROVED) {
@@ -1042,6 +1155,12 @@ public class CourseService {
     private void validateIfUserWasFound(User user, String userName) throws UserNotFoundExcepion {
         if (user == null) {
             throw new UserNotFoundExcepion("User " + userName + " doesn't exist in system");
+        }
+    }
+
+    private void validateIfCourseWasFound(Course course, Long courseId) throws CourseNotFoundExcepion {
+        if (course == null) {
+            throw new CourseNotFoundExcepion("Course with id: " + courseId + " was not found in db");
         }
     }
 

@@ -1,5 +1,6 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.ViewModel;
 
+import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import lombok.Data;
 import org.hibernate.annotations.LazyToOne;
@@ -19,4 +20,6 @@ public class RolViewModel {
     @Lob
     private String description;
     private boolean generated;
+
+    private Roles role;
 }

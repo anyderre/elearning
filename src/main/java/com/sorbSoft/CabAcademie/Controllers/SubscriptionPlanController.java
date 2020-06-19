@@ -34,7 +34,7 @@ import java.util.Set;
 @RestController
 @RequestMapping("/api/admin/dashboard/subscription-plan")
 @Log4j2
-public class SubscriptionPlanApi {
+public class SubscriptionPlanController {
 
     @Autowired
     private UserServices userService;

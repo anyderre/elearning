@@ -2,11 +2,16 @@ package com.sorbSoft.CabAcademie.Controllers;
 
 
 import com.sorbSoft.CabAcademie.Entities.Course;
+import com.sorbSoft.CabAcademie.Entities.Enums.CourseStatus;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Services.CourseService;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import com.sorbSoft.CabAcademie.config.JwtTokenUtil;
+import com.sorbSoft.CabAcademie.exception.CourseAccessDeniedException;
+import com.sorbSoft.CabAcademie.exception.CourseNotFoundExcepion;
+import com.sorbSoft.CabAcademie.exception.EmptyValueException;
+import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +68,122 @@ public class CourseController {
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/allByUserId/{userId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get All Courses by user id. Role: ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_SCHOOL, ROLE_PROFESSOR, ROLE_FREELANCER, ROLE_ORGANIZATION, ROLE_INSTRUCTOR")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
+    public ResponseEntity<List<CourseViewModel>> getAllCoursesByUserId(@PathVariable Long userId) throws UserNotFoundExcepion {
+
+        List<CourseViewModel> courses = courseService.fetchAllCoursesByUser(userId);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/allByUserId/{userId}/amount/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get All Courses by user id and amount. Role: ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_SCHOOL, ROLE_PROFESSOR, ROLE_FREELANCER, ROLE_ORGANIZATION, ROLE_INSTRUCTOR")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
+    public ResponseEntity<List<CourseViewModel>> getAllCoursesByUserIdAndAmount(
+            @PathVariable Long userId,
+            @PathVariable Integer amount) throws UserNotFoundExcepion {
+
+        List<CourseViewModel> courses = courseService.fetchAllCoursesByUserAndAmount(userId, amount);
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/countByUserId/{userId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get User Courses Count by user id. Role: ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_SCHOOL, ROLE_PROFESSOR, ROLE_FREELANCER, ROLE_ORGANIZATION, ROLE_INSTRUCTOR")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
+    public ResponseEntity<Long> getUserCoursesCount(
+            @PathVariable Long userId) throws UserNotFoundExcepion {
+
+        long userCoursesCount = courseService.countUserCourses(userId);
+        return new ResponseEntity<>(userCoursesCount, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/countByUserId/{userId}/approved" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get User Courses Count by user id and status. Role: ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_SCHOOL, ROLE_PROFESSOR, ROLE_FREELANCER, ROLE_ORGANIZATION, ROLE_INSTRUCTOR")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
+    public ResponseEntity<Long> getApprovedUserCoursesCount(
+            @PathVariable Long userId) throws UserNotFoundExcepion, EmptyValueException {
+
+        long userCoursesCount = courseService.countUserCoursesWithStatus(userId, CourseStatus.APPROVED);
+        return new ResponseEntity<>(userCoursesCount, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/countByUserId/{userId}/pending" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get User Courses Count by user id and status. Role: ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_SCHOOL, ROLE_PROFESSOR, ROLE_FREELANCER, ROLE_ORGANIZATION, ROLE_INSTRUCTOR")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
+    public ResponseEntity<Long> getPendingUserCoursesCount(
+            @PathVariable Long userId) throws UserNotFoundExcepion, EmptyValueException {
+
+        long userCoursesCount = courseService.countUserCoursesWithStatus(userId, CourseStatus.PENDING);
+        return new ResponseEntity<>(userCoursesCount, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/countByUserId/{userId}/declined" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get User Courses Count by user id and status. Role: ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_SCHOOL, ROLE_PROFESSOR, ROLE_FREELANCER, ROLE_ORGANIZATION, ROLE_INSTRUCTOR")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
+    public ResponseEntity<Long> getDeclinedUserCoursesCount(
+            @PathVariable Long userId) throws UserNotFoundExcepion, EmptyValueException {
+
+        long userCoursesCount = courseService.countUserCoursesWithStatus(userId, CourseStatus.DECLINED);
+        return new ResponseEntity<>(userCoursesCount, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/countByUserId/{userId}/draft" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Get User Courses Count by user id and status. Role: ROLE_ADMIN, ROLE_SUPER_ADMIN, ROLE_SCHOOL, ROLE_PROFESSOR, ROLE_FREELANCER, ROLE_ORGANIZATION, ROLE_INSTRUCTOR")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
+    public ResponseEntity<Long> getDraftUserCoursesCount(
+            @PathVariable Long userId) throws UserNotFoundExcepion, EmptyValueException {
+
+        long userCoursesCount = courseService.countUserCoursesWithStatus(userId, CourseStatus.DRAFT);
+        return new ResponseEntity<>(userCoursesCount, HttpStatus.OK);
     }
 
     @GetMapping(value = "/public/subSection/{subSectionId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -297,6 +418,7 @@ public class CourseController {
     }
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Save Course at status Pending (available for Admin approve")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
             "or hasRole('ROLE_SUPER_ADMIN') " +
             "or hasRole('ROLE_SCHOOL') " +
@@ -305,14 +427,39 @@ public class CourseController {
             "or hasRole('ROLE_ORGANIZATION') " +
             "or hasRole('ROLE_INSTRUCTOR')")
     public  ResponseEntity<MessageResponse> saveCourse(@Valid @RequestBody CourseViewModel vm, Principal principal, HttpServletRequest request){
+        vm.setStatus(CourseStatus.DRAFT);
         Result result = courseService.saveCourse(vm);
         if(!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(MessageResponse.of("Course successfully saved"), HttpStatus.OK);
     }
 
-    //Added this
+    @PostMapping(value = "/saveDraft", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Save Course at status Draft. Not available for admin approve.")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
+    public  ResponseEntity<MessageResponse> saveDraftCourse(@Valid @RequestBody CourseViewModel vm, Principal principal, HttpServletRequest request){
+        vm.setStatus(CourseStatus.DRAFT);
+        Result result = courseService.saveCourse(vm);
+        if(!result.isValid())
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of("Course successfully saved"), HttpStatus.OK);
+    }
+
     @PutMapping(value = "/update")
+    @ApiOperation(value = "Update Course. This api sets course status Pending (available for Admin approve)")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
     public ResponseEntity<Course> updateCourse(@RequestBody CourseViewModel courseVm){
 
         //TODO: Validators should be implemenmted as seperate layer
@@ -325,6 +472,89 @@ public class CourseController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
 
+        courseVm.setStatus(CourseStatus.PENDING);
+        Result result = courseService.updateCourse(courseVm);
+
+        if (result == null)
+            return  new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
+
+        return new ResponseEntity("Course updated", HttpStatus.OK);
+    }
+
+    @PutMapping(value = "/makePendingByTeacher/{courseId}")
+    @ApiOperation(value = "Publish course. This api sets course status Pending (available for Admin approve)")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
+    public ResponseEntity<MessageResponse> publishCourse(
+            @PathVariable Long courseId,
+            Principal principal)
+            throws CourseNotFoundExcepion, CourseAccessDeniedException, UserNotFoundExcepion {
+
+        if(courseId <= 0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        boolean isStatusChanged = courseService.makeCourseStatusPending(courseId, principal.getName());
+
+        if(isStatusChanged) {
+            return new ResponseEntity<>(MessageResponse.of("Course status changed"), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(MessageResponse.of("Course status Not changed"), HttpStatus.NOT_MODIFIED);
+        }
+    }
+
+    @PutMapping(value = "/makeDraftByTeacher/{courseId}")
+    @ApiOperation(value = "Make course draft course. This api sets course status Draft (Not available for Admin approve)")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
+    public ResponseEntity<MessageResponse> makeCourseDraft(
+            @PathVariable Long courseId,
+            Principal principal)
+            throws CourseNotFoundExcepion, CourseAccessDeniedException, UserNotFoundExcepion {
+
+        if(courseId <= 0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        boolean isStatusChanged = courseService.makeCourseStatusDraft(courseId, principal.getName());
+
+        if(isStatusChanged) {
+            return new ResponseEntity<>(MessageResponse.of("Course status changed"), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(MessageResponse.of("Course status Not changed"), HttpStatus.NOT_MODIFIED);
+        }
+    }
+
+    @PutMapping(value = "/updateDraft")
+    @ApiOperation(value = "Update Course. This api sets course status Draft (Not available for Admin approve)")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasRole('ROLE_SUPER_ADMIN') " +
+            "or hasRole('ROLE_SCHOOL') " +
+            "or hasRole('ROLE_PROFESSOR') " +
+            "or hasRole('ROLE_FREELANCER') " +
+            "or hasRole('ROLE_ORGANIZATION') " +
+            "or hasRole('ROLE_INSTRUCTOR')")
+    public ResponseEntity<Course> updateDraftCourse(@RequestBody CourseViewModel courseVm){
+
+        //TODO: Validators should be implemenmted as seperate layer
+        if(courseVm == null
+                || courseVm.getId()==null)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Long id = courseVm.getId();
+        if(!courseService.exists(id))
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+
+        courseVm.setStatus(CourseStatus.DRAFT);
         Result result = courseService.updateCourse(courseVm);
 
         if (result == null)

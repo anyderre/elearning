@@ -1,5 +1,6 @@
 package com.sorbSoft.CabAcademie.Repository;
 
+import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,7 +27,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User>findAllByRoleName(String roleName);
 
-    User findByRoleNameAndId(String roleName, Long professorId);
+    User findByRoleRoleAndId(Roles role, Long professorId);
 
     Boolean existsByUsernameAndIdIsNot(String username, Long id);
 

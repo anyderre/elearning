@@ -2,10 +2,12 @@ package com.sorbSoft.CabAcademie.Services.Dtos.Factory;
 
 import com.sorbSoft.CabAcademie.Entities.*;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@ToString
 public class UserFactory {
     public static UserViewModel getUserViewModel(){
         return new UserViewModel() {

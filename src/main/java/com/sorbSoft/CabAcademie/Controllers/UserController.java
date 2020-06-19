@@ -12,8 +12,8 @@ import com.sorbSoft.CabAcademie.exception.PasswordsDoNotMatchException;
 import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import com.sorbSoft.CabAcademie.exception.WorkspaceNameIsAlreadyTaken;
 import com.sorbSoft.CabAcademie.payload.ChangePasswordRequest;
-import com.sorbSoft.CabAcademie.payload.SetupNewPasswordRequest;
 import com.sorbSoft.CabAcademie.payload.ResetPasswordRequest;
+import com.sorbSoft.CabAcademie.payload.SetupNewPasswordRequest;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
@@ -53,6 +54,18 @@ public class UserController {
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
         UserViewModel vm= userService.getUserViewModel(id, filterRoles);
+        if(vm==null)
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+
+        return new ResponseEntity<>(vm, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/getById/{userId}")
+    public ResponseEntity<UserViewModel> getUserById(@PathVariable Long userId){
+        if(userId<0)
+            return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        UserViewModel vm= userService.findUserById(userId);
         if(vm==null)
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
@@ -90,10 +103,11 @@ public class UserController {
     }
 
     @GetMapping(value = "/professor/{id}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<User> findProfessor(@PathVariable Long id){
-        User professor = userService.findProfessor(id);
+    public ResponseEntity<UserViewModel> findProfessor(@PathVariable Long id) throws IOException {
+        UserViewModel professor = userService.findProfessor(id);
         if(professor == null)
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
         return new ResponseEntity<>(professor, HttpStatus.OK);
     }
 

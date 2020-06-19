@@ -2,24 +2,19 @@ package com.sorbSoft.CabAcademie.Controllers;
 
 
 import com.sorbSoft.CabAcademie.Entities.Course;
-import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Services.CourseService;
-import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
-import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
-import com.sorbSoft.CabAcademie.config.JwtTokenUtil;
 import com.sorbSoft.CabAcademie.exception.*;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;

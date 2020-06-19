@@ -215,6 +215,13 @@ public class UserServices {
 
     }
 
+    public UserViewModel findUserById(Long userId){
+        User user = userRepository.findById(userId);
+        UserViewModel userViewModel = mapper.mapToViewModel(user);
+        return userViewModel;
+
+    }
+
     public long countFreeUsersByRole(Roles role) {
 
         Rol studentRole = rolRepository.findByDescription(role.toString());
@@ -258,8 +265,12 @@ public class UserServices {
         return userRepository.findAllByRoleName(Roles.ROLE_PROFESSOR.name());
     }
 
-    public User findProfessor(Long professorId){
-        return userRepository.findByRoleNameAndId(Roles.ROLE_PROFESSOR.name(), professorId);
+    public UserViewModel findProfessor(Long professorId){
+        User professor = userRepository.findByRoleRoleAndId(Roles.ROLE_PROFESSOR, professorId);
+
+        UserViewModel userViewModel = mapper.mapToViewModel(professor);
+
+        return userViewModel;
     }
 
     public List<User> findAllUsersFilteredFromAdmin(){

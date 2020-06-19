@@ -24,6 +24,8 @@ public class SubscriptionPlan {
 
     private Long maxCoursesPerProfessor;
 
+    private Long maxDraftCoursesPerProfessor;
+
     private Long maxProfessors;
 
     private Long maxStudents;
