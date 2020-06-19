@@ -321,7 +321,7 @@ public class UserServices {
         } else {
             vm.setAllRoles(rolServices.fetchAllRole());
         }
-        vm.setAllCourses(courseService.fetchAllCourses());
+        //vm.setAllCourses(courseService.fetchAllCourses());
         vm.setAllCategories(categoryService.fetchAllCategories());
         vm.setAllSubCategories(subCategoryService.fetchAllSubCategories());
         vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
