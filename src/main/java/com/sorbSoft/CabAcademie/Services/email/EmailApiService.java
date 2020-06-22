@@ -638,4 +638,25 @@ public class EmailApiService {
 
         sendMail(mail, parameters);
     }
+
+    @Async
+    public void sendPasswordChangedEmail(User user) {
+        log.debug("Sending change password notification to user: {}", user);
+
+        final Mail mail = new Mail();
+        String title;
+        mail.setMailFrom(USER_NAME);
+        mail.setMailTo(user.getEmail());
+
+        title = "Password Changed Notification";
+        mail.setMailSubject(title);
+        mail.setTemplateName("password_changed.vm");
+
+        final Map<String, Object> parameters = new HashMap<>();
+        parameters.put("title", title);
+        parameters.put("firstName", user.getFirstName());
+        parameters.put("lastName", user.getLastName());
+
+        sendMail(mail, parameters);
+    }
 }

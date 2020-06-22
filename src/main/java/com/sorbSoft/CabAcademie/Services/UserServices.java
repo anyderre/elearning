@@ -10,6 +10,7 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
 import com.sorbSoft.CabAcademie.exception.*;
+import com.sorbSoft.CabAcademie.payload.ChangeBatchPasswordRequest;
 import com.sorbSoft.CabAcademie.payload.ChangePasswordRequest;
 import com.sorbSoft.CabAcademie.payload.SetupNewPasswordRequest;
 import lombok.extern.log4j.Log4j2;
@@ -722,6 +723,7 @@ public class UserServices {
             user.setIsDefaultPasswordChanged(true);
 
             userRepository.save(user);
+            emailAPI.sendPasswordChangedEmail(user);
         } else {
             throw new PasswordsDoNotMatchException("Password and confirm password do not match");
         }
@@ -750,9 +752,41 @@ public class UserServices {
                 user.setIsDefaultPasswordChanged(true);
 
                 userRepository.save(user);
+
+                emailAPI.sendPasswordChangedEmail(user);
             } else {
                 throw new PasswordsDoNotMatchException("Old Password and current user password do not match");
             }
+        } else {
+            throw new PasswordsDoNotMatchException("New Password and confirm password do not match");
+        }
+
+    }
+
+    public void changeBatchPassword(ChangeBatchPasswordRequest resetRq, String userName) throws EmptyValueException, PasswordsDoNotMatchException, UserNotFoundExcepion, UserIsNotBatchException {
+
+        String newPassword = resetRq.getNewPassword();
+        String confirmPassword = resetRq.getConfirmPassword();
+
+        validator.validateNull(newPassword, "New Password");
+        validator.validateNull(confirmPassword, "Confirm Password");
+
+        if(newPassword.equals(confirmPassword)){
+
+            User user = userRepository.findByUsername(userName);
+            validator.validateNull(user, "userName", userName);
+
+            if(user.getIsDefaultPasswordChanged() == false) {
+                user.setPassword(bCryptPasswordEncoder.encode(newPassword));
+                user.setIsDefaultPasswordChanged(true);
+
+                userRepository.save(user);
+
+                emailAPI.sendPasswordChangedEmail(user);
+            } else {
+                throw new UserIsNotBatchException("This user can't change password without providing old password");
+            }
+
         } else {
             throw new PasswordsDoNotMatchException("New Password and confirm password do not match");
         }

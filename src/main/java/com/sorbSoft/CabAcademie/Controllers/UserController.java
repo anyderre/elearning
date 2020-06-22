@@ -7,10 +7,8 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Info.UserInfo;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
 import com.sorbSoft.CabAcademie.Services.UserServices;
-import com.sorbSoft.CabAcademie.exception.EmptyValueException;
-import com.sorbSoft.CabAcademie.exception.PasswordsDoNotMatchException;
-import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
-import com.sorbSoft.CabAcademie.exception.WorkspaceNameIsAlreadyTaken;
+import com.sorbSoft.CabAcademie.exception.*;
+import com.sorbSoft.CabAcademie.payload.ChangeBatchPasswordRequest;
 import com.sorbSoft.CabAcademie.payload.ChangePasswordRequest;
 import com.sorbSoft.CabAcademie.payload.ResetPasswordRequest;
 import com.sorbSoft.CabAcademie.payload.SetupNewPasswordRequest;
@@ -252,6 +250,16 @@ public class UserController {
             Principal principal) throws UserNotFoundExcepion, PasswordsDoNotMatchException, EmptyValueException {
 
         userService.changePassword(resetRq, principal.getName());
+
+        return new ResponseEntity(MessageResponse.of("Password changed"),HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/change-batch-password" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> changeBatchPassword(
+            @Valid @RequestBody ChangeBatchPasswordRequest resetRq,
+            Principal principal) throws UserNotFoundExcepion, PasswordsDoNotMatchException, EmptyValueException, UserIsNotBatchException {
+
+        userService.changeBatchPassword(resetRq, principal.getName());
 
         return new ResponseEntity(MessageResponse.of("Password changed"),HttpStatus.OK);
     }
