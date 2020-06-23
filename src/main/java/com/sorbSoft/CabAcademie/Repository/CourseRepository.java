@@ -32,7 +32,7 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     long countCoursesByUserAndStatus(User user, CourseStatus status);
 
     //subSection
-    List<Course> findAllBySubSectionIdAndSchoolsIsNullAndStatus(Long subSectionId, CourseStatus status);
+    List<Course> findAllBySubSectionIdAndSchoolsNewIsNullAndStatus(Long subSectionId, CourseStatus status);
 
     List<Course> findAllBySubSectionId(Long subSectionId);
 

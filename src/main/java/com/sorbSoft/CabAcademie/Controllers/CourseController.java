@@ -421,9 +421,14 @@ public class CourseController {
     @ApiOperation(value = "Save Course at status Approved")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
             "or hasRole('ROLE_SUPER_ADMIN') ")
-    public  ResponseEntity<MessageResponse> saveApprovedCourseByAdmin(@Valid @RequestBody CourseViewModel vm, Principal principal, HttpServletRequest request){
+    public  ResponseEntity<MessageResponse> saveApprovedCourseByAdmin(
+            @Valid @RequestBody CourseViewModel vm,
+            Principal principal){
+
         vm.setStatus(CourseStatus.APPROVED);
-        Result result = courseService.saveCourse(vm);
+
+        Result result = courseService.saveCourse(vm, principal.getName());
+
         if(!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(MessageResponse.of("Course successfully saved"), HttpStatus.OK);
@@ -438,9 +443,14 @@ public class CourseController {
             "or hasRole('ROLE_FREELANCER') " +
             "or hasRole('ROLE_ORGANIZATION') " +
             "or hasRole('ROLE_INSTRUCTOR')")
-    public  ResponseEntity<MessageResponse> saveCourse(@Valid @RequestBody CourseViewModel vm, Principal principal, HttpServletRequest request){
+    public  ResponseEntity<MessageResponse> saveCourse(
+            @Valid @RequestBody CourseViewModel vm,
+            Principal principal){
+
         vm.setStatus(CourseStatus.PENDING);
-        Result result = courseService.saveCourse(vm);
+
+        Result result = courseService.saveCourse(vm, principal.getName());
+
         if(!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(MessageResponse.of("Course successfully saved"), HttpStatus.OK);
@@ -455,9 +465,14 @@ public class CourseController {
             "or hasRole('ROLE_FREELANCER') " +
             "or hasRole('ROLE_ORGANIZATION') " +
             "or hasRole('ROLE_INSTRUCTOR')")
-    public  ResponseEntity<MessageResponse> saveDraftCourse(@Valid @RequestBody CourseViewModel vm, Principal principal, HttpServletRequest request){
+    public  ResponseEntity<MessageResponse> saveDraftCourse(
+            @Valid @RequestBody CourseViewModel vm,
+            Principal principal){
+
         vm.setStatus(CourseStatus.DRAFT);
-        Result result = courseService.saveCourse(vm);
+
+        Result result = courseService.saveCourse(vm, principal.getName());
+
         if(!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(MessageResponse.of("Course successfully saved"), HttpStatus.OK);
@@ -472,7 +487,9 @@ public class CourseController {
             "or hasRole('ROLE_FREELANCER') " +
             "or hasRole('ROLE_ORGANIZATION') " +
             "or hasRole('ROLE_INSTRUCTOR')")
-    public ResponseEntity<Course> updateCourse(@RequestBody CourseViewModel courseVm){
+    public ResponseEntity<Course> updateCourse(
+            @RequestBody CourseViewModel courseVm,
+            Principal principal){
 
         //TODO: Validators should be implemenmted as seperate layer
         if(courseVm == null
@@ -485,7 +502,7 @@ public class CourseController {
 
 
         courseVm.setStatus(CourseStatus.PENDING);
-        Result result = courseService.updateCourse(courseVm);
+        Result result = courseService.updateCourse(courseVm, principal.getName());
 
         if (result == null)
             return  new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
@@ -554,7 +571,9 @@ public class CourseController {
             "or hasRole('ROLE_FREELANCER') " +
             "or hasRole('ROLE_ORGANIZATION') " +
             "or hasRole('ROLE_INSTRUCTOR')")
-    public ResponseEntity<Course> updateDraftCourse(@RequestBody CourseViewModel courseVm){
+    public ResponseEntity<Course> updateDraftCourse(
+            @RequestBody CourseViewModel courseVm,
+            Principal principal){
 
         //TODO: Validators should be implemenmted as seperate layer
         if(courseVm == null
@@ -567,7 +586,7 @@ public class CourseController {
 
 
         courseVm.setStatus(CourseStatus.DRAFT);
-        Result result = courseService.updateCourse(courseVm);
+        Result result = courseService.updateCourse(courseVm, principal.getName());
 
         if (result == null)
             return  new ResponseEntity<>(HttpStatus.NOT_MODIFIED);

@@ -134,8 +134,11 @@ public class Course implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     private List<User> schools;
 
+    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    private List<CourseSchool> schoolsNew;
+
     @Enumerated(EnumType.STRING)
-    private CourseStatus status;
+    private CourseStatus status; //-> public status
 
     private String declineMessage;
 }

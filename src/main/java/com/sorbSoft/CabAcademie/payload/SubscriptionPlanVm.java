@@ -1,27 +1,20 @@
-package com.sorbSoft.CabAcademie.Entities;
+package com.sorbSoft.CabAcademie.payload;
 
-import com.sorbSoft.CabAcademie.Entities.Enums.SubscriptionPlanLevel;
 import com.sorbSoft.CabAcademie.Entities.Enums.OrganizationType;
+import com.sorbSoft.CabAcademie.Entities.Enums.SubscriptionPlanLevel;
 import lombok.Data;
 
-import javax.persistence.*;
 import java.util.Date;
 
 @Data
-@Entity
-@Table(name = "subscription_plan")
-public class SubscriptionPlan {
+public class SubscriptionPlanVm {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
-    @Enumerated(EnumType.STRING)
     private OrganizationType type;
 
-    @Enumerated(EnumType.STRING)
     private SubscriptionPlanLevel level;
 
     private Long maxCoursesPerProfessor;
@@ -43,4 +36,5 @@ public class SubscriptionPlan {
     private Date createdDate;
 
     private Date updatedDate;
+
 }

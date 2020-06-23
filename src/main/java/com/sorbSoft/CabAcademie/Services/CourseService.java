@@ -71,7 +71,125 @@ public class CourseService {
     @Autowired
     private GenericValidator validator;
 
+    @Autowired
+    private SubscriptionPlanValidator subscriptionValidator;
+
+    @Autowired
+    private CourseSchoolRepository courseSchoolRepository;
+
     private final CourseMapper mapper = Mappers.getMapper(CourseMapper.class);
+
+    public Result saveCourse(CourseViewModel vm, String userName){
+        vm = prepareEntity(vm);
+        Result result = ValidateModel(vm);
+        if (!result.isValid()) {
+            return result;
+        }
+        if (vm.getId() > 0L) {
+            return updateCourse(vm, userName);
+        } else {
+            Course savedCourse = courseRepository.findCourseByTitle(vm.getTitle());
+
+            if ( savedCourse != null){
+                result.add("The course you are trying to save already exist");
+                return result;
+            }
+
+            return save(vm);
+        }
+    }
+
+    private  Result save (CourseViewModel vm) {
+        Result result = new Result();
+        Course course = null;
+        try {
+            course = getEntity(vm);
+
+
+            if (vm.getId() > 0 || course.getOverview() != null || course.getSchools() != null) {
+                Overview overviewEntity = course.getOverview();
+                course.setOverview(null);
+
+                List<User> schools = course.getSchools();
+                //course.setSchoolsNew(null);
+
+                Course savedCourse = courseRepository.save(course);
+                if (overviewEntity != null) {
+                    overviewEntity.setCourse(savedCourse);
+                    Overview overview = overviewRepository.save(overviewEntity);
+
+                    savedCourse.setOverview(overview);
+
+                    courseRepository.save(savedCourse);
+                }
+
+                if(schools != null && schools.isEmpty() == false) {
+
+                    List<CourseSchool> schoolsNew = new ArrayList<>();
+                    for(User school : vm.getSchools()) {
+                        CourseSchool courseSchool = new CourseSchool();
+                        courseSchool.setCourse(savedCourse);
+                        courseSchool.setSchool(school);
+                        courseSchool.setTeacher(savedCourse.getUser());
+                        courseSchool.setStatus(vm.getStatus());
+
+                        //CourseSchool courseSchoolSaved = courseSchoolRepository.save(courseSchool);
+                        schoolsNew.add(courseSchool);
+                    }
+                    List<CourseSchool> schoolsNewSaved = courseSchoolRepository.save(schoolsNew);
+
+                    savedCourse.setSchoolsNew(schoolsNewSaved);
+                    courseRepository.save(savedCourse);
+                }
+            } else {
+                course = courseRepository.save(course);
+            }
+        } catch (Exception ex)  {
+            result.add(ex.getMessage());
+            return result;
+        }
+        return result;
+    }
+
+    private Course getEntity(CourseViewModel vm){
+        Course resultCourse = mapper.mapToEntity(vm);
+        resultCourse.setLastUpdate(new Date());
+        if (vm.getId() <= 0) {
+            resultCourse.setCreationDate(new Date());
+        } else {
+            resultCourse.setLastUpdate(new Date());
+        }
+
+       /* if(vm.getSchools()!=null) {
+
+            //TODO: check and maybe improve
+            List<CourseSchool> schools = new ArrayList<>();
+            for(User school : vm.getSchools()) {
+                CourseSchool courseSchool = new CourseSchool();
+                courseSchool.setCourse(resultCourse);
+                courseSchool.setSchool(school);
+                courseSchool.setTeacher(vm.getUser());
+                courseSchool.setStatus(vm.getStatus());
+
+                schools.add(courseSchool);
+            }
+
+            resultCourse.setSchoolsNew(schools);
+
+        }*/
+        if(isPublicCourse(vm)){
+            resultCourse.setStatus(vm.getStatus());
+        }
+        if(isPublicCourse(vm) == false) {
+            resultCourse.setStatus(null);
+        }
+
+        return resultCourse;
+    }
+
+    private boolean isPublicCourse(CourseViewModel vm) {
+        return vm.getSchools().isEmpty();
+    }
 
     public List<Course> fetchAllCourses(){
         return courseRepository.findAll();
@@ -86,7 +204,7 @@ public class CourseService {
         return courseRepository.findOne(id);
     }
 
-    public Result updateCourse(CourseViewModel vm){
+    public Result updateCourse(CourseViewModel vm, String userName){
         Result result = new Result();
         Course current = courseRepository.findOne(vm.getId());
 
@@ -174,32 +292,6 @@ public class CourseService {
         return courseRepository.countCoursesByUserAndStatus(user, status);
     }
 
-    private  Result save (CourseViewModel vm) {
-        Result result = new Result();
-        Course course = null;
-        try {
-            course = getEntity(vm);
-
-            if (vm.getId() > 0 || course.getOverview() != null) {
-                Overview overviewEntity = course.getOverview();
-                course.setOverview(null);
-                Course savedCourse = courseRepository.save(course);
-                if (overviewEntity != null) {
-                    overviewEntity.setCourse(savedCourse);
-                    Overview overview = overviewRepository.save(overviewEntity);
-                    savedCourse.setOverview(overview);
-                    courseRepository.save(savedCourse);
-                }
-            } else {
-                course = courseRepository.save(course);
-            }
-        } catch (Exception ex)  {
-            result.add(ex.getMessage());
-            return result;
-        }
-        return result;
-    }
-
     public Result deleteCourse(Long id){
         Result result = new Result();
 
@@ -244,29 +336,9 @@ public class CourseService {
         vm.setUsers(userServices.findAllUser()); // Filtered // TODO: could have more filters
         return vm;
     }
-    
-    public Result saveCourse(CourseViewModel vm){
-        vm = prepareEntity(vm);
-        Result result = ValidateModel(vm);
-        if (!result.isValid()) {
-            return result;
-        }
-        if (vm.getId() > 0L) {
-            return updateCourse(vm);
-        } else {
-            Course savedCourse = courseRepository.findCourseByTitle(vm.getTitle());
-
-            if ( savedCourse != null){
-                result.add("The course you are trying to save already exist");
-                return result;
-            }
-
-            return save(vm);
-        }
-    }
 
     public List<Course> fetchPublicCourseBySubSection(Long subSectionId) {
-        return courseRepository.findAllBySubSectionIdAndSchoolsIsNullAndStatus(subSectionId, CourseStatus.APPROVED);
+        return courseRepository.findAllBySubSectionIdAndSchoolsNewIsNullAndStatus(subSectionId, CourseStatus.APPROVED);
     }
 
     public List<Course> fetchPrivateCourseBySubSectionAlternative(Long subSectionId, String userName) {
@@ -304,9 +376,9 @@ public class CourseService {
             //select * from Course where Course.id IN (select course_id from Course_School where Course_School.user_id = school.id)
             List<Course> coursesBySubSection = courseRepository.findAllBySubSectionId(subSectionId);
             for(Course course : coursesBySubSection) {
-                for(User courseSchool : course.getSchools()) {
+                for(CourseSchool courseSchool : course.getSchoolsNew()) {
 
-                    if(schoolOrOrganization.getId() == courseSchool.getId()) {
+                    if(schoolOrOrganization.getId() == courseSchool.getSchool().getId()) {
                         courses.add(course);
                     }
                 }
@@ -587,22 +659,6 @@ public class CourseService {
         return  result;
     }
 
-
-    private Course getEntity(CourseViewModel vm){
-        Course resultCourse = mapper.mapToEntity(vm);
-        resultCourse.setLastUpdate(new Date());
-        if (vm.getId() <= 0) {
-            resultCourse.setCreationDate(new Date());
-        } else {
-            resultCourse.setLastUpdate(new Date());
-        }
-
-        if(vm.getSection()!=null) {
-            resultCourse.setStatus(vm.getStatus());
-        }
-        return resultCourse;
-    }
-
     public List<Course> fetchLastAddedPublicCourses(int amount) {
 
         return fetchLastAddedPublicCoursesByStatus(amount, CourseStatus.APPROVED);
@@ -806,19 +862,19 @@ public class CourseService {
 
         for (User school : schools) {
             if(status == null) {
-                coursesCount = courseRepository.countCoursesBySchoolsIn(school);
+                coursesCount = courseSchoolRepository.countCoursesBySchool(school);
             }
 
             if(status == CourseStatus.PENDING) {
-                coursesCount = courseRepository.countCoursesBySchoolsInAndStatus(school, CourseStatus.PENDING);
+                coursesCount = courseSchoolRepository.countCoursesBySchoolAndStatus(school, CourseStatus.PENDING);
             }
 
             if(status == CourseStatus.DECLINED) {
-                coursesCount = courseRepository.countCoursesBySchoolsInAndStatus(school, CourseStatus.DECLINED);
+                coursesCount = courseSchoolRepository.countCoursesBySchoolAndStatus(school, CourseStatus.DECLINED);
             }
 
             if(status == CourseStatus.APPROVED) {
-                coursesCount = courseRepository.countCoursesBySchoolsInAndStatus(school, CourseStatus.APPROVED);
+                coursesCount = courseSchoolRepository.countCoursesBySchoolAndStatus(school, CourseStatus.APPROVED);
             }
             return coursesCount;
         }
@@ -857,6 +913,8 @@ public class CourseService {
     }
 
     public boolean approveCourse(Long courseId) throws CourseNotFoundExcepion {
+
+
         return changeCourseStatus(courseId, CourseStatus.APPROVED, "");
     }
 
@@ -916,7 +974,9 @@ public class CourseService {
 
 
 
-    public boolean approveCourse(Long courseId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion {
+    public boolean approveCourse(Long courseId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, MaxCoursesPerProfessorExceededException {
+
+        subscriptionValidator.validateCourseApprovment(courseId, adminUsername);
         return changeCourseStatus(courseId, adminUsername, CourseStatus.APPROVED, "");
     }
 
@@ -942,19 +1002,19 @@ public class CourseService {
             throw new CourseNotFoundExcepion("Course with id: " + courseId + " was not found in db");
         }
 
-        List<User> courseSchools = course2Approve.getSchools();
+        List<CourseSchool> courseSchools = course2Approve.getSchoolsNew();
         if (courseSchools == null || courseSchools.isEmpty()) {
             throw new SchoolNotFoundExcepion("Course with id: " + courseId + " doesn't belong to any school");
         }
 
         //check if admin belong to school course
         for(User adminSchool : adminSchools) {
-            for(User courseSchool : courseSchools) {
-                if(adminSchool.equals(courseSchool)) {
+            for(CourseSchool courseSchool : courseSchools) {
+                if(adminSchool.equals(courseSchool.getSchool())) {
 
                     if(status == CourseStatus.APPROVED) {
 
-                        course2Approve.setStatus(CourseStatus.APPROVED);
+                        courseSchool.setStatus(CourseStatus.APPROVED);
                         course2Approve.setLastUpdate(new Date());
                         courseRepository.save(course2Approve);
                         isStatusChanged = true;
@@ -963,8 +1023,8 @@ public class CourseService {
 
                     if(status == CourseStatus.DECLINED) {
 
-                        course2Approve.setDeclineMessage(declineMessage);
-                        course2Approve.setStatus(CourseStatus.DECLINED);
+                        courseSchool.setStatus(CourseStatus.DECLINED);
+                        courseSchool.setDeclineMessage(declineMessage);
                         course2Approve.setLastUpdate(new Date());
                         courseRepository.save(course2Approve);
                         isStatusChanged = true;
