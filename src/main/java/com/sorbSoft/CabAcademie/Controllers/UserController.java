@@ -117,7 +117,7 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    private ResponseEntity<MessageResponse> saveUser(UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+    private ResponseEntity<MessageResponse> saveUser(UserViewModel user) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
         if (userRepository.existsByUsernameAndIdIsNot(user.getUsername(), user.getId())) {
             return ResponseEntity
                     .badRequest()
@@ -138,32 +138,32 @@ public class UserController {
 
 
     @PostMapping("/saveStudent")
-    public  ResponseEntity<MessageResponse> saveStudent(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+    public  ResponseEntity<MessageResponse> saveStudent(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
         user.setIsDefaultPasswordChanged(true);
         return saveUser(user);
     }
 
     @PostMapping("/saveOrganization")
-    public  ResponseEntity<MessageResponse> saveOrganization(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+    public  ResponseEntity<MessageResponse> saveOrganization(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
         user.setIsDefaultPasswordChanged(true);
         return saveUser(user);
     }
 
 
     @PostMapping("/saveSchool")
-    public  ResponseEntity<MessageResponse> saveSchool(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+    public  ResponseEntity<MessageResponse> saveSchool(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
         user.setIsDefaultPasswordChanged(true);
         return saveUser(user);
     }
 
     @PostMapping("/saveTeacher")
-    public  ResponseEntity<MessageResponse> saveTeacher(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+    public  ResponseEntity<MessageResponse> saveTeacher(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
         user.setIsDefaultPasswordChanged(true);
         return saveUser(user);
     }
 
     @PostMapping("/save")
-    public  ResponseEntity<MessageResponse> saveOtherUser(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+    public  ResponseEntity<MessageResponse> saveOtherUser(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
         user.setIsDefaultPasswordChanged(true);
         return saveUser(user);
     }
@@ -171,7 +171,7 @@ public class UserController {
     @PostMapping("/saveByAdmin")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @ApiOperation(value = "Add user by School/Org Admin, Role:ROLE_ADMIN")
-    public  ResponseEntity<MessageResponse> saveByAdmin(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken {
+    public  ResponseEntity<MessageResponse> saveByAdmin(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
         user.setIsDefaultPasswordChanged(false);
         return saveUser(user);
     }

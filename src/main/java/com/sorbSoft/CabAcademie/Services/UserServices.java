@@ -69,7 +69,7 @@ public class UserServices {
     private UserMapper mapper
             = Mappers.getMapper(UserMapper.class);
 
-    public Result saveUser (UserViewModel vm) throws WorkspaceNameIsAlreadyTaken {
+    public Result saveUser (UserViewModel vm) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
         vm = prepareEntity(vm);
         Result result = ValidateModel(vm);
         if (!result.isValid()) {
@@ -156,7 +156,7 @@ public class UserServices {
         return vm.getRole().getId() == 7;
     }
 
-    public Result saveSocialUser(UserViewModel vm) throws WorkspaceNameIsAlreadyTaken {
+    public Result saveSocialUser(UserViewModel vm) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
 
         Result result = new Result();
         result = saveUser(vm);
@@ -377,7 +377,7 @@ public class UserServices {
         return info;
     }
 
-    private Result ValidateModel(UserViewModel vm) throws WorkspaceNameIsAlreadyTaken {
+    private Result ValidateModel(UserViewModel vm) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
         Result result = new Result();
 
         if (vm.getRole().getId() <= 0) {
@@ -407,6 +407,13 @@ public class UserServices {
             List<User> schools = userRepository.findUsersByWorkspaceName(vm.getWorkspaceName());
             if(schools!=null && !schools.isEmpty()) {
                 throw new WorkspaceNameIsAlreadyTaken("Workspace name '"+vm.getWorkspaceName()+"' is already taken");
+            }
+
+            if(vm.getSubscriptionLevel() == null) {
+                throw new SubscriptionPlanNotSpecified("You should specify subscription plan level");
+            }
+            if(vm.getOrganizationType() == null) {
+                throw new SubscriptionPlanNotSpecified("You should specify subscription organization type");
             }
         }
         if (vm.getUsername().isEmpty()) {
@@ -795,7 +802,7 @@ public class UserServices {
 
     }
 
-    public void batchSignupUsers(MultipartFile usersCsvFile, String adminName) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CsvParseException, EmptyValueException, WorkspaceNameIsAlreadyTaken, SaveUserException, RoleNotAllowedException, RoleFormatException {
+    public void batchSignupUsers(MultipartFile usersCsvFile, String adminName) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CsvParseException, EmptyValueException, WorkspaceNameIsAlreadyTaken, SaveUserException, RoleNotAllowedException, RoleFormatException, SubscriptionPlanNotSpecified {
         User admin = userRepository.findByUsername(adminName);
         validator.validateNull(admin, adminName, "userName");
 

@@ -616,9 +616,7 @@ public class AdminDashboardController {
             @RequestPart(value = "file") MultipartFile file,
             Principal principal)
 
-            throws SaveUserException, UserNotFoundExcepion, EmptyValueException,
-            CsvParseException, SchoolNotFoundExcepion, WorkspaceNameIsAlreadyTaken,
-            RoleNotAllowedException, RoleFormatException {
+            throws SaveUserException, UserNotFoundExcepion, EmptyValueException, CsvParseException, SchoolNotFoundExcepion, WorkspaceNameIsAlreadyTaken, RoleNotAllowedException, RoleFormatException, SubscriptionPlanNotSpecified {
 
         log.debug("Principal username:"+principal.getName());
         userService.batchSignupUsers(file, principal.getName());

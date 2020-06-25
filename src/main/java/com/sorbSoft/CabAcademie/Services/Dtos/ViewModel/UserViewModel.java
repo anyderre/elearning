@@ -1,6 +1,8 @@
 package com.sorbSoft.CabAcademie.Services.Dtos.ViewModel;
 
 import com.sorbSoft.CabAcademie.Entities.*;
+import com.sorbSoft.CabAcademie.Entities.Enums.OrganizationType;
+import com.sorbSoft.CabAcademie.Entities.Enums.SubscriptionPlanLevel;
 import lombok.Data;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -11,6 +13,7 @@ import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Date;
 import java.util.List;
 @Data
 public class UserViewModel {
@@ -69,5 +72,11 @@ public class UserViewModel {
     private String timeZone;
 
     private Boolean isDefaultPasswordChanged;
+
+    private SubscriptionPlanLevel subscriptionLevel;
+
+    private OrganizationType organizationType;
+
+    private Date planActiveUntilDate;
 
 }

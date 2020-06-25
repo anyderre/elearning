@@ -260,6 +260,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(SubscriptionPlanNotSpecified.class)
+    protected ResponseEntity<Object> handleSubscriptionPlanNotSpecified(SubscriptionPlanNotSpecified ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         log.warn(apiError.getMessage());
