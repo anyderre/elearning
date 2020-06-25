@@ -130,9 +130,7 @@ public class UserServices {
         if(isSchool(vm)) {
             admin.setSchools(Arrays.asList(user));
         }
-        if(isOrganization(vm)) {
-            admin.setOrganizations(Arrays.asList(user));
-        }
+
         admin.setWorkspaceName("");
 
         return userRepository.save(admin);
@@ -428,7 +426,7 @@ public class UserServices {
         result.add(validateSubCategories(vm.getSubCategories()));
         result.add(validateCourses(vm.getCourses()));
         result.add(validateSchools(vm.getSchools()));
-        result.add(validateOrganizations(vm.getOrganizations()));
+        //result.add(validateOrganizations(vm.getOrganizations()));
 
         return result;
     }
@@ -486,9 +484,9 @@ public class UserServices {
         if (vm.getSchools()== null) {
             vm.setSchools(new ArrayList<>());
         }
-        if (vm.getOrganizations()== null) {
+        /*if (vm.getOrganizations()== null) {
             vm.setOrganizations(new ArrayList<>());
-        }
+        }*/
 
         Rol role = rolRepository.findOne(vm.getRole().getId());
         if (role != null) {
@@ -497,24 +495,24 @@ public class UserServices {
                 vm.setSubCategories(new ArrayList<>());
                 vm.setSchools(new ArrayList<>());
                 vm.setCourses(new ArrayList<>());
-                vm.setOrganizations(new ArrayList<>());
+                //vm.setOrganizations(new ArrayList<>());
             }
              else if (role.getDescription().equals(Roles.ROLE_PROFESSOR.name())) {
                 vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
                 vm.setWorkspaceName("");
-                vm.setOrganizations(new ArrayList<>());
+                //vm.setOrganizations(new ArrayList<>());
             } else if (role.getDescription().equals(Roles.ROLE_STUDENT.name())) {
                 vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
                 vm.setWorkspaceName("");
                 vm.setCategories(new ArrayList<>());
                 vm.setSubCategories(new ArrayList<>());
-                vm.setOrganizations(new ArrayList<>());
+                //vm.setOrganizations(new ArrayList<>());
                 vm.setCourses(new ArrayList<>());
             } else if (role.getDescription().equals(Roles.ROLE_FREELANCER.name())){
                 vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
                 vm.setWorkspaceName("");
                 vm.setSchools(new ArrayList<>());
-                vm.setOrganizations(new ArrayList<>());
+                //vm.setOrganizations(new ArrayList<>());
             } else if (role.getDescription().equals(Roles.ROLE_FREE_STUDENT.name())) {
                 vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
                 vm.setWorkspaceName("");
@@ -522,7 +520,7 @@ public class UserServices {
                 vm.setSubCategories(new ArrayList<>());
                 vm.setSchools(new ArrayList<>());
                 vm.setCourses(new ArrayList<>());
-                vm.setOrganizations(new ArrayList<>());
+                //vm.setOrganizations(new ArrayList<>());
             } else if (role.getDescription().equals(Roles.ROLE_EMPLOYEE.name())) {
                 vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
                 vm.setWorkspaceName("");
@@ -535,7 +533,7 @@ public class UserServices {
                 vm.setCategories(new ArrayList<>());
                 vm.setSubCategories(new ArrayList<>());
                 vm.setSchools(new ArrayList<>());
-                vm.setOrganizations(new ArrayList<>());
+                //vm.setOrganizations(new ArrayList<>());
             } else if (role.getDescription().equals(Roles.ROLE_ADMIN.name())) {
                 vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
                 vm.setWorkspaceName("");
@@ -547,7 +545,7 @@ public class UserServices {
                 vm.setName(vm.getFirstName() + ' ' + vm.getLastName());
                 vm.setCategories(new ArrayList<>());
                 vm.setSubCategories(new ArrayList<>());
-                vm.setOrganizations(new ArrayList<>());
+                //vm.setOrganizations(new ArrayList<>());
                 vm.setSchools(new ArrayList<>());
                 vm.setCourses(new ArrayList<>());
             } else if (role.getDescription().equals(Roles.ROLE_INSTRUCTOR.name())) {
@@ -818,16 +816,10 @@ public class UserServices {
 
     private void setSchoolOrOrg(List<UserViewModel> userViewModels, User admin) throws SchoolNotFoundExcepion, RoleNotAllowedException {
         List<User> schools = admin.getSchools();
-        List<User> orgs = admin.getOrganizations();
 
         if(schools != null && !schools.isEmpty()) {
             for(User school : schools){
                 setSchool(userViewModels, school);
-                break;
-            }
-        } else if(orgs != null && !orgs.isEmpty()) {
-            for(User org : orgs){
-                setOrg(userViewModels, org);
                 break;
             }
         } else {
@@ -847,7 +839,7 @@ public class UserServices {
         }
     }
 
-    private void setOrg(List<UserViewModel> vms, User organization) throws RoleNotAllowedException {
+    /*private void setOrg(List<UserViewModel> vms, User organization) throws RoleNotAllowedException {
         for(UserViewModel vm : vms) {
             //employee or instructor
             if(vm.getRole().getId() == 8 || vm.getRole().getId() == 10) {
@@ -856,7 +848,7 @@ public class UserServices {
                 throw new RoleNotAllowedException("Role id:"+vm.getRole().getId()+" of userName:"+vm.getUsername()+" is not allowed for Organization batch signup");
             }
         }
-    }
+    }*/
 
     private List<UserViewModel> parseUsersFromCSVFile(final MultipartFile file) throws CsvParseException, EmptyValueException, RoleNotAllowedException, RoleFormatException {
         final List<UserViewModel> vms = new ArrayList<>();

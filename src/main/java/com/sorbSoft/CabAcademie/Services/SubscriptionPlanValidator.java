@@ -11,6 +11,7 @@ import com.sorbSoft.CabAcademie.Repository.CourseRepository;
 import com.sorbSoft.CabAcademie.Repository.CourseSchoolRepository;
 import com.sorbSoft.CabAcademie.Repository.SubscriptionPlanRepository;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import com.sorbSoft.CabAcademie.exception.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -90,8 +91,16 @@ public class SubscriptionPlanValidator {
 
         User teacher = course2Approve.getUser();
 
+        validateAddCourseByAdmin(teacher.getId(), adminUsername);
+    }
+
+    public void validateAddCourseByAdmin(Long teacherId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, MaxCoursesPerProfessorExceededException {
+
+        User teacher = userRepository.findById(teacherId);
+
         User schoolAdmin = userRepository.findByUsername(adminUsername);
 
+        validator.validateNull(teacher, "teacher ID", teacherId);
         validator.validateNull(schoolAdmin, "admin userName", adminUsername);
 
         //TODO: add verifications
@@ -112,7 +121,14 @@ public class SubscriptionPlanValidator {
 
             SubscriptionPlan subscriptionPlan = planRepository.findOneByLevelAndTypeAndIsActiveTrue(subscriptionLevel, organizationType);
 
+            if(subscriptionLevel == null || organizationType == null) {
+                log.error("Subscription plan is not set for school id:"+adminSchool.getId()+" user name:"+adminSchool.getUsername());
+                return;
+            }
+
             if(subscriptionPlan == null) {
+                log.error("Subscription plan with level:"+subscriptionLevel+", type:"+organizationType+" is not available at db for school id:"+adminSchool.getId()+" user name:"+adminSchool.getUsername());
+                //probably need to throw some exception
                 return;
             }
             maxCoursesPerProfessor = subscriptionPlan.getMaxCoursesPerProfessor();

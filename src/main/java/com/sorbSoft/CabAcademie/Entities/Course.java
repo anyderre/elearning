@@ -134,7 +134,8 @@ public class Course implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"))
     private List<User> schools;
 
-    @OneToMany(mappedBy = "course", cascade = CascadeType.ALL)
+    @Fetch(value = FetchMode.SUBSELECT)
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<CourseSchool> schoolsNew;
 
     @Enumerated(EnumType.STRING)

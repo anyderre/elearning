@@ -1,8 +1,9 @@
 package com.sorbSoft.CabAcademie.Repository;
 
-import com.sorbSoft.CabAcademie.Entities.*;
+import com.sorbSoft.CabAcademie.Entities.Course;
+import com.sorbSoft.CabAcademie.Entities.CourseSchool;
 import com.sorbSoft.CabAcademie.Entities.Enums.CourseStatus;
-import org.springframework.data.domain.Pageable;
+import com.sorbSoft.CabAcademie.Entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,4 +17,8 @@ public interface CourseSchoolRepository extends JpaRepository<CourseSchool, Long
 
     long countCoursesBySchoolAndTeacherAndStatus(User school, User teacher, CourseStatus status);
 
+    List<CourseSchool> findAllByCourseAndTeacher(Course course, User teacher);
+    void deleteAllByCourseAndTeacher(Course course, User teacher);
+
+    CourseSchool findOneByCourseAndTeacherAndSchool(Course existingCourse, User teacher, User schoolPersistent);
 }

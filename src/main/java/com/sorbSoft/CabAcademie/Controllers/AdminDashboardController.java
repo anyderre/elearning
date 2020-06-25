@@ -44,9 +44,7 @@ public class AdminDashboardController {
     @ApiOperation(value = "Approve course, Role:ROLE_ADMIN")
     public ResponseEntity<MessageResponse> approveCourse(
             @Valid @RequestBody CourseApproveRequest approveRq,
-            Principal principal)
-            throws CourseNotFoundExcepion, UserNotFoundExcepion,
-            SchoolNotFoundExcepion, MaxCoursesPerProfessorExceededException {
+            Principal principal) throws CourseNotFoundExcepion, UserNotFoundExcepion, SchoolNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseAccessDeniedException {
 
         if (approveRq.getCourseId() == null || approveRq.getCourseId() <= 0 || principal == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -63,7 +61,7 @@ public class AdminDashboardController {
     @PostMapping(value = "/course/decline")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @ApiOperation(value = "Decline course, Role:ROLE_ADMIN")
-    public ResponseEntity<MessageResponse> declineCourse(@Valid @RequestBody CourseDeclineRequest declineRq, Principal principal) throws CourseNotFoundExcepion, UserNotFoundExcepion, SchoolNotFoundExcepion {
+    public ResponseEntity<MessageResponse> declineCourse(@Valid @RequestBody CourseDeclineRequest declineRq, Principal principal) throws CourseNotFoundExcepion, UserNotFoundExcepion, SchoolNotFoundExcepion, CourseAccessDeniedException {
 
         if (declineRq.getCourseId() == null || declineRq.getCourseId() <= 0 || principal == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

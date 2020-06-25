@@ -91,10 +91,10 @@ public class UserFactory {
                 return new ArrayList<>();
             }
 
-            @Override
+            /*@Override
             public List<User> getOrganizations() {
                 return new ArrayList<>();
-            }
+            }*/
 
             @Override
             public String getWorkspaceName() {

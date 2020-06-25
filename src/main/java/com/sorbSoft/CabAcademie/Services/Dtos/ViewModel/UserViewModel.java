@@ -43,7 +43,7 @@ public class UserViewModel {
     private Rol role;
     private List<Course> courses;
     private List<User> schools;
-    private List<User> organizations;
+
     // for select purpose
     private List<Rol> allRoles;
     // for select purpose

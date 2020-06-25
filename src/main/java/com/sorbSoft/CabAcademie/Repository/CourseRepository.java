@@ -36,13 +36,13 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     List<Course> findAllBySubSectionId(Long subSectionId);
 
-    List<Course> findAllBySubSectionIdAndSchoolsInAndStatus(Long subSectionId, User school, CourseStatus status);
+    List<Course> findAllBySubSectionIdAndSchoolsIn(Long subSectionId, User school);
 
 
     //subCategory
     List<Course> findAllBySubCategoryIdAndSchoolsIsNullAndStatus(Long subCategoryId, CourseStatus status);
 
-    List<Course> findAllBySubCategoryIdAndSchoolsInAndStatus(Long subCategoryId, User school, CourseStatus status);
+    List<Course> findAllBySubCategoryIdAndSchoolsIn(Long subCategoryId, User school);
 
     /*
         find last created
@@ -54,19 +54,14 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     List<Course> findLastCreatedPublicCoursesWithAnyStatus(Pageable pageable);
 
    //private last created
-    List<Course> findLastCreatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(CourseStatus status, User school, Pageable pageable);
 
     List<Course> findLastCreatedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(Category category, User school, Pageable pageable);
-    List<Course> findLastCreatedPrivateCoursesByCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(Category category, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findLastCreatedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(SubCategory subCategory, User school, Pageable pageable);
-    List<Course> findLastCreatedPrivateCoursesBySubCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(SubCategory subCategory, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findLastCreatedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(Section section, User school, Pageable pageable);
-    List<Course> findLastCreatedPrivateCoursesBySectionAndStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(Section section, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findLastCreatedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(SubSection subSection, User school, Pageable pageable);
-    List<Course> findLastCreatedPrivateCoursesBySubSectionAndStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(SubSection subSection, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findLastCreatedPrivateCoursesByDeletedFalseAndSchoolsInOrderByCreationDateDesc(User school, Pageable pageable);
 
@@ -86,23 +81,14 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
 
     //private best rated
-    List<Course> findBestRatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(CourseStatus status, User school, Pageable pageable);
-
-    List<Course> findBestRatedPrivateCoursesByCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(Category category, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findBestRatedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByRatingsDesc(Category category, User school, Pageable pageable);
-
-    List<Course> findBestRatedPrivateCoursesBySubCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(SubCategory subCategory, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findBestRatedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByRatingsDesc(SubCategory subCategory, User school, Pageable pageable);
 
     List<Course> findBestRatedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByRatingsDesc(Section section, User school, Pageable pageable);
 
-    List<Course> findBestRatedPrivateCoursesBySectionAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(Section section, CourseStatus status, User school, Pageable pageable);
-
     List<Course> findBestRatedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByRatingsDesc(SubSection subSection, User school, Pageable pageable);
-
-    List<Course> findBestRatedPrivateCoursesBySubSectionAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(SubSection subSection, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findBestRatedPrivateCoursesByDeletedFalseAndSchoolsInOrderByRatingsDesc(User school, Pageable pageable);
     /*
@@ -125,23 +111,14 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
 
     //private featured courses
-    List<Course> findFeaturedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(CourseStatus status, User school, Pageable pageable);
-
-    List<Course> findFeaturedPrivateCoursesByCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(Category category, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findFeaturedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(Category category, User school, Pageable pageable);
-
-    List<Course> findFeaturedPrivateCoursesBySubCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(SubCategory subCategory, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findFeaturedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(SubCategory subCategory, User school, Pageable pageable);
 
     List<Course> findFeaturedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(Section section, User school, Pageable pageable);
 
-    List<Course> findFeaturedPrivateCoursesBySectionAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(Section section, CourseStatus status, User school, Pageable pageable);
-
     List<Course> findFeaturedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(SubSection subSection, User school, Pageable pageable);
-
-    List<Course> findFeaturedPrivateCoursesBySubSectionAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(SubSection subSection, CourseStatus status, User school, Pageable pageable);
 
     List<Course> findFeaturedPrivateCoursesByDeletedFalseAndSchoolsInOrderByEnrolledDesc(User school, Pageable pageable);
     /*

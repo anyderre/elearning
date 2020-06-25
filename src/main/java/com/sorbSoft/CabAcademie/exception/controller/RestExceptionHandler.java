@@ -1,4 +1,4 @@
-package com.sorbSoft.CabAcademie.Controllers.exception;
+package com.sorbSoft.CabAcademie.exception.controller;
 
 
 import com.sorbSoft.CabAcademie.exception.*;
@@ -245,6 +245,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         String error = ex.getMessage();
 
         ApiError apiError = new ApiError(HttpStatus.FORBIDDEN);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
+    @ExceptionHandler(CoureTitleAlreadyTakenExcepion.class)
+    protected ResponseEntity<Object> handleCoureTitleAlreadyTakenExcepion(CoureTitleAlreadyTakenExcepion ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.NOT_ACCEPTABLE);
         apiError.setMessage(error);
 
         return buildResponseEntity(apiError);

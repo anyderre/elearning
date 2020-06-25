@@ -9,7 +9,6 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Factory.CourseFactory;
 import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CourseMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
-import com.sorbSoft.CabAcademie.annotation.NotUsed;
 import com.sorbSoft.CabAcademie.exception.*;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +78,13 @@ public class CourseService {
 
     private final CourseMapper mapper = Mappers.getMapper(CourseMapper.class);
 
-    public Result saveCourse(CourseViewModel vm, String userName){
+    public Result saveCourseByAdmin(CourseViewModel vm, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion {
+        //TODO: add course add validation. Validate if admin adds course to schools, orgs which he owns
+        subscriptionValidator.validateAddCourseByAdmin(vm.getUser().getId(), adminUsername);
+        return saveCourse(vm, adminUsername);
+    }
+
+    public Result saveCourse(CourseViewModel vm, String userName) throws CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion {
         vm = prepareEntity(vm);
         Result result = ValidateModel(vm);
         if (!result.isValid()) {
@@ -114,13 +119,9 @@ public class CourseService {
                 //course.setSchoolsNew(null);
 
                 Course savedCourse = courseRepository.save(course);
-                if (overviewEntity != null) {
-                    overviewEntity.setCourse(savedCourse);
-                    Overview overview = overviewRepository.save(overviewEntity);
 
-                    savedCourse.setOverview(overview);
-
-                    courseRepository.save(savedCourse);
+                if(vm.getId() > 0) {
+                    removeCourseSchools(vm);
                 }
 
                 if(schools != null && schools.isEmpty() == false) {
@@ -135,10 +136,21 @@ public class CourseService {
 
                         //CourseSchool courseSchoolSaved = courseSchoolRepository.save(courseSchool);
                         schoolsNew.add(courseSchool);
+
                     }
                     List<CourseSchool> schoolsNewSaved = courseSchoolRepository.save(schoolsNew);
 
                     savedCourse.setSchoolsNew(schoolsNewSaved);
+                    courseRepository.save(savedCourse);
+                }
+
+
+                if (overviewEntity != null) {
+                    overviewEntity.setCourse(savedCourse);
+                    Overview overview = overviewRepository.save(overviewEntity);
+
+                    savedCourse.setOverview(overview);
+
                     courseRepository.save(savedCourse);
                 }
             } else {
@@ -149,6 +161,13 @@ public class CourseService {
             return result;
         }
         return result;
+    }
+
+    private void removeCourseSchools(CourseViewModel vm) {
+        User teacher = userRepository.findById(vm.getUser().getId());
+        Course existingCourse = courseRepository.findOne(vm.getId());
+
+        courseSchoolRepository.deleteAllByCourseAndTeacher(existingCourse, teacher);
     }
 
     private Course getEntity(CourseViewModel vm){
@@ -188,7 +207,11 @@ public class CourseService {
     }
 
     private boolean isPublicCourse(CourseViewModel vm) {
-        return vm.getSchools().isEmpty();
+        return vm.getSchools() == null || vm.getSchools().isEmpty();
+    }
+
+    private boolean isPublicCourse(Course course) {
+        return course.getSchools() == null || course.getSchools().isEmpty();
     }
 
     public List<Course> fetchAllCourses(){
@@ -204,24 +227,21 @@ public class CourseService {
         return courseRepository.findOne(id);
     }
 
-    public Result updateCourse(CourseViewModel vm, String userName){
+    public Result updateCourse(CourseViewModel vm, String userName) throws CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion {
         Result result = new Result();
         Course current = courseRepository.findOne(vm.getId());
 
         if (current == null) {
-            result.add("The course you want to update does not exist");
-            return result;
+            throw new CourseNotFoundExcepion("The course you want to update does not exist");
         }
 
         Course savedCourse = courseRepository.findCourseByTitleAndIdIsNot(vm.getTitle(), vm.getId());
         if (savedCourse != null) {
-            result.add("The course name already exist for another definition");
-            return result;
+            throw new CoureTitleAlreadyTakenExcepion("The course name already exist for another definition");
         }
         Course currentCourse = courseRepository.findOne(vm.getId());
         if(currentCourse == null) {
-            result.add("The course you are trying to edit does not exist anymore");
-            return result;
+            throw new CourseNotFoundExcepion("The course you are trying to edit does not exist anymore");
         }
 
         return save(vm);
@@ -344,45 +364,31 @@ public class CourseService {
     public List<Course> fetchPrivateCourseBySubSectionAlternative(Long subSectionId, String userName) {
         User user = userRepository.findByUsername(userName);
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             List<Course> coursesBySubSectionAndSchool
-                    = courseRepository.findAllBySubSectionIdAndSchoolsInAndStatus(subSectionId, schoolOrOrganization, CourseStatus.APPROVED);
-            courses.addAll(coursesBySubSectionAndSchool);
+                    = courseRepository.findAllBySubSectionIdAndSchoolsIn(subSectionId, schoolOrOrganization);
+
+            List<Course> approvedCoursesAtSchool = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, CourseStatus.APPROVED);
+
+            courses.addAll(approvedCoursesAtSchool);
         }
 
         return courses;
     }
 
-
-    @Deprecated
-    @NotUsed
-    public List<Course> fetchPrivateCourseBySubSection(Long subSectionId, String userName) {
-        User user = userRepository.findByUsername(userName);
-
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
-
+    private List<Course> getSchoolCoursesByStatus(List<Course> coursesBySubSectionAndSchool, User school, CourseStatus status) {
         List<Course> courses = new ArrayList<>();
-
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
-            //TODO: should be refactored: added sql query with subquesry at db level
-            //select * from Course where Course.id IN (select course_id from Course_School where Course_School.user_id = school.id)
-            List<Course> coursesBySubSection = courseRepository.findAllBySubSectionId(subSectionId);
-            for(Course course : coursesBySubSection) {
-                for(CourseSchool courseSchool : course.getSchoolsNew()) {
-
-                    if(schoolOrOrganization.getId() == courseSchool.getSchool().getId()) {
-                        courses.add(course);
-                    }
+        for(Course course : coursesBySubSectionAndSchool) {
+            for(CourseSchool cs : course.getSchoolsNew()) {
+                if(cs.getStatus() == status
+                        && cs.getSchool().equals(school))
+                {
+                    courses.add(course);
                 }
-
             }
         }
 
@@ -397,15 +403,15 @@ public class CourseService {
     public List<Course> fetchPrivateCourseBySubCategory(Long subCategoryId, String userName) {
         User user = userRepository.findByUsername(userName);
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
-            List<Course> coursesBySubSectionAndSchool = courseRepository.findAllBySubCategoryIdAndSchoolsInAndStatus(subCategoryId, schoolOrOrganization, CourseStatus.APPROVED);
-            courses.addAll(coursesBySubSectionAndSchool);
+        for(User schoolOrOrganization : schools) {
+            List<Course> coursesBySubSectionAndSchool = courseRepository.findAllBySubCategoryIdAndSchoolsIn(subCategoryId, schoolOrOrganization);
+
+            List<Course> approvedCoursesAtSchool = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, CourseStatus.APPROVED);
+            courses.addAll(approvedCoursesAtSchool);
         }
 
         return courses;
@@ -688,13 +694,11 @@ public class CourseService {
         Pageable pageable = new PageRequest(0, amount);
         User user = userRepository.findByUsername(userName);
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -706,11 +710,11 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findLastCreatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
-                                status,
+                        findLastCreatedPrivateCoursesByDeletedFalseAndSchoolsInOrderByCreationDateDesc(
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -855,7 +859,7 @@ public class CourseService {
         List<User> schools = admin.getSchools();
 
         if (schools == null) {
-            throw new SchoolNotFoundExcepion("Admin " + adminUsername + " doesn't belong to any school");
+            throw new SchoolNotFoundExcepion("Admin " + adminUsername + " doesn't belong to any school or organization");
         }
 
         long coursesCount = 0;
@@ -882,7 +886,7 @@ public class CourseService {
         return coursesCount;
     }
 
-    public boolean makeCourseStatusPending(Long courseId, String userName) throws CourseNotFoundExcepion, UserNotFoundExcepion, CourseAccessDeniedException {
+    public boolean makeCourseStatusPending(Long courseId, String userName) throws CourseNotFoundExcepion, UserNotFoundExcepion, CourseAccessDeniedException, SchoolNotFoundExcepion, CourseUpdateDeniedException {
         User user = userRepository.findByUsername(userName);
         validateIfUserWasFound(user, userName);
 
@@ -890,14 +894,20 @@ public class CourseService {
         validateIfCourseWasFound(course, courseId);
 
         if(course.getUser().getUsername().equals(user.getUsername())) {
-            return changeCourseStatus(courseId, CourseStatus.PENDING, "");
+            if(isPublicCourse(course)) {
+                return changePublicCourseStatus(courseId, CourseStatus.PENDING, "");
+            } else {
+                String teacherUsername = course.getUser().getUsername();
+                return changeCourseStatusBySchoolAdmin(courseId, teacherUsername, CourseStatus.PENDING, "");
+            }
+
         } else {
             throw new CourseAccessDeniedException("You are not an owner of course which you are trying to publish");
         }
 
     }
 
-    public boolean makeCourseStatusDraft(Long courseId, String userName) throws CourseNotFoundExcepion, UserNotFoundExcepion, CourseAccessDeniedException {
+    public boolean makeCourseStatusDraft(Long courseId, String userName) throws CourseNotFoundExcepion, UserNotFoundExcepion, CourseAccessDeniedException, SchoolNotFoundExcepion {
         User user = userRepository.findByUsername(userName);
         validateIfUserWasFound(user, userName);
 
@@ -905,7 +915,12 @@ public class CourseService {
         validateIfCourseWasFound(course, courseId);
 
         if(course.getUser().getUsername().equals(user.getUsername())) {
-            return changeCourseStatus(courseId, CourseStatus.DRAFT, "");
+            if(isPublicCourse(course)) {
+                return changePublicCourseStatus(courseId, CourseStatus.DRAFT, "");
+            } else {
+                String teacherUsername = course.getUser().getUsername();
+                return changeCourseStatusBySchoolAdmin(courseId, teacherUsername, CourseStatus.DRAFT, "");
+            }
         } else {
             throw new CourseAccessDeniedException("You are not an owner of course which you are trying to make draft");
         }
@@ -915,14 +930,14 @@ public class CourseService {
     public boolean approveCourse(Long courseId) throws CourseNotFoundExcepion {
 
 
-        return changeCourseStatus(courseId, CourseStatus.APPROVED, "");
+        return changePublicCourseStatus(courseId, CourseStatus.APPROVED, "");
     }
 
     public boolean declineCourse(Long courseId, String declineMessage) throws CourseNotFoundExcepion {
-        return changeCourseStatus(courseId, CourseStatus.DECLINED, declineMessage);
+        return changePublicCourseStatus(courseId, CourseStatus.DECLINED, declineMessage);
     }
 
-    private boolean changeCourseStatus(Long courseId, CourseStatus status, String declineMessage) throws CourseNotFoundExcepion {
+    private boolean changePublicCourseStatus(Long courseId, CourseStatus status, String declineMessage) throws CourseNotFoundExcepion {
 
         boolean isStatusChanged = false;
 
@@ -974,17 +989,17 @@ public class CourseService {
 
 
 
-    public boolean approveCourse(Long courseId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, MaxCoursesPerProfessorExceededException {
+    public boolean approveCourse(Long courseId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseAccessDeniedException {
 
         subscriptionValidator.validateCourseApprovment(courseId, adminUsername);
-        return changeCourseStatus(courseId, adminUsername, CourseStatus.APPROVED, "");
+        return changeCourseStatusBySchoolAdmin(courseId, adminUsername, CourseStatus.APPROVED, "");
     }
 
-    public boolean declineCourse(Long courseId, String adminUsername, String declineMessage) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion {
-        return changeCourseStatus(courseId, adminUsername, CourseStatus.DECLINED, declineMessage);
+    public boolean declineCourse(Long courseId, String adminUsername, String declineMessage) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, CourseAccessDeniedException {
+        return changeCourseStatusBySchoolAdmin(courseId, adminUsername, CourseStatus.DECLINED, declineMessage);
     }
 
-    private boolean changeCourseStatus(Long courseId, String adminUsername, CourseStatus status, String declineMessage) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion {
+    private boolean changeCourseStatusBySchoolAdmin(Long courseId, String adminUsername, CourseStatus status, String declineMessage) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, CourseAccessDeniedException {
         User admin = userRepository.findByUsername(adminUsername);
         boolean isStatusChanged = false;
 
@@ -993,13 +1008,21 @@ public class CourseService {
         }
 
         List<User> adminSchools = admin.getSchools();
+
         if (adminSchools == null || adminSchools.isEmpty()) {
             throw new SchoolNotFoundExcepion("Admin " + adminUsername + " doesn't belong to any school");
         }
 
         Course course2Approve = courseRepository.findOne(courseId);
+
         if (course2Approve == null) {
             throw new CourseNotFoundExcepion("Course with id: " + courseId + " was not found in db");
+        }
+
+        if(isProfessor(admin) || isInstructor(admin)) {
+            if(!admin.getUsername().equals(course2Approve.getUser().getUsername())) {
+                throw new CourseAccessDeniedException("User with id:"+admin.getUsername()+"try to update course status, but is not a course owner");
+            }
         }
 
         List<CourseSchool> courseSchools = course2Approve.getSchoolsNew();
@@ -1011,6 +1034,24 @@ public class CourseService {
         for(User adminSchool : adminSchools) {
             for(CourseSchool courseSchool : courseSchools) {
                 if(adminSchool.equals(courseSchool.getSchool())) {
+
+                    if(status == CourseStatus.DRAFT) {
+
+                        courseSchool.setStatus(CourseStatus.DRAFT);
+                        course2Approve.setLastUpdate(new Date());
+                        courseRepository.save(course2Approve);
+                        isStatusChanged = true;
+                        return isStatusChanged;
+                    }
+
+                    if(status == CourseStatus.PENDING) {
+
+                        courseSchool.setStatus(CourseStatus.PENDING);
+                        course2Approve.setLastUpdate(new Date());
+                        courseRepository.save(course2Approve);
+                        isStatusChanged = true;
+                        return isStatusChanged;
+                    }
 
                     if(status == CourseStatus.APPROVED) {
 
@@ -1035,6 +1076,14 @@ public class CourseService {
         }
 
         return isStatusChanged;
+    }
+
+    private boolean isInstructor(User user) {
+        return user.getRole().getRole() == Roles.ROLE_INSTRUCTOR;
+    }
+
+    private boolean isProfessor(User user) {
+        return user.getRole().getRole() == Roles.ROLE_PROFESSOR;
     }
 
     public List<Course> getLastAddedPrivateCoursesAnyStatus(Integer amount, String userName) {
@@ -1126,13 +1175,11 @@ public class CourseService {
             throw new CategoryNotFoundException("Category with id:"+categoryId+" was not found");
         }
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1145,12 +1192,12 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findLastCreatedPrivateCoursesByCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
+                        findLastCreatedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
                                 category,
-                                status,
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1176,13 +1223,11 @@ public class CourseService {
             throw new SubCategoryNotFoundException("SubCategory with id:"+subCategoryId+" was not found");
         }
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1195,12 +1240,12 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findLastCreatedPrivateCoursesBySubCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
+                        findLastCreatedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
                                 subCategory,
-                                status,
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1225,7 +1270,7 @@ public class CourseService {
     }
 
     private void validateIfSchoolOrOrganizationExists(User user, String userName) throws SchoolNotFoundExcepion {
-        if (user.getSchools() == null && user.getOrganizations() == null) {
+        if (user.getSchools() == null) {
             throw new SchoolNotFoundExcepion("User " + userName + " doesn't belong to any school");
         }
     }
@@ -1244,13 +1289,11 @@ public class CourseService {
             throw new SectionNotFoundException("Section with id:"+sectionId+" was not found");
         }
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1263,12 +1306,12 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findLastCreatedPrivateCoursesBySectionAndStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
+                        findLastCreatedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
                                 section,
-                                status,
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1294,13 +1337,11 @@ public class CourseService {
             throw new SubSectionNotFoundException("SubSection with id:"+subSectionId+" was not found");
         }
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1313,12 +1354,12 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findLastCreatedPrivateCoursesBySubSectionAndStatusAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
+                        findLastCreatedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByCreationDateDesc(
                                 subSection,
-                                status,
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1338,13 +1379,11 @@ public class CourseService {
         validateIfUserWasFound(user, userName);
         validateIfSchoolOrOrganizationExists(user, userName);
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1356,11 +1395,11 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findBestRatedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
-                                status,
+                        findBestRatedPrivateCoursesByDeletedFalseAndSchoolsInOrderByRatingsDesc(
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1386,13 +1425,11 @@ public class CourseService {
             throw new CategoryNotFoundException("Category with id:"+categoryId+" was not found");
         }
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1405,12 +1442,12 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findBestRatedPrivateCoursesByCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                        findBestRatedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
                                 category,
-                                status,
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1436,13 +1473,11 @@ public class CourseService {
             throw new SubCategoryNotFoundException("SubCategory with id:"+subCategoryId+" was not found");
         }
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1455,12 +1490,12 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findBestRatedPrivateCoursesBySubCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                        findBestRatedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
                                 subCategory,
-                                status,
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1486,13 +1521,11 @@ public class CourseService {
             throw new SectionNotFoundException("Section with id:"+sectionId+" was not found");
         }
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1505,12 +1538,12 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findBestRatedPrivateCoursesBySectionAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                        findBestRatedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
                                 section,
-                                status,
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1536,13 +1569,11 @@ public class CourseService {
             throw new SubSectionNotFoundException("SubSection with id:"+subSectionId+" was not found");
         }
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1555,12 +1586,13 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findBestRatedPrivateCoursesBySubSectionAndStatusAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
+                        findBestRatedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByRatingsDesc(
                                 subSection,
-                                status,
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1579,13 +1611,11 @@ public class CourseService {
         validateIfUserWasFound(user, userName);
         validateIfSchoolOrOrganizationExists(user, userName);
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1597,11 +1627,11 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findFeaturedPrivateCoursesByStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
-                                status,
+                        findFeaturedPrivateCoursesByDeletedFalseAndSchoolsInOrderByEnrolledDesc(
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1627,13 +1657,11 @@ public class CourseService {
             throw new CategoryNotFoundException("Category with id:"+categoryId+" was not found");
         }
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1646,12 +1674,12 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findFeaturedPrivateCoursesByCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                        findFeaturedPrivateCoursesByCategoryAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
                                 category,
-                                status,
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1677,13 +1705,11 @@ public class CourseService {
             throw new SubCategoryNotFoundException("SubCategory with id:"+subCategoryId+" was not found");
         }
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1696,12 +1722,12 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findFeaturedPrivateCoursesBySubCategoryAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                        findFeaturedPrivateCoursesBySubCategoryAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
                                 subCategory,
-                                status,
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1727,13 +1753,11 @@ public class CourseService {
             throw new SectionNotFoundException("Section with id:"+sectionId+" was not found");
         }
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1746,12 +1770,12 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findFeaturedPrivateCoursesBySectionAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                        findFeaturedPrivateCoursesBySectionAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
                                 section,
-                                status,
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }
@@ -1777,13 +1801,11 @@ public class CourseService {
             throw new SubSectionNotFoundException("SubSection with id:"+subSectionId+" was not found");
         }
 
-        List<User> schoolsAndOrganizations = new ArrayList<>();
-        schoolsAndOrganizations.addAll(user.getSchools());
-        schoolsAndOrganizations.addAll(user.getOrganizations());
+        List<User> schools = user.getSchools();
 
         List<Course> courses = new ArrayList<>();
 
-        for(User schoolOrOrganization : schoolsAndOrganizations) {
+        for(User schoolOrOrganization : schools) {
             if(status == null) {
                 //fetch courses with any status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
@@ -1796,12 +1818,12 @@ public class CourseService {
             } else {
                 //find by status
                 List<Course> coursesBySubSectionAndSchool = courseRepository.
-                        findFeaturedPrivateCoursesBySubSectionAndStatusAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
+                        findFeaturedPrivateCoursesBySubSectionAndDeletedFalseAndSchoolsInOrderByEnrolledDesc(
                                 subSection,
-                                status,
                                 schoolOrOrganization,
                                 pageable);
-                courses.addAll(coursesBySubSectionAndSchool);
+                List<Course> coursesByStatus = getSchoolCoursesByStatus(coursesBySubSectionAndSchool, schoolOrOrganization, status);
+                courses.addAll(coursesByStatus);
             }
 
         }

@@ -103,12 +103,12 @@ public class User {
     )
     private List<User> schools;
 
-    @Fetch(value = FetchMode.SUBSELECT)
+/*    @Fetch(value = FetchMode.SUBSELECT)
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="user_organizations"
     )
-    private List<User> organizations;
+    private List<User> organizations;*/
     @NotNull
     private boolean agreeWithTerms;
     @NotNull

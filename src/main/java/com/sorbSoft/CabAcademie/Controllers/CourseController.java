@@ -8,10 +8,7 @@ import com.sorbSoft.CabAcademie.Services.CourseService;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import com.sorbSoft.CabAcademie.config.JwtTokenUtil;
-import com.sorbSoft.CabAcademie.exception.CourseAccessDeniedException;
-import com.sorbSoft.CabAcademie.exception.CourseNotFoundExcepion;
-import com.sorbSoft.CabAcademie.exception.EmptyValueException;
-import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
+import com.sorbSoft.CabAcademie.exception.*;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -419,11 +416,26 @@ public class CourseController {
 
     @PostMapping(value = "/saveByAdmin", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ApiOperation(value = "Save Course at status Approved")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
-            "or hasRole('ROLE_SUPER_ADMIN') ")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public  ResponseEntity<MessageResponse> saveApprovedCourseByAdmin(
             @Valid @RequestBody CourseViewModel vm,
-            Principal principal){
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion {
+
+        vm.setStatus(CourseStatus.APPROVED);
+
+        Result result = courseService.saveCourseByAdmin(vm, principal.getName());
+
+        if(!result.isValid())
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of("Course successfully saved"), HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/saveBySuperAdmin", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Save Course at status Approved")
+    @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
+    public  ResponseEntity<MessageResponse> saveApprovedCourseBySuperAdmin(
+            @Valid @RequestBody CourseViewModel vm,
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion {
 
         vm.setStatus(CourseStatus.APPROVED);
 
@@ -445,7 +457,7 @@ public class CourseController {
             "or hasRole('ROLE_INSTRUCTOR')")
     public  ResponseEntity<MessageResponse> saveCourse(
             @Valid @RequestBody CourseViewModel vm,
-            Principal principal){
+            Principal principal) throws CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion {
 
         vm.setStatus(CourseStatus.PENDING);
 
@@ -467,7 +479,7 @@ public class CourseController {
             "or hasRole('ROLE_INSTRUCTOR')")
     public  ResponseEntity<MessageResponse> saveDraftCourse(
             @Valid @RequestBody CourseViewModel vm,
-            Principal principal){
+            Principal principal) throws CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion {
 
         vm.setStatus(CourseStatus.DRAFT);
 
@@ -489,7 +501,7 @@ public class CourseController {
             "or hasRole('ROLE_INSTRUCTOR')")
     public ResponseEntity<Course> updateCourse(
             @RequestBody CourseViewModel courseVm,
-            Principal principal){
+            Principal principal) throws CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion {
 
         //TODO: Validators should be implemenmted as seperate layer
         if(courseVm == null
@@ -521,8 +533,7 @@ public class CourseController {
             "or hasRole('ROLE_INSTRUCTOR')")
     public ResponseEntity<MessageResponse> publishCourse(
             @PathVariable Long courseId,
-            Principal principal)
-            throws CourseNotFoundExcepion, CourseAccessDeniedException, UserNotFoundExcepion {
+            Principal principal) throws CourseNotFoundExcepion, CourseAccessDeniedException, UserNotFoundExcepion, SchoolNotFoundExcepion, CourseUpdateDeniedException {
 
         if(courseId <= 0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -547,8 +558,7 @@ public class CourseController {
             "or hasRole('ROLE_INSTRUCTOR')")
     public ResponseEntity<MessageResponse> makeCourseDraft(
             @PathVariable Long courseId,
-            Principal principal)
-            throws CourseNotFoundExcepion, CourseAccessDeniedException, UserNotFoundExcepion {
+            Principal principal) throws CourseNotFoundExcepion, CourseAccessDeniedException, UserNotFoundExcepion, SchoolNotFoundExcepion {
 
         if(courseId <= 0)
             return  new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -573,7 +583,7 @@ public class CourseController {
             "or hasRole('ROLE_INSTRUCTOR')")
     public ResponseEntity<Course> updateDraftCourse(
             @RequestBody CourseViewModel courseVm,
-            Principal principal){
+            Principal principal) throws CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion {
 
         //TODO: Validators should be implemenmted as seperate layer
         if(courseVm == null
@@ -600,6 +610,6 @@ public class CourseController {
         if (!result.isValid()){
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         }
-        return  new ResponseEntity<>(MessageResponse.of("Section successfully deleted"), HttpStatus.OK);
+        return  new ResponseEntity<>(MessageResponse.of("Course successfully deleted"), HttpStatus.OK);
     }
 }
