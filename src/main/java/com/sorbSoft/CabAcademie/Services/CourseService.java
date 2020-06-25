@@ -347,7 +347,7 @@ public class CourseService {
 
         Rol rolSchool = rolServices.findRoleByDescription(Roles.ROLE_SCHOOL.name());
         if (rolSchool != null){
-            vm.setAllSchools(userServices.filterUserByRole(rolSchool.getId()));
+            vm.setAllSchools(userServices.filterUserByRole(rolSchool));
         }
         vm.setSections(sectionService.fetchAllSection()); // TODO: could be filtered
         vm.setSubSections(subSectionService.fetchAllSubSections()); // TODO: could be filtered

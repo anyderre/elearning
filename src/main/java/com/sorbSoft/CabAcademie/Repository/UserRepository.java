@@ -29,7 +29,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByRoleRoleAndId(Roles role, Long professorId);
 
-    List<User> findByRoleRole(Roles role);
+    List<User> findAllByRole(Rol role);
 
     Boolean existsByUsernameAndIdIsNot(String username, Long id);
 

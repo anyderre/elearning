@@ -58,6 +58,9 @@ public class UserServices {
     private UserRepository userRepository;
 
     @Autowired
+    private RolRepository roleRepository;
+
+    @Autowired
     private EmailApiService emailAPI;
 
     @Autowired
@@ -277,9 +280,10 @@ public class UserServices {
                 !user.getRole().getDescription().equals(Roles.ROLE_SUPER_ADMIN.name()) && !user.getRole().getDescription().equals(Roles.ROLE_ADMIN.name())).collect(Collectors.toList());
     }
 
-    public List<User> filterUserByRole(Long roleId){
-        return userRepository.findAll().stream().filter(user ->
-                user.getRole().getId().equals(roleId)).collect(Collectors.toList());
+    public List<User> filterUserByRole(Rol role){
+        return userRepository.findAllByRole(role);
+        /*return userRepository.findAll().stream().filter(user ->
+                user.getRole().getId().equals(roleId)).collect(Collectors.toList());*/
     }
 
     public Result deleteUser(Long id){
@@ -327,11 +331,11 @@ public class UserServices {
 
         Rol rolSchool = rolServices.findRoleByDescription(Roles.ROLE_SCHOOL.name());
         if (rolSchool != null){
-            vm.setAllSchools(filterUserByRole(rolSchool.getId()));
+            vm.setAllSchools(filterUserByRole(rolSchool));
         }
         Rol rolOrganization = rolServices.findRoleByDescription(Roles.ROLE_ORGANIZATION.name());
         if (rolOrganization != null){
-            vm.setAllOrganizations(filterUserByRole(rolOrganization.getId()));
+            vm.setAllOrganizations(filterUserByRole(rolOrganization));
         }
         return vm;
     }
