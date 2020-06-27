@@ -66,6 +66,9 @@ public class UserServices {
     @Autowired
     private GenericValidator validator;
 
+    @Autowired
+    private StripeService stripeService;
+
     private UserMapper mapper
             = Mappers.getMapper(UserMapper.class);
 
@@ -144,6 +147,13 @@ public class UserServices {
         user.setEmail("school_"+user.getEmail());
         user.setUsername("school_"+user.getUsername());
         user.setEnable(1);
+
+        /*String stripeId = stripeService.createCustomer(vm.getEmail(), vm.getStripeToken());
+        String plan = vm.getSubscriptionLevel()+"-"+vm.getOrganizationType();
+        String subscriptionId = stripeService.createSubscription(stripeId, plan, vm.getCoupon());
+
+        user.setStripeId(stripeId);
+        user.setSubscriptionId(subscriptionId);*/
 
         return userRepository.save(user);
     }
@@ -409,12 +419,14 @@ public class UserServices {
                 throw new WorkspaceNameIsAlreadyTaken("Workspace name '"+vm.getWorkspaceName()+"' is already taken");
             }
 
-            if(vm.getSubscriptionLevel() == null) {
+            /*if(vm.getSubscriptionLevel() == null) {
+                log.warn("You should specify subscription plan level for school with workspace {}", vm.getWorkspaceName());
                 throw new SubscriptionPlanNotSpecified("You should specify subscription plan level");
             }
             if(vm.getOrganizationType() == null) {
+                log.warn("You should specify subscription organization type for school with workspace {}", vm.getWorkspaceName());
                 throw new SubscriptionPlanNotSpecified("You should specify subscription organization type");
-            }
+            }*/
         }
         if (vm.getUsername().isEmpty()) {
             result.add("You should specify the username");

@@ -149,12 +149,14 @@ public class User {
     @Enumerated(EnumType.STRING)
     private OrganizationType organizationType;
 
-    @Column(name = "plan_active_until_date")
-    private Date planActiveUntilDate;
-
     @Column(name = "stripe_id")
     private String stripeId;
 
+    @Column(name = "subscription_id")
+    private String subscriptionId;
 
-    //private Date lastPaymentDate; //??
+    private String productId;
+
+    private String priceId;
+
 }

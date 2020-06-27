@@ -79,4 +79,8 @@ public class UserViewModel {
 
     private Date planActiveUntilDate;
 
+    private String stripeToken;
+
+    private String coupon;
+
 }

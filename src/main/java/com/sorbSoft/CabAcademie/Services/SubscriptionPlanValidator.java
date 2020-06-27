@@ -11,12 +11,14 @@ import com.sorbSoft.CabAcademie.Repository.CourseRepository;
 import com.sorbSoft.CabAcademie.Repository.CourseSchoolRepository;
 import com.sorbSoft.CabAcademie.Repository.SubscriptionPlanRepository;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
-import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import com.sorbSoft.CabAcademie.exception.*;
 import lombok.extern.log4j.Log4j2;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -36,24 +38,11 @@ public class SubscriptionPlanValidator {
     private CourseSchoolRepository courseSchoolRepository;
 
     @Autowired
+    private StripeService stripeService;
+
+    @Autowired
     private GenericValidator validator;
 
-    public void checkIfDraftCourseAddAllowed(Long userId, Course course) throws UserNotFoundExcepion, RoleNotAllowedException {
-        User user = userRepository.findById(userId);
-        validator.validateNull(user, "userId", userId);
-
-        Rol role = user.getRole();
-        validateAllowedRoles(role);
-
-        if(isProfessor(role) || isInstructor(role) || isAdmin(role)) {
-            log.debug("Role is: ",role.getDescription());
-        }
-
-        if(isSuperAdmin(role)){
-            log.debug("Role is: ",role.getDescription());
-        }
-
-    }
 
     private boolean isProfessor(Rol role) {
         return role.getId() == 3;
@@ -84,6 +73,41 @@ public class SubscriptionPlanValidator {
         } else {
             throw new RoleNotAllowedException("Role id:"+roleId+" is not allowed for add draft course");
         }
+    }
+
+    public void checkIfSubscriptionValid(String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, SubscriptionPlanDateExpired, PaymentException {
+
+        boolean isValid = false;
+
+        User schoolAdmin = userRepository.findByUsername(adminUsername);
+        validator.validateNull(schoolAdmin, "admin userName", adminUsername);
+
+        List<User> adminSchools = schoolAdmin.getSchools();
+
+        if (adminSchools == null || adminSchools.isEmpty()) {
+            throw new SchoolNotFoundExcepion("Admin " + adminUsername + " doesn't belong to any school");
+        }
+
+        for(User school : adminSchools) {
+
+            //subscription exist?
+            if(school.getSubscriptionId() == null || school.getSubscriptionId().isEmpty()) {
+                log.warn("School haven't made subscription yet. School ID: {}", school.getId());
+                throw new PaymentException("School haven't made subscription yet. School ID: " + school.getId());
+            }
+
+            String status = stripeService.getSubscriptionStatus(school.getSubscriptionId());
+
+            if(status == null || !status.equalsIgnoreCase("active")) {
+
+                log.warn("You subscription plan is not active. School ID {}. Probably you need to update your payment method", school.getId());
+                throw new SubscriptionPlanDateExpired("You subscription plan is not active. School ID "+school.getId()+". Probably you need to update your payment method");
+            }
+            return;
+        }
+
+        log.warn("Admin doesn't belong to any school. Admin userName {}", adminUsername);
+        throw new SchoolNotFoundExcepion("Admin doesn't belong to any school. Admin userName "+ adminUsername);
     }
 
     public void validateCourseApprovment(Long courseId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, MaxCoursesPerProfessorExceededException {

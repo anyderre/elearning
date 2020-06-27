@@ -43,4 +43,8 @@ public class SubscriptionPlan {
     private Date createdDate;
 
     private Date updatedDate;
+
+    private String productId;
+
+    private String priceId;
 }

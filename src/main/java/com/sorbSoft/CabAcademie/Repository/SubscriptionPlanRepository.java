@@ -13,5 +13,5 @@ public interface SubscriptionPlanRepository extends JpaRepository<SubscriptionPl
     SubscriptionPlan findOneByLevelAndTypeAndIsActiveTrue(SubscriptionPlanLevel level, OrganizationType type);
 
 
-
+    SubscriptionPlan findOneByPriceId(String priceId);
 }
