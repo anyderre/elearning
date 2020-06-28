@@ -12,6 +12,8 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Log4j2
 public class SubscriptionPlanService {
@@ -37,8 +39,8 @@ public class SubscriptionPlanService {
         //TODO: add validation
     }
 
-    public void fetchAll() {
-
+    public List<SubscriptionPlan> fetchAll() {
+        return planRepository.findAll();
     }
 
     public OrganizationType[] fetchAllOrganizationTypes(){
@@ -63,6 +65,10 @@ public class SubscriptionPlanService {
     }
 
     public void delete(long subscriptionPlanId) {
+        planRepository.delete(subscriptionPlanId);
+    }
 
+    public SubscriptionPlan fetchById(Long id) {
+        return planRepository.findOne(id);
     }
 }
