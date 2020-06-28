@@ -46,10 +46,10 @@ public class SubscriptionPlanController {
     @GetMapping(value = "/get/all")
     @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
     @ApiOperation(value = "Get all subscription plans, Role:SUPER_ROLE_ADMIN")
-    public ResponseEntity<List<SubscriptionPlan>> getSubscriptionPlans() {
+    public ResponseEntity<List<SubscriptionPlanVm>> getSubscriptionPlans() {
 
 
-        List<SubscriptionPlan> all = planService.fetchAll();
+        List<SubscriptionPlanVm> all = planService.fetchAll();
 
         return new ResponseEntity<>(all, HttpStatus.OK);
 
@@ -58,12 +58,12 @@ public class SubscriptionPlanController {
     @GetMapping(value = "/get-by-id/{id}")
     @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
     @ApiOperation(value = "Get all subscription plans, Role:SUPER_ROLE_ADMIN")
-    public ResponseEntity<SubscriptionPlan> getSubscriptionPlans(@PathVariable Long id) {
+    public ResponseEntity<SubscriptionPlanVm> getSubscriptionPlans(@PathVariable Long id) {
 
         if (id == null || id == 0)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        SubscriptionPlan plan = planService.fetchById(id);
+        SubscriptionPlanVm plan = planService.fetchById(id);
 
         if(plan == null) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

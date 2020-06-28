@@ -12,6 +12,7 @@ import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -39,8 +40,15 @@ public class SubscriptionPlanService {
         //TODO: add validation
     }
 
-    public List<SubscriptionPlan> fetchAll() {
-        return planRepository.findAll();
+    public List<SubscriptionPlanVm> fetchAll() {
+        List<SubscriptionPlan> all = planRepository.findAll();
+        List<SubscriptionPlanVm> vms = new ArrayList<>();
+        for(SubscriptionPlan plan : all) {
+            SubscriptionPlanVm subscriptionPlanVm = mapper.mapToViewModel(plan);
+            vms.add(subscriptionPlanVm);
+        }
+
+        return vms;
     }
 
     public OrganizationType[] fetchAllOrganizationTypes(){
@@ -68,7 +76,9 @@ public class SubscriptionPlanService {
         planRepository.delete(subscriptionPlanId);
     }
 
-    public SubscriptionPlan fetchById(Long id) {
-        return planRepository.findOne(id);
+    public SubscriptionPlanVm fetchById(Long id) {
+        SubscriptionPlan plan = planRepository.findOne(id);
+        SubscriptionPlanVm subscriptionPlanVm = mapper.mapToViewModel(plan);
+        return subscriptionPlanVm;
     }
 }

@@ -37,4 +37,8 @@ public class SubscriptionPlanVm {
 
     private Date updatedDate;
 
+    private String productId;
+
+    private String priceId;
+
 }
