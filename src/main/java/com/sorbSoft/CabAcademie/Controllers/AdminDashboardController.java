@@ -44,7 +44,7 @@ public class AdminDashboardController {
     @ApiOperation(value = "Approve course, Role:ROLE_ADMIN")
     public ResponseEntity<MessageResponse> approveCourse(
             @Valid @RequestBody CourseApproveRequest approveRq,
-            Principal principal) throws CourseNotFoundExcepion, UserNotFoundExcepion, SchoolNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseAccessDeniedException {
+            Principal principal) throws CourseNotFoundExcepion, UserNotFoundExcepion, SchoolNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseAccessDeniedException, PaymentException, SubscriptionPlanDateExpired {
 
         if (approveRq.getCourseId() == null || approveRq.getCourseId() <= 0 || principal == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);

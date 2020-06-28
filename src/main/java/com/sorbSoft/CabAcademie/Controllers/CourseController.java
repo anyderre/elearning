@@ -419,7 +419,7 @@ public class CourseController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public  ResponseEntity<MessageResponse> saveApprovedCourseByAdmin(
             @Valid @RequestBody CourseViewModel vm,
-            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion {
+            Principal principal) throws UserNotFoundExcepion, SchoolNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion, PaymentException, SubscriptionPlanDateExpired {
 
         vm.setStatus(CourseStatus.APPROVED);
 

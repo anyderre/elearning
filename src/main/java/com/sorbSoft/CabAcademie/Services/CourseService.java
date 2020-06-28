@@ -12,6 +12,7 @@ import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import com.sorbSoft.CabAcademie.exception.*;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -76,11 +77,16 @@ public class CourseService {
     @Autowired
     private CourseSchoolRepository courseSchoolRepository;
 
+    @Value("${stripe.enabled}")
+    private Boolean isStripeEnabled;
+
     private final CourseMapper mapper = Mappers.getMapper(CourseMapper.class);
 
-    public Result saveCourseByAdmin(CourseViewModel vm, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion {
+    public Result saveCourseByAdmin(CourseViewModel vm, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseNotFoundExcepion, CoureTitleAlreadyTakenExcepion, PaymentException, SubscriptionPlanDateExpired {
         //TODO: add course add validation. Validate if admin adds course to schools, orgs which he owns
-        subscriptionValidator.validateAddCourseByAdmin(vm.getUser().getId(), adminUsername);
+        if(isStripeEnabled) {
+            subscriptionValidator.validateAddCourseByAdmin(vm.getUser().getId(), adminUsername);
+        }
         return saveCourse(vm, adminUsername);
     }
 
@@ -989,9 +995,11 @@ public class CourseService {
 
 
 
-    public boolean approveCourse(Long courseId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseAccessDeniedException {
+    public boolean approveCourse(Long courseId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, MaxCoursesPerProfessorExceededException, CourseAccessDeniedException, PaymentException, SubscriptionPlanDateExpired {
 
-        subscriptionValidator.validateCourseApprovment(courseId, adminUsername);
+        if(isStripeEnabled) {
+            subscriptionValidator.validateCourseApprovment(courseId, adminUsername);
+        }
         return changeCourseStatusBySchoolAdmin(courseId, adminUsername, CourseStatus.APPROVED, "");
     }
 

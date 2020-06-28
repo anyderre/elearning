@@ -110,7 +110,8 @@ public class SubscriptionPlanValidator {
         throw new SchoolNotFoundExcepion("Admin doesn't belong to any school. Admin userName "+ adminUsername);
     }
 
-    public void validateCourseApprovment(Long courseId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, MaxCoursesPerProfessorExceededException {
+    public void validateCourseApprovment(Long courseId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, MaxCoursesPerProfessorExceededException, PaymentException, SubscriptionPlanDateExpired {
+
         Course course2Approve = courseRepository.findOne(courseId);
 
         User teacher = course2Approve.getUser();
@@ -118,7 +119,9 @@ public class SubscriptionPlanValidator {
         validateAddCourseByAdmin(teacher.getId(), adminUsername);
     }
 
-    public void validateAddCourseByAdmin(Long teacherId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, MaxCoursesPerProfessorExceededException {
+    public void validateAddCourseByAdmin(Long teacherId, String adminUsername) throws UserNotFoundExcepion, SchoolNotFoundExcepion, CourseNotFoundExcepion, MaxCoursesPerProfessorExceededException, PaymentException, SubscriptionPlanDateExpired {
+
+        checkIfSubscriptionValid(adminUsername);
 
         User teacher = userRepository.findById(teacherId);
 
