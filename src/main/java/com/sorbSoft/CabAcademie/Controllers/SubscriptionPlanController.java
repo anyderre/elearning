@@ -90,7 +90,7 @@ public class SubscriptionPlanController {
 
     @GetMapping(value = "/getLevels")
     @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
-    @ApiOperation(value = "Get subscription plan level, like BASIC, GOLD, etc, Role:ROLE_ADMIN")
+    @ApiOperation(value = "Get subscription plan level, like BASIC, GOLD, etc, Role:ROLE_SUPER_ADMIN")
     public ResponseEntity<SubscriptionPlanLevel[]> getLevels() {
 
         SubscriptionPlanLevel[] levels = planService.fetchAllSubscriptionLevels();
@@ -100,7 +100,7 @@ public class SubscriptionPlanController {
 
     @GetMapping(value = "/getOrganizationTypes")
     @PreAuthorize("hasAuthority('ROLE_SUPER_ADMIN')")
-    @ApiOperation(value = "Get organization type of subscription plan, like School, Organization, Role:ROLE_ADMIN")
+    @ApiOperation(value = "Get organization type of subscription plan, like School, Organization, Role:ROLE_SUPER_ADMIN")
     public ResponseEntity<OrganizationType[]> getOrganizationTypes() {
 
         OrganizationType[] organizationTypes = planService.fetchAllOrganizationTypes();
