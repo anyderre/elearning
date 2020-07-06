@@ -34,4 +34,6 @@ public interface SlotsRepository extends JpaRepository<TimeSlot, Long> {
 
     @Query("select ap from TimeSlot ap where ap.dateFrom <= :meetingStart and ap.dateTo >= :meetingEnd and ap.teacher = :teacher and ap.status = 'OPENED'")
     TimeSlot getAvailableSlot(@Param("meetingStart") Date meetingStart, @Param("meetingEnd") Date meetingEnd, @Param("teacher") User teacher);
+
+    TimeSlot findById(Long id);
 }

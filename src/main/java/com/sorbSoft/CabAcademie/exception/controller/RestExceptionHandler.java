@@ -280,6 +280,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(apiError);
     }
 
+    @ExceptionHandler(TimeSlotException.class)
+    protected ResponseEntity<Object> handleTimeSlotException(TimeSlotException ex) {
+        String error = ex.getMessage();
+
+        ApiError apiError = new ApiError(HttpStatus.CONFLICT);
+        apiError.setMessage(error);
+
+        return buildResponseEntity(apiError);
+    }
+
 
     private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
         log.warn(apiError.getMessage());

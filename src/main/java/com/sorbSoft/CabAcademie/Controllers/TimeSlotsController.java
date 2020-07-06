@@ -7,6 +7,8 @@ import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotsGetRequ
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotsResponseModel;
 import com.sorbSoft.CabAcademie.Services.TimeSlotService;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
+import com.sorbSoft.CabAcademie.exception.EntityNotFoundException;
+import com.sorbSoft.CabAcademie.exception.TimeSlotException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,6 +41,23 @@ public class TimeSlotsController {
         return  new ResponseEntity<>(MessageResponse.of("Appointment Slots Saved Successfully"), HttpStatus.OK);
     }
 
+    @PutMapping(value = "/updateSlot", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') " +
+            "or hasAuthority('ROLE_SUPER_ADMIN') " +
+            "or hasAuthority('ROLE_INSTRUCTOR') " +
+            "or hasAuthority('ROLE_PROFESSOR') " +
+            "or hasAuthority('ROLE_FREELANCER')")
+    public ResponseEntity<MessageResponse> updateSlots(@Valid @RequestBody SlotAddRequestModel timeSlotVm) throws TimeSlotException, EntityNotFoundException {
+
+        if(timeSlotVm.getId() == null || timeSlotVm.getId() <=0) {
+            return new ResponseEntity<>(MessageResponse.of("Id can't be null"), HttpStatus.BAD_REQUEST);
+        }
+
+        timeSlotService.update(timeSlotVm);
+
+        return  new ResponseEntity<>(MessageResponse.of("Appointment Slots Successfully Updated"), HttpStatus.OK);
+    }
+
 
     @PostMapping(value = "/getByTeacherIdWithinDateRange", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<SlotsResponseModel> getSlotsByUserIdWithinDateRange(
@@ -54,9 +73,6 @@ public class TimeSlotsController {
         }
         Result result = timeSlotService.getSlotsByUserIdWithinDateRange(vmSlots);
         List<SlotsResponseModel> slots = (List<SlotsResponseModel>)result.getValue();
-
-        if(slots == null || slots.size() == 0)
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
         return new ResponseEntity(slots, HttpStatus.OK);
     }

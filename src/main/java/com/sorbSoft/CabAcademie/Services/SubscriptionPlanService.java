@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -34,10 +35,11 @@ public class SubscriptionPlanService {
 
 
     public void save(SubscriptionPlanVm addRequest) {
+        //TODO: add validation, plan exist, field are empty or not, etc
         SubscriptionPlan subscriptionPlan = mapper.mapToEntity(addRequest);
+        subscriptionPlan.setCreatedDate(new Date());
         planRepository.save(subscriptionPlan);
 
-        //TODO: add validation
     }
 
     public List<SubscriptionPlanVm> fetchAll() {

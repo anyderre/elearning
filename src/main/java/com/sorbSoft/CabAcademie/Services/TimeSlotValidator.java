@@ -67,6 +67,40 @@ public class TimeSlotValidator {
 
     }
 
+    public Result validateUpdateSlotByTeacher(SlotAddRequestModel vm) {
+
+        Result result = new Result();
+
+        result = validateAppointmentType(vm);
+        if (!result.isValid()) return result;
+
+
+        AppointmentType timeSlotType = vm.getTimeSlotType();
+
+        if (timeSlotType == AppointmentType.PRIVATE) {
+
+            result = validate121Null(vm);
+            if (!result.isValid()) return result;
+
+            result = validateUpdateSlotTeacherAndDates(vm);
+            if (!result.isValid()) return result;
+
+        } else if (timeSlotType == AppointmentType.GROUP) {
+
+            result = validate12ManyNull(vm);
+            if (!result.isValid()) return result;
+
+            result = validateUpdateSlotTeacherAndDates(vm);
+            if (!result.isValid()) return result;
+        } else {
+            result.add("Time slot type is not correct or has been corrupted");
+        }
+
+
+        return result;
+
+    }
+
     private Result validate12ManyNull(SlotAddRequestModel vm) {
         Result result = new Result();
 
@@ -105,6 +139,28 @@ public class TimeSlotValidator {
 
 
         result = validateDateOverlappedWithDbSlots(vm);
+        if (!result.isValid()) return result;
+
+        return result;
+    }
+
+    private Result validateUpdateSlotTeacherAndDates(SlotAddRequestModel vm) {
+        Result result = new Result();
+
+        result = validateTeacherExists(vm);
+        if (!result.isValid()) return result;
+
+        result = validator.validateDateFromToOrder(vm.getDateFrom(), vm.getDateTo());
+        if (!result.isValid()) return result;
+
+        result = validator.validateDateBeforeNow(vm.getDateFrom(), "Date From");
+        if (!result.isValid()) return result;
+
+        result = validator.validateDateBeforeNow(vm.getDateTo(), "Date To");
+        if (!result.isValid()) return result;
+
+
+        result = validateUpdateSlotDateOverlappedWithDbSlots(vm);
         if (!result.isValid()) return result;
 
         return result;
@@ -219,6 +275,37 @@ public class TimeSlotValidator {
                 result.add("Your dates " + curFrom + "-" + curTo + " overlap with db dates " + dbFrom + "-" + dbTo + " for user " + user.getId());
                 log.debug("Your dates " + curFrom + "-" + curTo + " overlap with db dates " + dbFrom + "-" + dbTo + " for user " + user.getId());
                 return result;
+            }
+        }
+
+        return result;
+    }
+
+    public Result validateUpdateSlotDateOverlappedWithDbSlots(SlotAddRequestModel vm) {
+        Result result = new Result();
+
+        Date from = DateUtils.removeSeconds(vm.getDateFrom());
+        Date to = DateUtils.removeSeconds(vm.getDateTo());
+
+        User user = userR.findById(vm.getTeacherId());
+
+        DateTime curFrom = new DateTime(from);
+        DateTime curTo = new DateTime(to);
+
+        List<TimeSlot> dbSlots = slotsRepo.findByTeacher(user);
+
+        for (TimeSlot sl : dbSlots) {
+
+            if(vm.getId() != sl.getId()) {
+
+                DateTime dbFrom = new DateTime(sl.getDateFrom());
+                DateTime dbTo = new DateTime(sl.getDateTo());
+
+                if (DateUtils.isOverlapped(curFrom, curTo, dbFrom, dbTo)) {
+                    result.add("Your dates " + curFrom + "-" + curTo + " overlap with db dates " + dbFrom + "-" + dbTo + " for user " + user.getId());
+                    log.debug("Your dates " + curFrom + "-" + curTo + " overlap with db dates " + dbFrom + "-" + dbTo + " for user " + user.getId());
+                    return result;
+                }
             }
         }
 

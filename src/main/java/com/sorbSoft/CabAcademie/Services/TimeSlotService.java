@@ -10,6 +10,8 @@ import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.*;
 import com.sorbSoft.CabAcademie.Utils.DateUtils;
+import com.sorbSoft.CabAcademie.exception.EntityNotFoundException;
+import com.sorbSoft.CabAcademie.exception.TimeSlotException;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -62,6 +64,31 @@ public class TimeSlotService {
         return result;
     }
 
+    public Result update(SlotAddRequestModel vmTimeZoned) throws EntityNotFoundException, TimeSlotException {
+
+        Result result = new Result();
+
+        TimeSlot timeSlot = slotsRepo.findById(vmTimeZoned.getId());
+
+        if(timeSlot == null) {
+            throw new EntityNotFoundException("Time slot with id:"+vmTimeZoned.getId()+" doesn't exist");
+        }
+
+        SlotAddRequestModel vmUtc = tzConverter.convertFromTimeZonedToUtc(vmTimeZoned);
+
+        result = validator.validateUpdateSlotByTeacher(vmUtc);
+        if(!result.isValid()) {
+            throw new TimeSlotException(result.getLista().get(0).message);
+        }
+
+        TimeSlot entity = getEntity(vmUtc);
+        entity.setId(timeSlot.getId());
+
+        slotsRepo.save(entity);
+
+
+       return result;
+    }
 
 
     public Result getSlotsByUserIdWithinDateRange(SlotsGetRequestModel vmTimeZoned) {
