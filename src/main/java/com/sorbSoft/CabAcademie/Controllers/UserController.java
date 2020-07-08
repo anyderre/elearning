@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -92,11 +93,25 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/professors" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/schoolProfessors" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<User>> findAllProfessors(Principal principal) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+
+        List<User> users = new ArrayList<>();
+
+        if(principal == null) {
+            return new ResponseEntity(MessageResponse.of("You should be logged in as school member"), HttpStatus.FORBIDDEN);
+        } else {
+            users = userService.findSchoolProfessors(principal.getName());
+        }
+
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/publicProfessors" , consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<User>> findAllProfessors(){
-        List<User> users= userService.findAllProfessor();
-        if(users.isEmpty())
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        List<User> users = userService.findPublicProfessors();
+
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 

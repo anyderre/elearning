@@ -25,7 +25,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User>findAll();
 
-    List<User>findAllByRoleName(String roleName);
+    List<User> findAllByRoleRole(Roles role);
 
     User findByRoleRoleAndId(Roles role, Long professorId);
 
@@ -46,4 +46,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findOneByPasswordResetToken(String token);
 
     User findBySubscriptionId(String subscriptionId);
+
+    List<User> findAllBySchoolsInAndRoleRole(User school, Roles role);
 }

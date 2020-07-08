@@ -273,8 +273,41 @@ public class UserServices {
         return userRepository.findAll();
     }
 
-    public List<User> findAllProfessor(){
-        return userRepository.findAllByRoleName(Roles.ROLE_PROFESSOR.name());
+    public List<User> findSchoolProfessors(String userName) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+
+        validator.validateNull(userName, "User should be logged in as school member. userName");
+        User user = userRepository.findByUsername(userName);
+
+        validator.validateNull(user, "userName", userName);
+
+        List<User> schools = user.getSchools();
+
+     /*  if(schools == null || schools.isEmpty()) {
+            throw new SchoolNotFoundExcepion("User with username "+userName+" doesn't belong to any schools or organization");
+        }*/
+
+        List<User> professors = new ArrayList<>();
+
+        for(User school : schools) {
+
+            List<User> findings = new ArrayList<>();
+
+            if(school.getRole().getRole() == Roles.ROLE_SCHOOL) {
+                findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_PROFESSOR);
+            }
+
+            if(school.getRole().getRole() == Roles.ROLE_ORGANIZATION) {
+                findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_INSTRUCTOR);
+            }
+
+            professors.addAll(findings);
+
+        }
+        return professors;
+    }
+
+    public List<User> findPublicProfessors() {
+        return userRepository.findAllByRoleRole(Roles.ROLE_FREELANCER);
     }
 
     public UserViewModel findProfessor(Long professorId){
@@ -941,5 +974,7 @@ public class UserServices {
             throw new RoleNotAllowedException("Role id:"+roleId+" at line:"+lineNumber+" is not allowed for batch signup");
         }
     }
+
+
 }
 
