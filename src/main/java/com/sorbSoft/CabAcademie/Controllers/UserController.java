@@ -116,8 +116,8 @@ public class UserController {
     }
 
     @GetMapping(value = "/schoolProfessors/{schoolId}/{page}/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAuthority('ROLE_PROFESSOR') or hasAuthority('ROLE_INSTRUCTOR')")
-    @ApiOperation(value = "Get School/Org Teachers, Role:ROLE_PROFESSOR, ROLE_INSTRUCTOR")
+    @PreAuthorize("hasAuthority('ROLE_PROFESSOR') or hasAuthority('ROLE_INSTRUCTOR') or hasAuthority('ROLE_SUPER_ADMIN')")
+    @ApiOperation(value = "Get School/Org Teachers, Role:ROLE_PROFESSOR, ROLE_INSTRUCTOR, ROLE_SUPER_ADMIN")
     public ResponseEntity<Page<User>> findSchoolProfessorsForProfessor(
             @PathVariable Long schoolId,
             @PathVariable Integer page,

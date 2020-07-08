@@ -323,20 +323,35 @@ public class UserServices {
 
         List<User> schools = professor.getSchools();
 
-        for (User mySchool : schools) {
-            if(mySchool.getId() == school.getId()) {
-                if(school.getRole().getRole() == Roles.ROLE_SCHOOL) {
-                    findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_PROFESSOR, request);
-                }
+        if(isSuperAdmin(professor)) {
+            if(school.getRole().getRole() == Roles.ROLE_SCHOOL) {
+                findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_PROFESSOR, request);
+            }
 
-                if(school.getRole().getRole() == Roles.ROLE_ORGANIZATION) {
-                    findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_INSTRUCTOR, request);
+            if(school.getRole().getRole() == Roles.ROLE_ORGANIZATION) {
+                findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_INSTRUCTOR, request);
+            }
+        } else { // if professor
+
+            for (User mySchool : schools) {
+                if(mySchool.getId() == school.getId()) {
+                    if(school.getRole().getRole() == Roles.ROLE_SCHOOL) {
+                        findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_PROFESSOR, request);
+                    }
+
+                    if(school.getRole().getRole() == Roles.ROLE_ORGANIZATION) {
+                        findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_INSTRUCTOR, request);
+                    }
                 }
             }
+
+
         }
-
-
         return findings;
+    }
+
+    private boolean isSuperAdmin(User professor) {
+        return professor.getRole().getRole() == Roles.ROLE_SUPER_ADMIN;
     }
 
     public Page<User> findPublicProfessors(Integer page, Integer amount) {
