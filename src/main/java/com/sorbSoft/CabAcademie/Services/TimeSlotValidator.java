@@ -9,6 +9,7 @@ import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotAddRequestModel;
 import com.sorbSoft.CabAcademie.Utils.DateUtils;
+import com.sorbSoft.CabAcademie.exception.EmptyValueException;
 import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class TimeSlotValidator {
     @Autowired
     private UserRepository userR;
 
-    public Result validateAddNewSlotByTeacher(SlotAddRequestModel vm) {
+    public Result validateAddNewSlotByTeacher(SlotAddRequestModel vm) throws EmptyValueException {
 
         Result result = new Result();
 
@@ -67,7 +68,7 @@ public class TimeSlotValidator {
 
     }
 
-    public Result validateUpdateSlotByTeacher(SlotAddRequestModel vm) {
+    public Result validateUpdateSlotByTeacher(SlotAddRequestModel vm) throws EmptyValueException {
 
         Result result = new Result();
 
@@ -101,7 +102,7 @@ public class TimeSlotValidator {
 
     }
 
-    private Result validate12ManyNull(SlotAddRequestModel vm) {
+    private Result validate12ManyNull(SlotAddRequestModel vm) throws EmptyValueException {
         Result result = new Result();
 
         result = validateNullGeneral(vm);
@@ -113,11 +114,10 @@ public class TimeSlotValidator {
         return result;
     }
 
-    private Result validateMaxAttendees(SlotAddRequestModel vm) {
+    private Result validateMaxAttendees(SlotAddRequestModel vm) throws EmptyValueException {
         Result result = new Result();
 
-        result = validator.validateNull(vm.getMaxAttendees(), "Max attendees");
-        if(!result.isValid()) return result;
+        validator.validateNull(vm.getMaxAttendees(), "Max attendees");
 
         return result;
     }
@@ -172,7 +172,7 @@ public class TimeSlotValidator {
 
 
 
-    public Result validate121Null(SlotAddRequestModel vm) {
+    public Result validate121Null(SlotAddRequestModel vm) throws EmptyValueException {
 
         Result result = new Result();
 
@@ -186,21 +186,18 @@ public class TimeSlotValidator {
         return result;
     }
 
-    private Result validateMinMinutes(SlotAddRequestModel vm) {
+    private Result validateMinMinutes(SlotAddRequestModel vm) throws EmptyValueException {
         Result result = new Result();
 
-        result = validator.validateNull(vm.getMinMinutes(), "Minimal time slot");
-        if(!result.isValid()) return result;
+        validator.validateNull(vm.getMinMinutes(), "Minimal time slot");
 
         return result;
     }
 
-    private Result validateNullGeneral(SlotAddRequestModel vm) {
+    private Result validateNullGeneral(SlotAddRequestModel vm) throws EmptyValueException {
         Result result = new Result();
 
-        result = validator.validateNull(vm.getTeacherId(), "User Id");
-        if (!result.isValid()) return result;
-
+        validator.validateNull(vm.getTeacherId(), "User Id");
 
         result = validator.validateNull(vm.getDateFrom(), "Date From");
         if (!result.isValid()) return result;
@@ -325,7 +322,7 @@ public class TimeSlotValidator {
         return result;
     }
 
-    public Result validateGetSlotsByUserIdWithinDateRange(Date dateFrom, Date dateTo, Long userId) {
+    public Result validateGetSlotsByUserIdWithinDateRange(Date dateFrom, Date dateTo, Long userId) throws EmptyValueException {
 
         Result result = new Result();
 
@@ -335,9 +332,7 @@ public class TimeSlotValidator {
         result = validator.validateNull(dateTo, "Date To");
         if(!result.isValid()) return result;
 
-        result = validator.validateNull(userId, "User Id");
-        if(!result.isValid()) return result;
-
+        validator.validateNull(userId, "User Id");
 
         result = validator.validateDateFromToOrder(dateFrom, dateTo);
         if (!result.isValid()) return result;

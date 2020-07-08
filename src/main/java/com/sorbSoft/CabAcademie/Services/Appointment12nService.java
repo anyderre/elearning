@@ -10,6 +10,7 @@ import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.GroupAppointmentViewModel;
 import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
+import com.sorbSoft.CabAcademie.exception.EmptyValueException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -39,7 +40,7 @@ public class Appointment12nService {
     @Autowired
     private EmailApiService emailSender;
 
-    public Result subscribeToGroupMeeting(GroupAppointmentViewModel vm) {
+    public Result subscribeToGroupMeeting(GroupAppointmentViewModel vm) throws EmptyValueException {
 
         Result result = new Result();
 

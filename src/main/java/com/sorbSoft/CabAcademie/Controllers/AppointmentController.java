@@ -6,6 +6,8 @@ import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.OneToOneAppo
 import com.sorbSoft.CabAcademie.Services.Appointment12nService;
 import com.sorbSoft.CabAcademie.Services.Appointmeent121Service;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
+import com.sorbSoft.CabAcademie.exception.EmptyValueException;
+import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -31,7 +33,7 @@ public class AppointmentController {
             "or hasAuthority('ROLE_STUDENT') " +
             "or hasAuthority('ROLE_EMPLOYEE') " +
             "or hasAuthority('ROLE_FREE_STUDENT')")
-    public ResponseEntity<MessageResponse> make121Appointment(@Valid @RequestBody OneToOneAppointmentMakeRequestModel appointmentVmSlot) {
+    public ResponseEntity<MessageResponse> make121Appointment(@Valid @RequestBody OneToOneAppointmentMakeRequestModel appointmentVmSlot) throws EmptyValueException, UserNotFoundExcepion {
 
         Result result = appointmeent121Service.book121Meeting(appointmentVmSlot);
         if (!result.isValid())
@@ -45,7 +47,7 @@ public class AppointmentController {
             "or hasAuthority('ROLE_STUDENT') " +
             "or hasAuthority('ROLE_EMPLOYEE') " +
             "or hasAuthority('ROLE_FREE_STUDENT')")
-    public ResponseEntity<MessageResponse> makeOneToManyAppointment(@Valid @RequestBody GroupAppointmentViewModel appointmentVmSlot) {
+    public ResponseEntity<MessageResponse> makeOneToManyAppointment(@Valid @RequestBody GroupAppointmentViewModel appointmentVmSlot) throws EmptyValueException {
 
         Result result = appointment12nService.subscribeToGroupMeeting(appointmentVmSlot);
         if (!result.isValid())

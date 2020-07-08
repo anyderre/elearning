@@ -76,7 +76,7 @@ public class CourseController {
             "or hasRole('ROLE_FREELANCER') " +
             "or hasRole('ROLE_ORGANIZATION') " +
             "or hasRole('ROLE_INSTRUCTOR')")
-    public ResponseEntity<List<CourseViewModel>> getAllCoursesByUserId(@PathVariable Long userId) throws UserNotFoundExcepion {
+    public ResponseEntity<List<CourseViewModel>> getAllCoursesByUserId(@PathVariable Long userId) throws UserNotFoundExcepion, EmptyValueException {
 
         List<CourseViewModel> courses = courseService.fetchAllCoursesByUser(userId);
         if(courses.isEmpty())
@@ -95,7 +95,7 @@ public class CourseController {
             "or hasRole('ROLE_INSTRUCTOR')")
     public ResponseEntity<List<CourseViewModel>> getAllCoursesByUserIdAndAmount(
             @PathVariable Long userId,
-            @PathVariable Integer amount) throws UserNotFoundExcepion {
+            @PathVariable Integer amount) throws UserNotFoundExcepion, EmptyValueException {
 
         List<CourseViewModel> courses = courseService.fetchAllCoursesByUserAndAmount(userId, amount);
         if(courses.isEmpty())
@@ -113,7 +113,7 @@ public class CourseController {
             "or hasRole('ROLE_ORGANIZATION') " +
             "or hasRole('ROLE_INSTRUCTOR')")
     public ResponseEntity<Long> getUserCoursesCount(
-            @PathVariable Long userId) throws UserNotFoundExcepion {
+            @PathVariable Long userId) throws UserNotFoundExcepion, EmptyValueException {
 
         long userCoursesCount = courseService.countUserCourses(userId);
         return new ResponseEntity<>(userCoursesCount, HttpStatus.OK);

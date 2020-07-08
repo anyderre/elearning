@@ -11,6 +11,7 @@ import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.GroupAppointmentViewModel;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotAddRequestModel;
+import com.sorbSoft.CabAcademie.exception.EmptyValueException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,12 +37,10 @@ public class GroupAppointmentValidator {
 
 
 
-    public Result validateSubscribeToMeeting(GroupAppointmentViewModel vm) {
+    public Result validateSubscribeToMeeting(GroupAppointmentViewModel vm) throws EmptyValueException {
         Result result = new Result();
 
-        result = validateNull(vm);
-        if (!result.isValid()) return result;
-
+        validateNull(vm);
 
         result = userValidator.validateUserExists(vm.getStudentId());
 
@@ -51,15 +50,13 @@ public class GroupAppointmentValidator {
     }
 
 
-    public Result validateNull(GroupAppointmentViewModel vm) {
+    public Result validateNull(GroupAppointmentViewModel vm) throws EmptyValueException {
 
         Result result = new Result();
 
-        result = validator.validateNull(vm.getAppointmentId(), "Appointment id");
-        if (!result.isValid()) return result;
+        validator.validateNull(vm.getAppointmentId(), "Appointment id");
 
-        result = validator.validateNull(vm.getStudentId(), "Student id");
-        if (!result.isValid()) return result;
+        validator.validateNull(vm.getStudentId(), "Student id");
 
         return result;
     }

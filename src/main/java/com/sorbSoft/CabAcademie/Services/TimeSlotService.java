@@ -10,8 +10,10 @@ import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.*;
 import com.sorbSoft.CabAcademie.Utils.DateUtils;
+import com.sorbSoft.CabAcademie.exception.EmptyValueException;
 import com.sorbSoft.CabAcademie.exception.EntityNotFoundException;
 import com.sorbSoft.CabAcademie.exception.TimeSlotException;
+import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,9 +40,12 @@ public class TimeSlotService {
     @Autowired
     private TimeZoneConverter tzConverter;
 
+    @Autowired
+    private GenericValidator gValidator;
+
 
     //create
-    public Result save(List<SlotAddRequestModel> appointmentVmSlots) {
+    public Result save(List<SlotAddRequestModel> appointmentVmSlots) throws EmptyValueException, UserNotFoundExcepion {
 
         Result result = new Result();
 
@@ -64,7 +69,7 @@ public class TimeSlotService {
         return result;
     }
 
-    public Result update(SlotAddRequestModel vmTimeZoned) throws EntityNotFoundException, TimeSlotException {
+    public Result update(SlotAddRequestModel vmTimeZoned) throws EntityNotFoundException, TimeSlotException, EmptyValueException, UserNotFoundExcepion {
 
         Result result = new Result();
 
@@ -90,8 +95,51 @@ public class TimeSlotService {
        return result;
     }
 
+    public List<SlotsResponseModel> getUpcomingSessions(String teacherName) throws EmptyValueException, UserNotFoundExcepion {
 
-    public Result getSlotsByUserIdWithinDateRange(SlotsGetRequestModel vmTimeZoned) {
+
+        gValidator.validateNull(teacherName, "userName");
+
+        User teacher = userR.findByUsername(teacherName);
+
+        gValidator.validateNull(teacher, "userName", teacherName);
+
+        Date now = new Date();
+
+        List<TimeSlot> allSlotsAfterNow = slotsRepo.findAllByTeacherAndDateFromGreaterThan(teacher, now);
+
+        List<TimeSlot> upcommingSlots = new ArrayList<>();
+
+        for(TimeSlot slot : allSlotsAfterNow) {
+
+            if(slot.getType() == AppointmentType.GROUP) {
+                if(slot.getApprovedAttendee() != null &&  slot.getApprovedAttendee() > 0) {
+                    upcommingSlots.add(slot);
+                }
+            }
+
+            if(slot.getType() == AppointmentType.PRIVATE) {
+                if(slot.getStatus() == TimeSlotStatus.CLOSED) {
+                    upcommingSlots.add(slot);
+                }
+
+            }
+
+        }
+
+        List<SlotsResponseModel> vms = getSlotsVms(upcommingSlots);
+
+        for(SlotsResponseModel responseModel : vms) {
+            //it changes value by object link, no need to copy/clone values
+            tzConverter.convertFromUtcToTimeZoned(responseModel, teacher.getId());
+        }
+
+        return vms;
+
+    }
+
+
+    public Result getSlotsByUserIdWithinDateRange(SlotsGetRequestModel vmTimeZoned) throws EmptyValueException, UserNotFoundExcepion {
 
         Result result = new Result();
 
@@ -207,7 +255,7 @@ public class TimeSlotService {
         return result;
     }
 
-    public Result getAllSlotsByUserId(Long userId, Long requesterId) {
+    public Result getAllSlotsByUserId(Long userId, Long requesterId) throws EmptyValueException, UserNotFoundExcepion {
 
         Result result = new Result();
 
@@ -233,7 +281,7 @@ public class TimeSlotService {
         return result;
     }
 
-    public Result deleteSlotsByUserIdWithinDateRange(SlotDeleteRequestModel vmTimeZoned) {
+    public Result deleteSlotsByUserIdWithinDateRange(SlotDeleteRequestModel vmTimeZoned) throws EmptyValueException, UserNotFoundExcepion {
         Result result = new Result();
 
         SlotDeleteRequestModel vmUtc = tzConverter.convertFromTimeZonedToUtc(vmTimeZoned);

@@ -23,13 +23,11 @@ public class GenericValidator {
         return result;
     }
 
-    public Result validateNull(Long value, String valueName) {
+    public void validateNull(Long value, String valueName) throws EmptyValueException {
         Result result = new Result();
         if (value == null || value <= 0) {
-            result.add(valueName + " be null or equal 0");
-            return result;
+            throw new EmptyValueException(valueName + " be null or equal 0");
         }
-        return result;
     }
 
     public Result validateNull(Integer value, String valueName) {

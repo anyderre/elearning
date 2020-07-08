@@ -258,7 +258,7 @@ public class CourseService {
         return courseRepository.exists(id);
     }
 
-    public List<CourseViewModel> fetchAllCoursesByUser(Long userId) throws UserNotFoundExcepion {
+    public List<CourseViewModel> fetchAllCoursesByUser(Long userId) throws UserNotFoundExcepion, EmptyValueException {
         validator.validateNull(userId, "userId");
         User user = userRepository.findById(userId);
 
@@ -273,7 +273,7 @@ public class CourseService {
         return vms;
     }
 
-    public List<CourseViewModel> fetchAllCoursesByUserAndAmount(Long userId, Integer amount) throws UserNotFoundExcepion {
+    public List<CourseViewModel> fetchAllCoursesByUserAndAmount(Long userId, Integer amount) throws UserNotFoundExcepion, EmptyValueException {
 
         validator.validateNull(userId, "userId");
         validator.validateNull(amount, "amount");
@@ -292,7 +292,7 @@ public class CourseService {
         return vms;
     }
 
-    public long countUserCourses(Long userId) throws UserNotFoundExcepion {
+    public long countUserCourses(Long userId) throws UserNotFoundExcepion, EmptyValueException {
 
         validator.validateNull(userId, "userId");
 

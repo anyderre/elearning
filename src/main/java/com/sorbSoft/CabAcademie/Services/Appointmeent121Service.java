@@ -12,6 +12,8 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.OneToOneAppointmentMakeRequestModel;
 import com.sorbSoft.CabAcademie.Services.email.EmailApiService;
 import com.sorbSoft.CabAcademie.Utils.DateUtils;
+import com.sorbSoft.CabAcademie.exception.EmptyValueException;
+import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import lombok.extern.log4j.Log4j2;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -50,7 +52,7 @@ public class Appointmeent121Service {
 
     //TODO: add appointment validator service
 
-    public Result book121Meeting(OneToOneAppointmentMakeRequestModel vmTimeZoned) {
+    public Result book121Meeting(OneToOneAppointmentMakeRequestModel vmTimeZoned) throws EmptyValueException, UserNotFoundExcepion {
 
         Result result = new Result();
 
