@@ -3,6 +3,8 @@ package com.sorbSoft.CabAcademie.Repository;
 import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Rol;
 import com.sorbSoft.CabAcademie.Entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -25,7 +27,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User>findAll();
 
-    List<User> findAllByRoleRole(Roles role);
+    Page<User> findAllByRoleRole(Roles role, Pageable pageble);
+
+    Page<User> getPageByRoleRole(Roles role, Pageable pageble);
 
     User findByRoleRoleAndId(Roles role, Long professorId);
 
@@ -48,4 +52,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User findBySubscriptionId(String subscriptionId);
 
     List<User> findAllBySchoolsInAndRoleRole(User school, Roles role);
+
+    Page<User> findAllBySchoolsInAndRoleRole(User school, Roles role, Pageable pageable);
 }

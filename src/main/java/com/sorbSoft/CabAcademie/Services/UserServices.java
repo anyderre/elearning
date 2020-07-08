@@ -16,6 +16,10 @@ import com.sorbSoft.CabAcademie.payload.SetupNewPasswordRequest;
 import lombok.extern.log4j.Log4j2;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -273,7 +277,7 @@ public class UserServices {
         return userRepository.findAll();
     }
 
-    public List<User> findSchoolProfessors(String userName) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+    public Page<User> findSchoolProfessors(Integer page, Integer amount, String userName) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
 
         validator.validateNull(userName, "User should be logged in as school member. userName");
         User user = userRepository.findByUsername(userName);
@@ -282,32 +286,74 @@ public class UserServices {
 
         List<User> schools = user.getSchools();
 
-     /*  if(schools == null || schools.isEmpty()) {
-            throw new SchoolNotFoundExcepion("User with username "+userName+" doesn't belong to any schools or organization");
-        }*/
 
-        List<User> professors = new ArrayList<>();
+        Pageable request = new PageRequest(page, amount);
+        Page<User> findings = new PageImpl<User>(new ArrayList<>());
 
         for(User school : schools) {
 
-            List<User> findings = new ArrayList<>();
+
 
             if(school.getRole().getRole() == Roles.ROLE_SCHOOL) {
-                findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_PROFESSOR);
+                findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_PROFESSOR, request);
             }
 
             if(school.getRole().getRole() == Roles.ROLE_ORGANIZATION) {
-                findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_INSTRUCTOR);
+                findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_INSTRUCTOR, request);
             }
 
-            professors.addAll(findings);
 
         }
-        return professors;
+
+        return findings;
     }
 
-    public List<User> findPublicProfessors() {
-        return userRepository.findAllByRoleRole(Roles.ROLE_FREELANCER);
+    public Page<User> findSchoolProfessorsForProfessors(Long schoolId, Integer page, Integer amount, String userName) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+
+        validator.validateNull(schoolId, "school ID");
+        User school = userRepository.findById(schoolId);
+        User professor = userRepository.findByUsername(userName);
+
+        validator.validateNull(school, "school ID", schoolId);
+        validator.validateNull(professor, "userName", userName);
+
+
+        Pageable request = new PageRequest(page, amount);
+        Page<User> findings = new PageImpl<User>(new ArrayList<>());
+
+        List<User> schools = professor.getSchools();
+
+        for (User mySchool : schools) {
+            if(mySchool.getId() == school.getId()) {
+                if(school.getRole().getRole() == Roles.ROLE_SCHOOL) {
+                    findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_PROFESSOR, request);
+                }
+
+                if(school.getRole().getRole() == Roles.ROLE_ORGANIZATION) {
+                    findings = userRepository.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_INSTRUCTOR, request);
+                }
+            }
+        }
+
+
+        return findings;
+    }
+
+    public Page<User> findPublicProfessors(Integer page, Integer amount) {
+        Pageable request = new PageRequest(page, amount);
+        return userRepository.findAllByRoleRole(Roles.ROLE_FREELANCER, request);
+    }
+
+    public Integer getPageAmountOfPublicProfessors(Integer amount) {
+        Pageable request = new PageRequest(0, amount);
+        Page<User> page = userRepository.getPageByRoleRole(Roles.ROLE_FREELANCER, request);
+        return page.getTotalPages();
+    }
+
+    public Integer getPageAmountOfSchoolProfessors(Integer amount) {
+        Pageable request = new PageRequest(0, amount);
+        Page<User> page = userRepository.getPageByRoleRole(Roles.ROLE_FREELANCER, request);
+        return page.getTotalPages();
     }
 
     public UserViewModel findProfessor(Long professorId){

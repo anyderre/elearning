@@ -16,6 +16,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -93,27 +95,58 @@ public class UserController {
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/schoolProfessors" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<User>> findAllProfessors(Principal principal) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+    @GetMapping(value = "/schoolProfessors/{page}/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') or hasAuthority('ROLE_STUDENT')")
+    @ApiOperation(value = "Get School Teachers, Role:ROLE_ADMIN, ROLE_STUDENT")
+    public ResponseEntity<Page<User>> findSchoolProfessors(
+            @PathVariable Integer page,
+            @PathVariable Integer amount,
+            Principal principal)
+            throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
 
-        List<User> users = new ArrayList<>();
+        Page<User> users = new PageImpl<>(new ArrayList<>());
 
         if(principal == null) {
             return new ResponseEntity(MessageResponse.of("You should be logged in as school member"), HttpStatus.FORBIDDEN);
         } else {
-            users = userService.findSchoolProfessors(principal.getName());
+            users = userService.findSchoolProfessors(page, amount, principal.getName());
         }
 
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/publicProfessors" , consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<User>> findAllProfessors(){
+    @GetMapping(value = "/schoolProfessors/{schoolId}/{page}/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_PROFESSOR') or hasAuthority('ROLE_INSTRUCTOR')")
+    @ApiOperation(value = "Get School/Org Teachers, Role:ROLE_PROFESSOR, ROLE_INSTRUCTOR")
+    public ResponseEntity<Page<User>> findSchoolProfessorsForProfessor(
+            @PathVariable Long schoolId,
+            @PathVariable Integer page,
+            @PathVariable Integer amount,
+            Principal principal)
+            throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
 
-        List<User> users = userService.findPublicProfessors();
+        Page<User> users = new PageImpl<>(new ArrayList<>());
+
+        if(principal == null) {
+            return new ResponseEntity(MessageResponse.of("You should be logged in as school member"), HttpStatus.FORBIDDEN);
+        } else {
+            users = userService.findSchoolProfessorsForProfessors(schoolId, page, amount, principal.getName());
+        }
 
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
+
+    @GetMapping(value = "/publicProfessors/{page}/{amount}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<User>> findPublicProfessors(
+            @PathVariable Integer page,
+            @PathVariable Integer amount){
+
+        Page<User> users = userService.findPublicProfessors(page, amount);
+
+        return new ResponseEntity<>(users, HttpStatus.OK);
+    }
+
+
 
     @GetMapping(value = "/professor/{id}" , consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserViewModel> findProfessor(@PathVariable Long id) throws IOException {
