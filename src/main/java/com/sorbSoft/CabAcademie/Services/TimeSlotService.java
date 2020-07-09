@@ -1,6 +1,7 @@
 package com.sorbSoft.CabAcademie.Services;
 
 import com.sorbSoft.CabAcademie.Entities.Attendee;
+import com.sorbSoft.CabAcademie.Entities.Enums.AttendeeStatus;
 import com.sorbSoft.CabAcademie.Entities.Enums.TimeSlotStatus;
 import com.sorbSoft.CabAcademie.Entities.Enums.AppointmentType;
 import com.sorbSoft.CabAcademie.Entities.TimeSlot;
@@ -113,15 +114,21 @@ public class TimeSlotService {
         for(TimeSlot slot : allSlotsAfterNow) {
 
             if(slot.getType() == AppointmentType.GROUP) {
-                if(slot.getApprovedAttendee() != null &&  slot.getApprovedAttendee() > 0) {
-                    upcommingSlots.add(slot);
-                }
+                upcommingSlots.add(slot);
             }
 
             if(slot.getType() == AppointmentType.PRIVATE) {
                 if(slot.getStatus() == TimeSlotStatus.CLOSED) {
                     upcommingSlots.add(slot);
                 }
+
+                /*if(slot.getAttendees() != null && slot.getAttendees().size()>0) {
+                    if(slot.getAttendees().get(0).getStatus() != AttendeeStatus.CANCELED
+                    || slot.getAttendees().get(0).getStatus() != AttendeeStatus.REJECTED) {
+
+                        upcommingSlots.add(slot);
+                    }
+                }*/
 
             }
 
@@ -208,6 +215,8 @@ public class TimeSlotService {
         vm.setStatus(slot.getStatus());
 
         vm.setType(slot.getType());
+
+        vm.setApprovedAttendee(slot.getApprovedAttendee());
 
         return vm;
     }
@@ -366,6 +375,7 @@ public class TimeSlotService {
         slot.setMinMinutes(vm.getMinMinutes());
         slot.setType(vm.getTimeSlotType());
         slot.setPrices(vm.getPrices());
+        slot.setApprovedAttendee(0L);
 
         AppointmentType type = vm.getTimeSlotType();
         if(type == AppointmentType.PRIVATE) {

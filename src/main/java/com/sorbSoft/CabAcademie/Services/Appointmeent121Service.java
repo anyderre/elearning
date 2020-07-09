@@ -637,6 +637,14 @@ public class Appointmeent121Service {
 
                 }
 
+                if(attendee.getStatus() == AttendeeStatus.PENDING_APPROVAL) {
+                    if(timeSlot.getType() == AppointmentType.PRIVATE) {
+
+                        timeSlot.setStatus(TimeSlotStatus.OPENED);
+                        timeSlot.setApprovedAttendee(0L);
+                    }
+                }
+
                 //decline
                 attendee.setStatus(AttendeeStatus.REJECTED);
                 attendee.setDeclineUid("");

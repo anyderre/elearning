@@ -38,4 +38,6 @@ public class SlotsResponseModel {
 
     private AppointmentType type;
 
+    private Long approvedAttendee;
+
 }
