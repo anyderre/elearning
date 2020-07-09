@@ -2,6 +2,8 @@ package com.sorbSoft.CabAcademie.Repository;
 
 import com.sorbSoft.CabAcademie.Entities.TimeSlot;
 import com.sorbSoft.CabAcademie.Entities.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -37,6 +39,6 @@ public interface SlotsRepository extends JpaRepository<TimeSlot, Long> {
 
     TimeSlot findById(Long id);
 
-    //@Query("select ap from TimeSlot ap where ap.dateFrom <= :meetingStart and ap.dateTo >= :meetingEnd and ap.teacher = :teacher and ap.status = 'OPENED'")
-    List<TimeSlot> findAllByTeacherAndDateFromGreaterThan(User teacher, Date date);
+    @Query("select ap from TimeSlot ap where ap.dateFrom > :now and ap.teacher = :teacher and ((ap.type = 'PRIVATE' and ap.status = 'CLOSED') or ap.type = 'GROUP')")
+    Page<TimeSlot> findUpcomingSessionByTeacher(@Param("teacher") User teacher, @Param("now") Date now, Pageable pageable);
 }

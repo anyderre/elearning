@@ -4,6 +4,7 @@ import com.sorbSoft.CabAcademie.Entities.Course;
 import com.sorbSoft.CabAcademie.Entities.User;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.exception.EmptyValueException;
+import com.sorbSoft.CabAcademie.exception.SchoolNotFoundExcepion;
 import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
 import org.joda.time.DateTime;
 import org.springframework.stereotype.Service;
@@ -99,6 +100,18 @@ public class GenericValidator {
     public void validateNull(User user, String valueName, Long byValue) throws UserNotFoundExcepion {
         if(user == null) {
             throw new UserNotFoundExcepion("User with "+valueName+": "+byValue+" has not been found in db");
+        }
+    }
+
+    public void validateSchoolsNull(List<User> schools, String valueName, String byValue) throws UserNotFoundExcepion, SchoolNotFoundExcepion {
+        if(schools == null || schools.isEmpty()) {
+            throw new SchoolNotFoundExcepion("User with "+valueName+": "+byValue+" doesn't belong to any school or organization");
+        }
+    }
+
+    public void validateSchoolsNull(List<User> schools, String valueName, Long byValue) throws UserNotFoundExcepion, SchoolNotFoundExcepion {
+        if(schools == null || schools.isEmpty()) {
+            throw new SchoolNotFoundExcepion("User with "+valueName+": "+byValue+" doesn't belong to any school or organization");
         }
     }
 

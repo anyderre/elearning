@@ -2,21 +2,21 @@ package com.sorbSoft.CabAcademie.Services;
 
 import com.sorbSoft.CabAcademie.Entities.Attendee;
 import com.sorbSoft.CabAcademie.Entities.Enums.AttendeeStatus;
+import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Enums.TimeSlotStatus;
 import com.sorbSoft.CabAcademie.Entities.Enums.AppointmentType;
 import com.sorbSoft.CabAcademie.Entities.TimeSlot;
 import com.sorbSoft.CabAcademie.Entities.User;
+import com.sorbSoft.CabAcademie.Repository.AttendeeRepository;
 import com.sorbSoft.CabAcademie.Repository.SlotsRepository;
 import com.sorbSoft.CabAcademie.Repository.UserRepository;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.*;
 import com.sorbSoft.CabAcademie.Utils.DateUtils;
-import com.sorbSoft.CabAcademie.exception.EmptyValueException;
-import com.sorbSoft.CabAcademie.exception.EntityNotFoundException;
-import com.sorbSoft.CabAcademie.exception.TimeSlotException;
-import com.sorbSoft.CabAcademie.exception.UserNotFoundExcepion;
+import com.sorbSoft.CabAcademie.exception.*;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +43,9 @@ public class TimeSlotService {
 
     @Autowired
     private GenericValidator gValidator;
+
+    @Autowired
+    private AttendeeRepository attendeeRepository;
 
 
     //create
@@ -96,52 +99,104 @@ public class TimeSlotService {
        return result;
     }
 
-    public List<SlotsResponseModel> getUpcomingSessions(String teacherName) throws EmptyValueException, UserNotFoundExcepion {
-
-
+    public Page<SlotsResponseModel> getTeacherUpcomingSessions(String teacherName, int page, int amount) throws EmptyValueException, UserNotFoundExcepion {
         gValidator.validateNull(teacherName, "userName");
 
         User teacher = userR.findByUsername(teacherName);
-
         gValidator.validateNull(teacher, "userName", teacherName);
+
+        return getTeacherUpcomingSessions(teacher, page, amount);
+    }
+
+    public Page<SlotsResponseModel> getTeacherUpcomingSessions(User teacher, int page, int amount) throws EmptyValueException, UserNotFoundExcepion {
 
         Date now = new Date();
 
-        List<TimeSlot> allSlotsAfterNow = slotsRepo.findAllByTeacherAndDateFromGreaterThan(teacher, now);
+        Pageable pageable = new PageRequest(page, amount, Sort.Direction.ASC, "dateFrom");
 
-        List<TimeSlot> upcommingSlots = new ArrayList<>();
+        Page<TimeSlot> allSlotsAfterNow = slotsRepo.findUpcomingSessionByTeacher(teacher, now, pageable);
 
-        for(TimeSlot slot : allSlotsAfterNow) {
-
-            if(slot.getType() == AppointmentType.GROUP) {
-                upcommingSlots.add(slot);
-            }
-
-            if(slot.getType() == AppointmentType.PRIVATE) {
-                if(slot.getStatus() == TimeSlotStatus.CLOSED) {
-                    upcommingSlots.add(slot);
-                }
-
-                /*if(slot.getAttendees() != null && slot.getAttendees().size()>0) {
-                    if(slot.getAttendees().get(0).getStatus() != AttendeeStatus.CANCELED
-                    || slot.getAttendees().get(0).getStatus() != AttendeeStatus.REJECTED) {
-
-                        upcommingSlots.add(slot);
-                    }
-                }*/
-
-            }
-
-        }
-
-        List<SlotsResponseModel> vms = getSlotsVms(upcommingSlots);
+        List<SlotsResponseModel> vms = getSlotsVms(allSlotsAfterNow.getContent());
 
         for(SlotsResponseModel responseModel : vms) {
             //it changes value by object link, no need to copy/clone values
             tzConverter.convertFromUtcToTimeZoned(responseModel, teacher.getId());
         }
 
-        return vms;
+        Page<SlotsResponseModel> pageVms = new PageImpl<>(vms, pageable, allSlotsAfterNow.getTotalElements());
+
+        return pageVms;
+
+    }
+
+    public Page<SlotsResponseModel> getStudentUpcomingSessions(String studentName, int page, int amount) throws EmptyValueException, UserNotFoundExcepion {
+
+
+        gValidator.validateNull(studentName, "userName");
+
+        User student = userR.findByUsername(studentName);
+        gValidator.validateNull(student, "userName", studentName);
+
+        Date now = new Date();
+        Pageable pageable = new PageRequest(page, amount, Sort.Direction.ASC, "timeSlot.dateFrom");
+        //Pageable pageable = new PageRequest(page, amount);
+
+        Page<TimeSlot> upcomingSlots = attendeeRepository.findStudentUpcomingSessions(student, now, pageable);
+        //List<TimeSlot> upcomingSlots = attendeeRepository.findStudentUpcomingSessions(student, pageable);
+        /*List<TimeSlot> upcomingSlots = new ArrayList<>();
+
+        for(Attendee request : studentRequests) {
+            if(request.getStatus() != AttendeeStatus.REJECTED && request.getStatus() != AttendeeStatus.CANCELED) {
+                upcomingSlots.add(request.getTimeSlot());
+            }
+        }*/
+
+
+        List<SlotsResponseModel> vms = getSlotsVms(upcomingSlots.getContent());
+
+        for(SlotsResponseModel responseModel : vms) {
+            //it changes value by object link, no need to copy/clone values
+            tzConverter.convertFromUtcToTimeZoned(responseModel, student.getId());
+        }
+
+        Page<SlotsResponseModel> pageVms = new PageImpl<SlotsResponseModel>(vms,pageable, upcomingSlots.getTotalElements());
+
+        return pageVms;
+
+    }
+
+    public List<SlotsResponseModel> getSchoolUpcomingSessions(String adminName, int amount) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+
+
+        gValidator.validateNull(adminName, "userName");
+
+        User admin = userR.findByUsername(adminName);
+        gValidator.validateNull(admin, "userName", adminName);
+
+        List<User> schools = admin.getSchools();
+        gValidator.validateSchoolsNull(schools, "userName", adminName);
+
+        List<SlotsResponseModel> schoolUpcomingSessionsVms = new ArrayList<>();
+
+        for(User school : schools) {
+
+            List<User> teachers = new ArrayList<>();
+            if(school.getRole().getRole() == Roles.ROLE_SCHOOL) {
+                teachers = userR.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_PROFESSOR);
+            }
+            if(school.getRole().getRole() == Roles.ROLE_ORGANIZATION) {
+                teachers = userR.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_INSTRUCTOR);
+            }
+
+
+            for (User teacher : teachers) {
+                Page<SlotsResponseModel> teacherUpcomingSessions = getTeacherUpcomingSessions(teacher, 0, 5);
+                schoolUpcomingSessionsVms.addAll(teacherUpcomingSessions.getContent());
+            }
+            break;
+        }
+
+        return schoolUpcomingSessionsVms;
 
     }
 
