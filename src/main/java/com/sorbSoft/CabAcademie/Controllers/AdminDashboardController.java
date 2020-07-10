@@ -6,6 +6,8 @@ import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Services.CourseService;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.UserViewModel;
+import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.appointment.SlotsResponseModel;
+import com.sorbSoft.CabAcademie.Services.TimeSlotService;
 import com.sorbSoft.CabAcademie.Services.UserServices;
 import com.sorbSoft.CabAcademie.exception.*;
 import com.sorbSoft.CabAcademie.payload.CourseApproveRequest;
@@ -13,6 +15,7 @@ import com.sorbSoft.CabAcademie.payload.CourseDeclineRequest;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +41,9 @@ public class AdminDashboardController {
 
     @Autowired
     private CourseService courseService;
+
+    @Autowired
+    private TimeSlotService timeSlotService;
 
     @PostMapping(value = "/course/approve")
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
@@ -622,5 +628,18 @@ public class AdminDashboardController {
         userService.batchSignupUsers(file, principal.getName());
 
         return new ResponseEntity<>(MessageResponse.of("Users created"),HttpStatus.CREATED);
+    }
+
+    @GetMapping(value = "/upcoming-sessions/{page}/{amount}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ApiOperation(value = "Get All Upcoming Live Sessions. Role: ROLE_ADMIN")
+    public ResponseEntity<Page<SlotsResponseModel>> getUpcomingLiveSessions(
+            @PathVariable Integer page,
+            @PathVariable Integer amount,
+            Principal principal) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+
+        Page<SlotsResponseModel> upcomingSessions = timeSlotService.getSchoolUpcomingSessions(principal.getName(), page, amount);
+
+        return  new ResponseEntity<>(upcomingSessions, HttpStatus.OK);
     }
 }

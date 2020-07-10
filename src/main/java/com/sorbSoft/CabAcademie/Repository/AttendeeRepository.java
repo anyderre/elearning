@@ -26,6 +26,9 @@ public interface AttendeeRepository extends JpaRepository<Attendee, Long> {
     @Query("select at.timeSlot from Attendee at where at.timeSlot.dateFrom > :now and at.user = :student and at.status <> 'REJECTED' and at.status <> 'CANCELED'")
     Page<TimeSlot> findStudentUpcomingSessions(@Param("student") User student, @Param("now") Date now, Pageable pageable);
 
+    @Query("select count(at) from Attendee at where at.timeSlot.dateFrom > :now and at.timeSlot.teacher = :teacher and at.status = 'PENDING_APPROVAL'")
+    long findPendingStudentByTeacher(@Param("teacher") User teacher, @Param("now") Date now);
+
     Attendee findByApprovalUid(String approvalUid);
 
     Attendee findByDeclineUid(String declineUid);

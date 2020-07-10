@@ -1,8 +1,6 @@
 package com.sorbSoft.CabAcademie.Services;
 
 import com.sorbSoft.CabAcademie.Entities.Attendee;
-import com.sorbSoft.CabAcademie.Entities.Enums.AttendeeStatus;
-import com.sorbSoft.CabAcademie.Entities.Enums.Roles;
 import com.sorbSoft.CabAcademie.Entities.Enums.TimeSlotStatus;
 import com.sorbSoft.CabAcademie.Entities.Enums.AppointmentType;
 import com.sorbSoft.CabAcademie.Entities.TimeSlot;
@@ -23,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -129,6 +128,19 @@ public class TimeSlotService {
 
     }
 
+    public long getPendingStudents(String teacherName) throws EmptyValueException, UserNotFoundExcepion {
+        gValidator.validateNull(teacherName, "userName");
+
+        User teacher = userR.findByUsername(teacherName);
+        gValidator.validateNull(teacher, "userName", teacherName);
+
+        Date now = new Date();
+
+        long amount = attendeeRepository.findPendingStudentByTeacher(teacher, now);
+
+        return amount;
+    }
+
     public Page<SlotsResponseModel> getStudentUpcomingSessions(String studentName, int page, int amount) throws EmptyValueException, UserNotFoundExcepion {
 
 
@@ -139,17 +151,8 @@ public class TimeSlotService {
 
         Date now = new Date();
         Pageable pageable = new PageRequest(page, amount, Sort.Direction.ASC, "timeSlot.dateFrom");
-        //Pageable pageable = new PageRequest(page, amount);
 
         Page<TimeSlot> upcomingSlots = attendeeRepository.findStudentUpcomingSessions(student, now, pageable);
-        //List<TimeSlot> upcomingSlots = attendeeRepository.findStudentUpcomingSessions(student, pageable);
-        /*List<TimeSlot> upcomingSlots = new ArrayList<>();
-
-        for(Attendee request : studentRequests) {
-            if(request.getStatus() != AttendeeStatus.REJECTED && request.getStatus() != AttendeeStatus.CANCELED) {
-                upcomingSlots.add(request.getTimeSlot());
-            }
-        }*/
 
 
         List<SlotsResponseModel> vms = getSlotsVms(upcomingSlots.getContent());
@@ -165,7 +168,7 @@ public class TimeSlotService {
 
     }
 
-    public List<SlotsResponseModel> getSchoolUpcomingSessions(String adminName, int amount) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+    public Page<SlotsResponseModel> getSchoolUpcomingSessions(String adminName, int page, int amount) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
 
 
         gValidator.validateNull(adminName, "userName");
@@ -177,26 +180,27 @@ public class TimeSlotService {
         gValidator.validateSchoolsNull(schools, "userName", adminName);
 
         List<SlotsResponseModel> schoolUpcomingSessionsVms = new ArrayList<>();
+        Pageable pageable = new PageRequest(page, amount, Sort.Direction.ASC, "dateFrom");
 
         for(User school : schools) {
 
-            List<User> teachers = new ArrayList<>();
-            if(school.getRole().getRole() == Roles.ROLE_SCHOOL) {
-                teachers = userR.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_PROFESSOR);
-            }
-            if(school.getRole().getRole() == Roles.ROLE_ORGANIZATION) {
-                teachers = userR.findAllBySchoolsInAndRoleRole(school, Roles.ROLE_INSTRUCTOR);
-            }
+            Date now = new Date();
+            Page<TimeSlot> upcomingSessionsBySchool = slotsRepo.
+                    findAllByTeacherSchoolsInAndDateFromGreaterThanAndAttendeesUserSchoolsIn(
+                            school, now, school, pageable);
 
+            List<TimeSlot> filtered = upcomingSessionsBySchool.getContent().
+                    stream().
+                    filter(s -> s.getType() == AppointmentType.GROUP || (s.getStatus() == TimeSlotStatus.CLOSED)).collect(Collectors.toList());
 
-            for (User teacher : teachers) {
-                Page<SlotsResponseModel> teacherUpcomingSessions = getTeacherUpcomingSessions(teacher, 0, 5);
-                schoolUpcomingSessionsVms.addAll(teacherUpcomingSessions.getContent());
-            }
-            break;
+            schoolUpcomingSessionsVms = getSlotsVms(filtered);
+
+            Page<SlotsResponseModel> pageVms = new PageImpl<SlotsResponseModel>(schoolUpcomingSessionsVms, pageable, upcomingSessionsBySchool.getTotalElements());
+
+            return pageVms;
         }
 
-        return schoolUpcomingSessionsVms;
+        return new PageImpl<>(new ArrayList<>(0));
 
     }
 
@@ -442,5 +446,6 @@ public class TimeSlotService {
 
         return slot;
     }
+
 
 }

@@ -1,5 +1,7 @@
 package com.sorbSoft.CabAcademie.Repository;
 
+import com.sorbSoft.CabAcademie.Entities.Enums.AppointmentType;
+import com.sorbSoft.CabAcademie.Entities.Enums.TimeSlotStatus;
 import com.sorbSoft.CabAcademie.Entities.TimeSlot;
 import com.sorbSoft.CabAcademie.Entities.User;
 import org.springframework.data.domain.Page;
@@ -11,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -41,4 +44,10 @@ public interface SlotsRepository extends JpaRepository<TimeSlot, Long> {
 
     @Query("select ap from TimeSlot ap where ap.dateFrom > :now and ap.teacher = :teacher and ((ap.type = 'PRIVATE' and ap.status = 'CLOSED') or ap.type = 'GROUP')")
     Page<TimeSlot> findUpcomingSessionByTeacher(@Param("teacher") User teacher, @Param("now") Date now, Pageable pageable);
+
+    Page<TimeSlot> findAllByTeacherSchoolsInAndDateFromGreaterThanAndAttendeesUserSchoolsIn(User school, Date now, User attendeeSchool, Pageable pageable);
+
+    /*@Query("select ap from TimeSlot ap where ap.dateFrom > :now and :bySchool member of ap.teacher.schools and :bySchool member of ap.attendees.user.schools and ((ap.type = 'PRIVATE' and ap.status = 'CLOSED') or ap.type = 'GROUP')")
+    List<TimeSlot> findUpcomingSessionsForAdmin(@Param("bySchool") Collection<User> bySchool, @Param("now") Date now);*/
+
 }

@@ -40,4 +40,17 @@ public class TeacherDashboardController {
 
         return  new ResponseEntity<>(upcomingSessions, HttpStatus.OK);
     }
+
+
+    @GetMapping(value = "/pending-students/count", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAuthority('ROLE_INSTRUCTOR') or hasAuthority('ROLE_PROFESSOR') or hasAuthority('ROLE_FREELANCER')")
+    @ApiOperation(value = "Get All Pending students. Role: ROLE_PROFESSOR, ROLE_INSTRUCTOR, ROLE_FREELANCER")
+    public ResponseEntity<Long> countPendingStudents(
+            Principal principal)
+            throws EmptyValueException, UserNotFoundExcepion {
+
+        long amount = timeSlotService.getPendingStudents(principal.getName());
+
+        return  new ResponseEntity<>(amount, HttpStatus.OK);
+    }
 }
