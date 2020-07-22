@@ -70,9 +70,9 @@ public class UserServicesTest {
         when(mapper.mapToEntity(any(UserViewModel.class))).thenReturn(newUser);
         when(bCryptPasswordEncoder.encode("password")).thenReturn("encryotedPwd");
 
-        MultipartFile file = prepareFileMock("First Name;Last name;Username;Email;Password;Country;Role Id;Timezone\n" +
-                                                   "Volodymyr;Bondarchuk2;postuf243;xayog88624@frost2d.net;12345678;Ukraine;3;+3:00\n" +
-                                                   "Volodymyr2;Bondarchuk2;postuf243;xayog88624@frost2d.net;12345678;Ukraine;3;+3:00\n");
+        MultipartFile file = prepareFileMock("First Name,Last name,Username,Email,Password,Country,Role Id,Timezone\n" +
+                                                   "Volodymyr,Bondarchuk2,postuf243,xayog88624@frost2d.net,12345678,Ukraine,3,+3:00\n" +
+                                                   "Volodymyr2,Bondarchuk2,postuf243,xayog88624@frost2d.net,12345678,Ukraine,3,+3:00\n");
 
         userServices.batchSignupUsers(file, "admin");
 

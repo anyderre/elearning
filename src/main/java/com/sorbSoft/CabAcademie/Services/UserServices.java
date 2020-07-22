@@ -979,7 +979,7 @@ public class UserServices {
                     continue;
                 }
 
-                final String[] data = line.split(";");
+                final String[] data = line.split(",");
 
                 if (data.length == CSV_LENGTH) {
 
