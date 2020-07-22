@@ -788,6 +788,11 @@ public class UserServices {
             String line;
             int lineNumber = 1;
             while ((line = br.readLine()) != null) {
+                if (lineNumber == 1) {
+                    lineNumber++;
+                    continue;
+                }
+
                 final String[] data = line.split(";");
 
                 if (data.length == CSV_LENGTH) {
@@ -848,6 +853,58 @@ public class UserServices {
         } else {
             throw new RoleNotAllowedException("Role id:"+roleId+" at line:"+lineNumber+" is not allowed for batch signup");
         }
+    }
+
+    public void setRolServices(RolServices rolServices) {
+        this.rolServices = rolServices;
+    }
+
+    public void setRolRepository(RolRepository rolRepository) {
+        this.rolRepository = rolRepository;
+    }
+
+    public void setCourseService(CourseService courseService) {
+        this.courseService = courseService;
+    }
+
+    public void setCourseRepository(CourseRepository courseRepository) {
+        this.courseRepository = courseRepository;
+    }
+
+    public void setbCryptPasswordEncoder(BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
+
+    public void setCategoryService(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
+
+    public void setCategoryRepository(CategoryRepository categoryRepository) {
+        this.categoryRepository = categoryRepository;
+    }
+
+    public void setSubCategoryService(SubCategoryService subCategoryService) {
+        this.subCategoryService = subCategoryService;
+    }
+
+    public void setSubCategoryRepository(SubCategoryRepository subCategoryRepository) {
+        this.subCategoryRepository = subCategoryRepository;
+    }
+
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    public void setEmailAPI(EmailApiService emailAPI) {
+        this.emailAPI = emailAPI;
+    }
+
+    public void setValidator(GenericValidator validator) {
+        this.validator = validator;
+    }
+
+    public void setMapper(UserMapper mapper) {
+        this.mapper = mapper;
     }
 }
 
