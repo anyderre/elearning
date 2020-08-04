@@ -82,7 +82,7 @@ public class AdminDashboardController {
     }
 
     @GetMapping(value = "/school/students/count/all")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') || hasAuthority('ROLE_SUPER_ADMIN')")
     @ApiOperation(value = "Count students in School. Statuses: all, Role:ROLE_ADMIN")
     public ResponseEntity<Long> getStudentsAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
@@ -95,7 +95,7 @@ public class AdminDashboardController {
     }
 
     @GetMapping(value = "/school/professors/count/all")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') || hasAuthority('ROLE_SUPER_ADMIN')")
     @ApiOperation(value = "Count professors in School. Statuses: all, Role:ROLE_ADMIN")
     public ResponseEntity<Long> getProfessorAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
@@ -108,7 +108,7 @@ public class AdminDashboardController {
     }
 
     @GetMapping(value = "/school/courses/count/all")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') || hasAuthority('ROLE_SUPER_ADMIN')")
     @ApiOperation(value = "Count courses in School. Statuses: all, Role:ROLE_ADMIN")
     public ResponseEntity<Long> getCoursesAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
@@ -121,7 +121,7 @@ public class AdminDashboardController {
     }
 
     @GetMapping(value = "/school/courses/count/approved")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') || hasAuthority('ROLE_SUPER_ADMIN')")
     @ApiOperation(value = "Count courses in School. Statuses: APPROVED, Role:ROLE_ADMIN")
     public ResponseEntity<Long> getApprovedCoursesAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
@@ -134,7 +134,7 @@ public class AdminDashboardController {
     }
 
     @GetMapping(value = "/school/courses/count/declined")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') || hasAuthority('ROLE_SUPER_ADMIN')")
     @ApiOperation(value = "Count courses in School. Statuses: DECLINED, Role:ROLE_ADMIN")
     public ResponseEntity<Long> getDeclinedCoursesAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
@@ -147,7 +147,7 @@ public class AdminDashboardController {
     }
 
     @GetMapping(value = "/school/courses/count/pending")
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') || hasAuthority('ROLE_SUPER_ADMIN')")
     @ApiOperation(value = "Count courses in School. Statuses: PENDING, Role:ROLE_ADMIN")
     public ResponseEntity<Long> getPendingCoursesAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 

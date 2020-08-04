@@ -862,6 +862,11 @@ public class CourseService {
         if (admin == null) {
             throw new UserNotFoundExcepion("User " + adminUsername + " doesn't exist in system");
         }
+
+        if (Roles.ROLE_SUPER_ADMIN.equals(admin.getRole().getRole())) {
+            return status == null ? courseSchoolRepository.countAllBy() : courseSchoolRepository.countCoursesByStatus(status);
+        }
+
         List<User> schools = admin.getSchools();
 
         if (schools == null) {
@@ -871,22 +876,8 @@ public class CourseService {
         long coursesCount = 0;
 
         for (User school : schools) {
-            if(status == null) {
-                coursesCount = courseSchoolRepository.countCoursesBySchool(school);
-            }
+            return status == null ? courseSchoolRepository.countCoursesBySchool(school) : courseSchoolRepository.countCoursesBySchoolAndStatus(school, status);
 
-            if(status == CourseStatus.PENDING) {
-                coursesCount = courseSchoolRepository.countCoursesBySchoolAndStatus(school, CourseStatus.PENDING);
-            }
-
-            if(status == CourseStatus.DECLINED) {
-                coursesCount = courseSchoolRepository.countCoursesBySchoolAndStatus(school, CourseStatus.DECLINED);
-            }
-
-            if(status == CourseStatus.APPROVED) {
-                coursesCount = courseSchoolRepository.countCoursesBySchoolAndStatus(school, CourseStatus.APPROVED);
-            }
-            return coursesCount;
         }
 
         return coursesCount;

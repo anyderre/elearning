@@ -249,24 +249,27 @@ public class UserServices {
     }
 
     public long countUsersInSchoolByRole(String adminUsername, Roles role) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
-
         User admin = userRepository.findByUsername(adminUsername);
-
         if (admin == null) {
             throw new UserNotFoundExcepion("User " + adminUsername + " doesn't exist in system");
         }
+
+        Rol searchRole = rolRepository.findByDescription(role.toString());
+
+        if (Roles.ROLE_SUPER_ADMIN.equals(admin.getRole().getRole())) {
+            return userRepository.countUsersByRoleAndEnable(searchRole, 1);
+        }
+
         List<User> schools = admin.getSchools();
 
         if (schools == null) {
             throw new SchoolNotFoundExcepion("Admin " + adminUsername + " doesn't belong to any school");
         }
 
-        Rol studentRole = rolRepository.findByDescription(role.toString());
         long studentCount = 0;
 
         for (User school : schools) {
-            studentCount = userRepository.countUsersByRoleAndSchoolsIn(studentRole, school);
-            return studentCount;
+            return userRepository.countUsersByRoleAndSchoolsIn(searchRole, school);
         }
 
         return studentCount;
