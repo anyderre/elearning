@@ -257,7 +257,12 @@ public class UserServices {
         Rol searchRole = rolRepository.findByDescription(role.toString());
 
         if (Roles.ROLE_SUPER_ADMIN.equals(admin.getRole().getRole())) {
-            return userRepository.countUsersByRoleAndEnable(searchRole, 1);
+            long count = userRepository.countUsersByRoleAndEnable(searchRole, 1);
+            if (searchRole.getRole().equals(Roles.ROLE_STUDENT)) {
+                count+= userRepository.countUsersByRoleAndEnable(rolRepository.findByDescription(Roles.ROLE_FREELANCER.toString()), 1);
+            }
+
+            return count;
         }
 
         List<User> schools = admin.getSchools();
