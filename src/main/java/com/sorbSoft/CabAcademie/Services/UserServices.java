@@ -248,7 +248,16 @@ public class UserServices {
 
     }
 
-    public long countUsersInSchoolByRole(String adminUsername, Roles role) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+
+    public long countPendingUsersInSchoolByRole(String name, Roles roleStudent) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+        return countUsersInSchoolByRole(name, roleStudent, true);
+    }
+
+    public long countAllUsersInSchoolByRole(String name, Roles roleStudent) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+        return countUsersInSchoolByRole(name, roleStudent, false);
+    }
+
+    public long countUsersInSchoolByRole(String adminUsername, Roles role, boolean pending) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
         User admin = userRepository.findByUsername(adminUsername);
         if (admin == null) {
             throw new UserNotFoundExcepion("User " + adminUsername + " doesn't exist in system");
@@ -257,9 +266,10 @@ public class UserServices {
         Rol searchRole = rolRepository.findByDescription(role.toString());
 
         if (Roles.ROLE_SUPER_ADMIN.equals(admin.getRole().getRole())) {
-            long count = userRepository.countUsersByRoleAndEnable(searchRole, 1);
+            int enable = pending ? 0 : 1;
+            long count = userRepository.countUsersByRoleAndEnable(searchRole, enable);
             if (searchRole.getRole().equals(Roles.ROLE_STUDENT)) {
-                count+= userRepository.countUsersByRoleAndEnable(rolRepository.findByDescription(Roles.ROLE_FREELANCER.toString()), 1);
+                count+= userRepository.countUsersByRoleAndEnable(rolRepository.findByDescription(Roles.ROLE_FREELANCER.toString()), enable);
             }
 
             return count;

@@ -83,26 +83,52 @@ public class AdminDashboardController {
 
     @GetMapping(value = "/school/students/count/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') || hasAuthority('ROLE_SUPER_ADMIN')")
-    @ApiOperation(value = "Count students in School. Statuses: all, Role:ROLE_ADMIN")
+    @ApiOperation(value = "Count students in School. Statuses: all, Role:ROLE_ADMIN and ROLE_SUPER_ADMIN")
     public ResponseEntity<Long> getStudentsAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
         if (principal == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        Long studentsCount = userService.countUsersInSchoolByRole(principal.getName(), Roles.ROLE_STUDENT);
+        Long studentsCount = userService.countAllUsersInSchoolByRole(principal.getName(), Roles.ROLE_STUDENT);
+
+        return new ResponseEntity<>(studentsCount, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/school/students/count/pending")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') || hasAuthority('ROLE_SUPER_ADMIN')")
+    @ApiOperation(value = "Count students in School. Statuses: pending, Role:ROLE_ADMIN and ROLE_SUPER_ADMIN")
+    public ResponseEntity<Long> getStudentsAmountPending(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+
+        if (principal == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Long studentsCount = userService.countPendingUsersInSchoolByRole(principal.getName(), Roles.ROLE_STUDENT);
 
         return new ResponseEntity<>(studentsCount, HttpStatus.OK);
     }
 
     @GetMapping(value = "/school/professors/count/all")
     @PreAuthorize("hasAuthority('ROLE_ADMIN') || hasAuthority('ROLE_SUPER_ADMIN')")
-    @ApiOperation(value = "Count professors in School. Statuses: all, Role:ROLE_ADMIN")
+    @ApiOperation(value = "Count professors in School. Statuses: all, Role:ROLE_ADMIN and ROLE_SUPER_ADMIN")
     public ResponseEntity<Long> getProfessorAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
 
         if (principal == null)
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
-        Long professorsCount = userService.countUsersInSchoolByRole(principal.getName(), Roles.ROLE_PROFESSOR);
+        Long professorsCount = userService.countAllUsersInSchoolByRole(principal.getName(), Roles.ROLE_PROFESSOR);
+
+        return new ResponseEntity<>(professorsCount, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/school/professors/count/pending")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN') || hasAuthority('ROLE_SUPER_ADMIN')")
+    @ApiOperation(value = "Count pending professors in School. Statuses: pending, Role:ROLE_ADMIN and ROLE_SUPER_ADMIN")
+    public ResponseEntity<Long> getPendingProfessorAmount(Principal principal) throws SchoolNotFoundExcepion, UserNotFoundExcepion {
+
+        if (principal == null)
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
+        Long professorsCount = userService.countPendingUsersInSchoolByRole(principal.getName(), Roles.ROLE_PROFESSOR);
 
         return new ResponseEntity<>(professorsCount, HttpStatus.OK);
     }
