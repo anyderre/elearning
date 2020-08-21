@@ -2,6 +2,7 @@ package com.sorbSoft.CabAcademie.Controllers;
 
 
 import com.sorbSoft.CabAcademie.Entities.Course;
+import com.sorbSoft.CabAcademie.Entities.CourseSchool;
 import com.sorbSoft.CabAcademie.Entities.Enums.CourseStatus;
 import com.sorbSoft.CabAcademie.Entities.Error.MessageResponse;
 import com.sorbSoft.CabAcademie.Services.CourseService;
@@ -19,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.security.Principal;
 import java.util.ArrayList;
@@ -62,6 +62,14 @@ public class CourseController {
     @GetMapping(value = "/all" , consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Course>> getAllCourses(){
         List<Course> courses = courseService.fetchAllCourses();
+        if(courses.isEmpty())
+            return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/workspace/all/{userId}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<CourseSchool>> getAllCoursesByWorkspace(@PathVariable Long userId) throws UserNotFoundExcepion, EmptyValueException, SchoolNotFoundExcepion {
+        List<CourseSchool> courses = courseService.fetchAllCoursesByWorkspace(userId);
         if(courses.isEmpty())
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);

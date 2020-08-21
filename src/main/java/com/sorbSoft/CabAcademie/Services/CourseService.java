@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -222,6 +223,27 @@ public class CourseService {
 
     public List<Course> fetchAllCourses(){
         return courseRepository.findAll();
+    }
+
+    public List<CourseSchool> fetchAllCoursesByWorkspace(Long userId) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        validator.validateNull(userId, "userId");
+        User user = userRepository.findById(userId);
+
+        validateIfUserWasFound(user, "id: "+userId);
+
+
+        List<User> schools = user.getSchools();
+
+        if (schools == null) {
+            throw new SchoolNotFoundExcepion("User " + user.getName() + " doesn't belong to any school or organization");
+        }
+
+        for (User school : schools) {
+           return courseSchoolRepository.findAllBySchool(school);
+
+        }
+
+        return Collections.emptyList();
     }
 
     public Page<Course> fetchAllCoursesByPage(int page, int itemsPerPage){

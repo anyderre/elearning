@@ -13,6 +13,7 @@ import java.util.List;
 public interface CourseSchoolRepository extends JpaRepository<CourseSchool, Long> {
 
     long countCoursesBySchool(User school);
+    List<CourseSchool> findAllBySchool(User school);
     long countAllBy();
     long countCoursesByStatus(CourseStatus status);
     long countCoursesBySchoolAndStatus(User school, CourseStatus status);
