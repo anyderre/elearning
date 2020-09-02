@@ -18,6 +18,68 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
 
     Page<Course> findAll(Pageable pagin);
 
+
+    Page<Course> findAllByDeletedIsFalse(Pageable pageable);
+    Page<Course> findAllByDeletedIsFalseOrderByRatingsDesc(Pageable pageable);
+    Page<Course> findAllByDeletedIsFalseOrderByRatingsAsc(Pageable pageable);
+    Page<Course> findAllByDeletedIsFalseOrderByTitleDesc(Pageable pageable);
+    Page<Course> findAllByDeletedIsFalseOrderByTitleAsc(Pageable pageable);
+    Page<Course> findAllByDeletedIsFalseOrderByAuthorDesc(Pageable pageable);
+    Page<Course> findAllByDeletedIsFalseOrderByAuthorAsc(Pageable pageable);
+    Page<Course> findAllByDeletedIsFalseOrderByPriceDesc(Pageable pageable);
+    Page<Course> findAllByDeletedIsFalseOrderByPriceAsc(Pageable pageable);
+
+    Page<Course> findAllByTitleAndDeletedIsFalse(String title, Pageable pageable);
+    Page<Course> findAllByTitleAndDeletedIsFalseOrderByRatingsDesc(String title, Pageable pageable);
+    Page<Course> findAllByTitleAndDeletedIsFalseOrderByRatingsAsc(String title, Pageable pageable);
+    Page<Course> findAllByTitleAndDeletedIsFalseOrderByTitleDesc(String title, Pageable pageable);
+    Page<Course> findAllByTitleAndDeletedIsFalseOrderByTitleAsc(String title, Pageable pageable);
+    Page<Course> findAllByTitleAndDeletedIsFalseOrderByAuthorDesc(String title, Pageable pageable);
+    Page<Course> findAllByTitleAndDeletedIsFalseOrderByAuthorAsc(String title, Pageable pageable);
+    Page<Course> findAllByTitleAndDeletedIsFalseOrderByPriceDesc(String title, Pageable pageable);
+    Page<Course> findAllByTitleAndDeletedIsFalseOrderByPriceAsc(String title, Pageable pageable);
+
+    Page<Course> findAllByUserAndDeletedIsFalse(User user, Pageable pageable);
+    Page<Course> findAllByUserAndDeletedIsFalseOrderByRatingsDesc(User user, Pageable pageable);
+    Page<Course> findAllByUserAndDeletedIsFalseOrderByRatingsAsc(User user, Pageable pageable);
+    Page<Course> findAllByUserAndDeletedIsFalseOrderByTitleDesc(User user, Pageable pageable);
+    Page<Course> findAllByUserAndDeletedIsFalseOrderByTitleAsc(User user, Pageable pageable);
+    Page<Course> findAllByUserAndDeletedIsFalseOrderByAuthorDesc(User user, Pageable pageable);
+    Page<Course> findAllByUserAndDeletedIsFalseOrderByAuthorAsc(User user, Pageable pageable);
+    Page<Course> findAllByUserAndDeletedIsFalseOrderByPriceDesc(User user, Pageable pageable);
+    Page<Course> findAllByUserAndDeletedIsFalseOrderByPriceAsc(User user, Pageable pageable);
+
+
+    Page<Course> findAllByDeletedIsFalseAndSchoolsIn(Pageable pageable, List<User> schools);
+    Page<Course> findAllByDeletedIsFalseAndSchoolsInOrderByRatingsDesc(Pageable pageable, List<User> schools);
+    Page<Course> findAllByDeletedIsFalseAndSchoolsInOrderByRatingsAsc(Pageable pageable, List<User> schools);
+    Page<Course> findAllByDeletedIsFalseAndSchoolsInOrderByTitleDesc(Pageable pageable, List<User> schools);
+    Page<Course> findAllByDeletedIsFalseAndSchoolsInOrderByTitleAsc(Pageable pageable, List<User> schools);
+    Page<Course> findAllByDeletedIsFalseAndSchoolsInOrderByAuthorDesc(Pageable pageable, List<User> schools);
+    Page<Course> findAllByDeletedIsFalseAndSchoolsInOrderByAuthorAsc(Pageable pageable, List<User> schools);
+    Page<Course> findAllByDeletedIsFalseAndSchoolsInOrderByPriceDesc(Pageable pageable, List<User> schools);
+    Page<Course> findAllByDeletedIsFalseAndSchoolsInOrderByPriceAsc(Pageable pageable, List<User> schools);
+
+    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsIn(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByRatingsDesc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByRatingsAsc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByTitleDesc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByTitleAsc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByAuthorDesc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByAuthorAsc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByPriceDesc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByPriceAsc(String title, Pageable pageable, List<User> schools);
+
+    Page<Course> findAllByUserAndDeletedIsFalseAndSchoolsIn(User user, Pageable pageable, List<User> schools);
+    Page<Course> findAllByUserAndDeletedIsFalseAndSchoolsInOrderByRatingsDesc(User user, Pageable pageable, List<User> schools);
+    Page<Course> findAllByUserAndDeletedIsFalseAndSchoolsInOrderByRatingsAsc(User user, Pageable pageable, List<User> schools);
+    Page<Course> findAllByUserAndDeletedIsFalseAndSchoolsInOrderByTitleDesc(User user, Pageable pageable, List<User> schools);
+    Page<Course> findAllByUserAndDeletedIsFalseAndSchoolsInOrderByTitleAsc(User user, Pageable pageable, List<User> schools);
+    Page<Course> findAllByUserAndDeletedIsFalseAndSchoolsInOrderByAuthorDesc(User user, Pageable pageable, List<User> schools);
+    Page<Course> findAllByUserAndDeletedIsFalseAndSchoolsInOrderByAuthorAsc(User user, Pageable pageable, List<User> schools);
+    Page<Course> findAllByUserAndDeletedIsFalseAndSchoolsInOrderByPriceDesc(User user, Pageable pageable, List<User> schools);
+    Page<Course> findAllByUserAndDeletedIsFalseAndSchoolsInOrderByPriceAsc(User user, Pageable pageable, List<User> schools);
+
     Course findCourseByTitle(String name);
 
     Course findCourseByTitleAndIdIsNot(String title, Long id);

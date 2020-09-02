@@ -10,6 +10,7 @@ import com.sorbSoft.CabAcademie.Services.Dtos.Mapper.CourseMapper;
 import com.sorbSoft.CabAcademie.Services.Dtos.Validation.Result;
 import com.sorbSoft.CabAcademie.Services.Dtos.ViewModel.CourseViewModel;
 import com.sorbSoft.CabAcademie.exception.*;
+import org.apache.commons.lang.StringUtils;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -249,6 +250,218 @@ public class CourseService {
     public Page<Course> fetchAllCoursesByPage(int page, int itemsPerPage){
         Pageable pageable = new PageRequest(page - 1 , itemsPerPage);
         return courseRepository.findAll(pageable);
+    }
+
+    public Page<Course> fetchAllCourses(int page, int itemsPerPage, String sortName, String sortValue) {
+        Pageable pageable = new PageRequest(page - 1 , itemsPerPage);
+        if (StringUtils.isNotBlank(sortName)) {
+            switch (sortName.toLowerCase()) {
+                case "bestplan":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByDeletedIsFalseOrderByRatingsDesc(pageable);
+                    }
+                    return courseRepository.findAllByDeletedIsFalseOrderByRatingsAsc(pageable);
+                case "title":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByDeletedIsFalseOrderByTitleDesc(pageable);
+                    }
+                    return courseRepository.findAllByDeletedIsFalseOrderByTitleAsc(pageable);
+                case "author":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByDeletedIsFalseOrderByAuthorDesc(pageable);
+                    }
+                    return courseRepository.findAllByDeletedIsFalseOrderByAuthorAsc(pageable);
+                case "price":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByDeletedIsFalseOrderByPriceDesc(pageable);
+                    }
+                    return courseRepository.findAllByDeletedIsFalseOrderByPriceAsc(pageable);
+            }
+        }
+
+        return courseRepository.findAllByDeletedIsFalse(pageable);
+    }
+
+    public Page<Course> fetchAllCoursesByPageAndTitle(String title, int page, int itemsPerPage, String sortName, String sortValue){
+        Pageable pageable = new PageRequest(page - 1 , itemsPerPage);
+        if (StringUtils.isNotBlank(sortName)) {
+            switch (sortName.toLowerCase()) {
+                case "bestPlan":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByTitleAndDeletedIsFalseOrderByRatingsDesc(title, pageable);
+                    }
+                    return courseRepository.findAllByTitleAndDeletedIsFalseOrderByRatingsAsc(title, pageable);
+                case "title":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByTitleAndDeletedIsFalseOrderByTitleDesc(title, pageable);
+                    }
+                    return courseRepository.findAllByTitleAndDeletedIsFalseOrderByTitleAsc(title, pageable);
+                case "author":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByTitleAndDeletedIsFalseOrderByAuthorDesc(title, pageable);
+                    }
+                    return courseRepository.findAllByTitleAndDeletedIsFalseOrderByAuthorAsc(title, pageable);
+                case "price":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByTitleAndDeletedIsFalseOrderByPriceDesc(title, pageable);
+                    }
+                    return courseRepository.findAllByTitleAndDeletedIsFalseOrderByPriceAsc(title, pageable);
+            }
+        }
+
+        return courseRepository.findAllByTitleAndDeletedIsFalse(title, pageable);
+    }
+
+    public Page<Course> fetchAllCoursesByPageAndUserId(Long userId, int page, int itemsPerPage, String sortName, String sortValue) throws EmptyValueException, UserNotFoundExcepion {
+        validator.validateNull(userId, "userId");
+        User user = userRepository.findById(userId);
+
+        validateIfUserWasFound(user, "id: "+userId);
+
+        Pageable pageable = new PageRequest(page - 1 , itemsPerPage);
+        if (StringUtils.isNotBlank(sortName)) {
+            switch (sortName.toLowerCase()) {
+                case "bestPlan":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByUserAndDeletedIsFalseOrderByRatingsDesc(user, pageable);
+                    }
+                    return courseRepository.findAllByUserAndDeletedIsFalseOrderByRatingsAsc(user, pageable);
+                case "title":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByUserAndDeletedIsFalseOrderByTitleDesc(user, pageable);
+                    }
+                    return courseRepository.findAllByUserAndDeletedIsFalseOrderByTitleAsc(user, pageable);
+                case "author":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByUserAndDeletedIsFalseOrderByAuthorDesc(user, pageable);
+                    }
+                    return courseRepository.findAllByUserAndDeletedIsFalseOrderByAuthorAsc(user, pageable);
+                case "price":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByUserAndDeletedIsFalseOrderByPriceDesc(user, pageable);
+                    }
+                    return courseRepository.findAllByUserAndDeletedIsFalseOrderByPriceAsc(user, pageable);
+            }
+        }
+
+        return courseRepository.findAllByUserAndDeletedIsFalse(user, pageable);
+    }
+
+    public Page<Course> fetchAllPrivateCoursesByPageAndTitle(String title, int page, int itemsPerPage, String sortName, String sortValue, String userName) throws UserNotFoundExcepion, SchoolNotFoundExcepion {
+        Pageable pageable = new PageRequest(page - 1 , itemsPerPage);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        List<User> schools = user.getSchools();
+
+        if (StringUtils.isNotBlank(sortName)) {
+            switch (sortName.toLowerCase()) {
+                case "bestPlan":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByRatingsDesc(title, pageable, schools);
+                    }
+                    return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByRatingsAsc(title, pageable, schools);
+                case "title":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByTitleDesc(title, pageable, schools);
+                    }
+                    return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByTitleAsc(title, pageable, schools);
+                case "author":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByAuthorDesc(title, pageable, schools);
+                    }
+                    return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByAuthorAsc(title, pageable, schools);
+                case "price":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByPriceDesc(title, pageable, schools);
+                    }
+                    return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByPriceAsc(title, pageable, schools);
+            }
+        }
+
+        return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsIn(title, pageable, schools);
+
+    }
+
+    public Page<Course> fetchAllPrivateCoursesByPageAndUserId(Long userId, int page, int itemsPerPage, String sortName, String sortValue, String userName) throws UserNotFoundExcepion, SchoolNotFoundExcepion, EmptyValueException {
+        Pageable pageable = new PageRequest(page - 1 , itemsPerPage);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        List<User> schools = user.getSchools();
+        validator.validateNull(userId, "userId");
+        User searchUser = userRepository.findById(userId);
+
+        validateIfUserWasFound(searchUser, "id: "+userId);
+
+        if (StringUtils.isNotBlank(sortName)) {
+            switch (sortName.toLowerCase()) {
+                case "bestPlan":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByUserAndDeletedIsFalseAndSchoolsInOrderByRatingsDesc(user, pageable, schools);
+                    }
+                    return courseRepository.findAllByUserAndDeletedIsFalseAndSchoolsInOrderByRatingsAsc(user, pageable, schools);
+                case "title":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByUserAndDeletedIsFalseAndSchoolsInOrderByTitleDesc(user, pageable, schools);
+                    }
+                    return courseRepository.findAllByUserAndDeletedIsFalseAndSchoolsInOrderByTitleAsc(user, pageable, schools);
+                case "author":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByUserAndDeletedIsFalseAndSchoolsInOrderByAuthorDesc(user, pageable, schools);
+                    }
+                    return courseRepository.findAllByUserAndDeletedIsFalseAndSchoolsInOrderByAuthorAsc(user, pageable, schools);
+                case "price":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByUserAndDeletedIsFalseAndSchoolsInOrderByPriceDesc(user, pageable, schools);
+                    }
+                    return courseRepository.findAllByUserAndDeletedIsFalseAndSchoolsInOrderByPriceAsc(user, pageable, schools);
+            }
+        }
+
+        return courseRepository.findAllByUserAndDeletedIsFalseAndSchoolsIn(user, pageable, schools);
+    }
+
+    public Page<Course> fetchAllPrivateCourses(int page, int itemsPerPage, String sortName, String sortValue, String userName) throws UserNotFoundExcepion, SchoolNotFoundExcepion {
+        Pageable pageable = new PageRequest(page - 1 , itemsPerPage);
+        User user = userRepository.findByUsername(userName);
+
+        validateIfUserWasFound(user, userName);
+        validateIfSchoolOrOrganizationExists(user, userName);
+
+        List<User> schools = user.getSchools();
+
+        if (StringUtils.isNotBlank(sortName)) {
+            switch (sortName.toLowerCase()) {
+                case "bestplan":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByDeletedIsFalseAndSchoolsInOrderByRatingsDesc(pageable, schools);
+                    }
+                    return courseRepository.findAllByDeletedIsFalseAndSchoolsInOrderByRatingsAsc(pageable, schools);
+                case "title":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByDeletedIsFalseAndSchoolsInOrderByTitleDesc(pageable, schools);
+                    }
+                    return courseRepository.findAllByDeletedIsFalseAndSchoolsInOrderByTitleAsc(pageable, schools);
+                case "author":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByDeletedIsFalseAndSchoolsInOrderByAuthorDesc(pageable, schools);
+                    }
+                    return courseRepository.findAllByDeletedIsFalseAndSchoolsInOrderByAuthorAsc(pageable, schools);
+                case "price":
+                    if (sortValue.equalsIgnoreCase("desc")) {
+                        return courseRepository.findAllByDeletedIsFalseAndSchoolsInOrderByPriceDesc(pageable, schools);
+                    }
+                    return courseRepository.findAllByDeletedIsFalseAndSchoolsInOrderByPriceAsc(pageable, schools);
+            }
+        }
+
+
+        return courseRepository.findAllByDeletedIsFalseAndSchoolsIn(pageable, schools);
     }
 
     public Course fetchCourse(Long id){

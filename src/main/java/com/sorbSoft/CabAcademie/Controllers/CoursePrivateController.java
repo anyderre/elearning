@@ -6,14 +6,13 @@ import com.sorbSoft.CabAcademie.Services.CourseService;
 import com.sorbSoft.CabAcademie.exception.*;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.ArrayList;
@@ -309,5 +308,61 @@ public class CoursePrivateController {
             return new ResponseEntity<>(new ArrayList<>(), HttpStatus.OK);
         return new ResponseEntity<>(courses, HttpStatus.OK);
 
+    }
+
+    /**
+     * Get All Courses Paginate
+     * * @param count
+     * * @param page
+     *
+     * @return courses
+     */
+    @GetMapping(value="/private/filterCourses", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<Course>> getAllCoursesByFilters(@RequestParam(value = "count", defaultValue = "10") String count,
+                                                               @RequestParam(value = "page", defaultValue = "1") String page,
+                                                               @RequestParam(value = "sort", required = false) String sort,
+                                                               @RequestParam(value = "filter", required = false) String filter,
+                                                               Principal principal) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
+        Page<Course> courses;
+        String sortName = null;
+        String sortValue = null;
+
+        if (StringUtils.isNotBlank(sort)) {
+            String[] split = sort.split(" ");
+
+            if (split.length != 2) {
+                throw new IllegalArgumentException("sort is incorrect, should be splitted by space ");
+            }
+
+
+            sortName = split[0];
+            sortValue = split[1];
+        }
+
+        if (StringUtils.isNotBlank(filter)) {
+            String[] split = filter.split(" ");
+
+            if (split.length != 2) {
+                throw new IllegalArgumentException("filter is incorrect, should be splitted by space ");
+            }
+
+            String filedName = split[0];
+            String filedValue = split[1];
+
+            switch(filedName.trim().toLowerCase()) {
+
+                case "title":
+                    courses = courseService.fetchAllPrivateCoursesByPageAndTitle(filedValue, Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue, principal.getName());
+                    return new ResponseEntity<>(courses, HttpStatus.OK);
+                case "userId":
+                    courses = courseService.fetchAllPrivateCoursesByPageAndUserId(Long.valueOf(filedValue), Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue, principal.getName());
+                    return new ResponseEntity<>(courses, HttpStatus.OK);
+            }
+
+        }
+
+        courses = courseService.fetchAllPrivateCourses(Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue, principal.getName());
+
+        return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 }

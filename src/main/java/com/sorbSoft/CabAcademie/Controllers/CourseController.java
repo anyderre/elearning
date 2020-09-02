@@ -12,6 +12,7 @@ import com.sorbSoft.CabAcademie.config.JwtTokenUtil;
 import com.sorbSoft.CabAcademie.exception.*;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.log4j.Log4j2;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -620,4 +621,62 @@ public class CourseController {
         }
         return  new ResponseEntity<>(MessageResponse.of("Course successfully deleted"), HttpStatus.OK);
     }
+
+    /**
+     * Get All Courses Paginate
+     * * @param count
+     * * @param page
+     *
+     * @return courses
+     */
+    @GetMapping(value="/filterCourses", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Page<Course>> getAllCoursesByFilters(@RequestParam(value = "count", defaultValue = "10") String count,
+                                                               @RequestParam(value = "page", defaultValue = "1") String page,
+                                                               @RequestParam(value = "sort", required = false) String sort,
+                                                               @RequestParam(value = "filter", required = false) String filter) throws EmptyValueException, UserNotFoundExcepion {
+        Page<Course> courses;
+        String sortName = null;
+        String sortValue = null;
+
+        if (StringUtils.isNotBlank(sort)) {
+            String[] split = sort.split(" ");
+
+            if (split.length != 2) {
+                throw new IllegalArgumentException("sort is incorrect, should be splitted by space ");
+            }
+
+
+            sortName = split[0];
+            sortValue = split[1];
+        }
+
+        if (StringUtils.isNotBlank(filter)) {
+            String[] split = filter.split(" ");
+
+            if (split.length != 2) {
+                throw new IllegalArgumentException("filter is incorrect, should be splitted by space ");
+            }
+
+            String filedName = split[0];
+            String filedValue = split[1];
+
+            switch(filedName.trim().toLowerCase()) {
+
+                case "title":
+                    courses = courseService.fetchAllCoursesByPageAndTitle(filedValue, Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue);
+                    return new ResponseEntity<>(courses, HttpStatus.OK);
+                case "userId":
+                    courses = courseService.fetchAllCoursesByPageAndUserId(Long.valueOf(filedValue), Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue);
+                    return new ResponseEntity<>(courses, HttpStatus.OK);
+            }
+
+        }
+
+        courses = courseService.fetchAllCourses(Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue);
+
+        return new ResponseEntity<>(courses, HttpStatus.OK);
+    }
+
+
+
 }
