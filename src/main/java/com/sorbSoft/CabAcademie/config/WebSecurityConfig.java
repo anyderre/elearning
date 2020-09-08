@@ -174,6 +174,7 @@ public class WebSecurityConfig {
                     .antMatchers(HttpMethod.GET, "/api/course/lastCreated/**").permitAll()
                     .antMatchers(HttpMethod.GET, "/api/course/bestRated/**").permitAll()
                     .antMatchers(HttpMethod.GET, "/api/course/featured/**").permitAll()
+                    .antMatchers(HttpMethod.GET, "/api/course/filterCourses/**").permitAll()
 
                     //TODO: potential security issue here. Need to split api on registerUpload and loggedIn upload
                     //TODO: registerUpload should be limited by file size like up to 10 Mb
