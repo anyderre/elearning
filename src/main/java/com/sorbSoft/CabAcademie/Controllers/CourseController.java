@@ -634,7 +634,7 @@ public class CourseController {
                                                                @RequestParam(value = "page", defaultValue = "1") String page,
                                                                @RequestParam(value = "sort", required = false) String sort,
                                                                @RequestParam(value = "filter", required = false) String filter) throws EmptyValueException, UserNotFoundExcepion {
-        Page<Course> courses;
+        Page<Course> courses = null;
         String sortName = null;
         String sortValue = null;
 
@@ -660,7 +660,7 @@ public class CourseController {
             String filedName = split[0];
             String filedValue = split[1];
 
-            switch(filedName.trim().toLowerCase()) {
+            switch (filedName.trim().toLowerCase()) {
 
                 case "title":
                     courses = courseService.fetchAllCoursesByPageAndTitle(filedValue, Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue);
@@ -670,9 +670,10 @@ public class CourseController {
                     return new ResponseEntity<>(courses, HttpStatus.OK);
             }
 
+        } else {
+             courses = courseService.fetchAllCourses(Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue);
         }
 
-        courses = courseService.fetchAllCourses(Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue);
 
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
@@ -690,7 +691,7 @@ public class CourseController {
                                                                @RequestParam(value = "sort", required = false) String sort,
                                                                @RequestParam(value = "filter", required = false) String filter,
                                                                Principal principal) throws EmptyValueException, UserNotFoundExcepion, SchoolNotFoundExcepion {
-        Page<Course> courses;
+        Page<Course> courses = null;
         String sortName = null;
         String sortValue = null;
 
@@ -716,7 +717,7 @@ public class CourseController {
             String filedName = split[0];
             String filedValue = split[1];
 
-            switch(filedName.trim().toLowerCase()) {
+            switch (filedName.trim().toLowerCase()) {
 
                 case "title":
                     courses = courseService.fetchAllPrivateCoursesByPageAndTitle(filedValue, Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue, principal.getName());
@@ -726,9 +727,10 @@ public class CourseController {
                     return new ResponseEntity<>(courses, HttpStatus.OK);
             }
 
+        } else {
+            courses = courseService.fetchAllPrivateCourses(Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue, principal.getName());
         }
 
-        courses = courseService.fetchAllPrivateCourses(Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue, principal.getName());
 
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }

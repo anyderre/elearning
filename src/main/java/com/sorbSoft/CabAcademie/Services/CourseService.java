@@ -288,28 +288,28 @@ public class CourseService {
             switch (sortName.toLowerCase()) {
                 case "bestPlan":
                     if (sortValue.equalsIgnoreCase("desc")) {
-                        return courseRepository.findAllByTitleAndDeletedIsFalseOrderByRatingsDesc(title, pageable);
+                        return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByRatingsDesc(title, pageable);
                     }
-                    return courseRepository.findAllByTitleAndDeletedIsFalseOrderByRatingsAsc(title, pageable);
+                    return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByRatingsAsc(title, pageable);
                 case "title":
                     if (sortValue.equalsIgnoreCase("desc")) {
-                        return courseRepository.findAllByTitleAndDeletedIsFalseOrderByTitleDesc(title, pageable);
+                        return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByTitleDesc(title, pageable);
                     }
-                    return courseRepository.findAllByTitleAndDeletedIsFalseOrderByTitleAsc(title, pageable);
+                    return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByTitleAsc(title, pageable);
                 case "author":
                     if (sortValue.equalsIgnoreCase("desc")) {
-                        return courseRepository.findAllByTitleAndDeletedIsFalseOrderByAuthorDesc(title, pageable);
+                        return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByAuthorDesc(title, pageable);
                     }
-                    return courseRepository.findAllByTitleAndDeletedIsFalseOrderByAuthorAsc(title, pageable);
+                    return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByAuthorAsc(title, pageable);
                 case "price":
                     if (sortValue.equalsIgnoreCase("desc")) {
-                        return courseRepository.findAllByTitleAndDeletedIsFalseOrderByPriceDesc(title, pageable);
+                        return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByPriceDesc(title, pageable);
                     }
-                    return courseRepository.findAllByTitleAndDeletedIsFalseOrderByPriceAsc(title, pageable);
+                    return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByPriceAsc(title, pageable);
             }
         }
 
-        return courseRepository.findAllByTitleAndDeletedIsFalse(title, pageable);
+        return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalse(title, pageable);
     }
 
     public Page<Course> fetchAllCoursesByPageAndUserId(Long userId, int page, int itemsPerPage, String sortName, String sortValue) throws EmptyValueException, UserNotFoundExcepion {
@@ -360,28 +360,28 @@ public class CourseService {
             switch (sortName.toLowerCase()) {
                 case "bestPlan":
                     if (sortValue.equalsIgnoreCase("desc")) {
-                        return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByRatingsDesc(title, pageable, schools);
+                        return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByRatingsDesc(title, pageable, schools);
                     }
-                    return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByRatingsAsc(title, pageable, schools);
+                    return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByRatingsAsc(title, pageable, schools);
                 case "title":
                     if (sortValue.equalsIgnoreCase("desc")) {
-                        return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByTitleDesc(title, pageable, schools);
+                        return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByTitleDesc(title, pageable, schools);
                     }
-                    return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByTitleAsc(title, pageable, schools);
+                    return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByTitleAsc(title, pageable, schools);
                 case "author":
                     if (sortValue.equalsIgnoreCase("desc")) {
-                        return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByAuthorDesc(title, pageable, schools);
+                        return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByAuthorDesc(title, pageable, schools);
                     }
-                    return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByAuthorAsc(title, pageable, schools);
+                    return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByAuthorAsc(title, pageable, schools);
                 case "price":
                     if (sortValue.equalsIgnoreCase("desc")) {
-                        return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByPriceDesc(title, pageable, schools);
+                        return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByPriceDesc(title, pageable, schools);
                     }
-                    return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByPriceAsc(title, pageable, schools);
+                    return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByPriceAsc(title, pageable, schools);
             }
         }
 
-        return courseRepository.findAllByTitleAndDeletedIsFalseAndSchoolsIn(title, pageable, schools);
+        return courseRepository.findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsIn(title, pageable, schools);
 
     }
 

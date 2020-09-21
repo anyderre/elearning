@@ -29,15 +29,15 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Page<Course> findAllByDeletedIsFalseOrderByPriceDesc(Pageable pageable);
     Page<Course> findAllByDeletedIsFalseOrderByPriceAsc(Pageable pageable);
 
-    Page<Course> findAllByTitleAndDeletedIsFalse(String title, Pageable pageable);
-    Page<Course> findAllByTitleAndDeletedIsFalseOrderByRatingsDesc(String title, Pageable pageable);
-    Page<Course> findAllByTitleAndDeletedIsFalseOrderByRatingsAsc(String title, Pageable pageable);
-    Page<Course> findAllByTitleAndDeletedIsFalseOrderByTitleDesc(String title, Pageable pageable);
-    Page<Course> findAllByTitleAndDeletedIsFalseOrderByTitleAsc(String title, Pageable pageable);
-    Page<Course> findAllByTitleAndDeletedIsFalseOrderByAuthorDesc(String title, Pageable pageable);
-    Page<Course> findAllByTitleAndDeletedIsFalseOrderByAuthorAsc(String title, Pageable pageable);
-    Page<Course> findAllByTitleAndDeletedIsFalseOrderByPriceDesc(String title, Pageable pageable);
-    Page<Course> findAllByTitleAndDeletedIsFalseOrderByPriceAsc(String title, Pageable pageable);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalse(String title, Pageable pageable);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByRatingsDesc(String title, Pageable pageable);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByRatingsAsc(String title, Pageable pageable);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByTitleDesc(String title, Pageable pageable);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByTitleAsc(String title, Pageable pageable);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByAuthorDesc(String title, Pageable pageable);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByAuthorAsc(String title, Pageable pageable);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByPriceDesc(String title, Pageable pageable);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseOrderByPriceAsc(String title, Pageable pageable);
 
     Page<Course> findAllByUserAndDeletedIsFalse(User user, Pageable pageable);
     Page<Course> findAllByUserAndDeletedIsFalseOrderByRatingsDesc(User user, Pageable pageable);
@@ -60,15 +60,15 @@ public interface CourseRepository extends JpaRepository<Course, Long> {
     Page<Course> findAllByDeletedIsFalseAndSchoolsInOrderByPriceDesc(Pageable pageable, List<User> schools);
     Page<Course> findAllByDeletedIsFalseAndSchoolsInOrderByPriceAsc(Pageable pageable, List<User> schools);
 
-    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsIn(String title, Pageable pageable, List<User> schools);
-    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByRatingsDesc(String title, Pageable pageable, List<User> schools);
-    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByRatingsAsc(String title, Pageable pageable, List<User> schools);
-    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByTitleDesc(String title, Pageable pageable, List<User> schools);
-    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByTitleAsc(String title, Pageable pageable, List<User> schools);
-    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByAuthorDesc(String title, Pageable pageable, List<User> schools);
-    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByAuthorAsc(String title, Pageable pageable, List<User> schools);
-    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByPriceDesc(String title, Pageable pageable, List<User> schools);
-    Page<Course> findAllByTitleAndDeletedIsFalseAndSchoolsInOrderByPriceAsc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsIn(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByRatingsDesc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByRatingsAsc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByTitleDesc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByTitleAsc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByAuthorDesc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByAuthorAsc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByPriceDesc(String title, Pageable pageable, List<User> schools);
+    Page<Course> findAllByTitleContainingIgnoreCaseAndDeletedIsFalseAndSchoolsInOrderByPriceAsc(String title, Pageable pageable, List<User> schools);
 
     Page<Course> findAllByUserAndDeletedIsFalseAndSchoolsIn(User user, Pageable pageable, List<User> schools);
     Page<Course> findAllByUserAndDeletedIsFalseAndSchoolsInOrderByRatingsDesc(User user, Pageable pageable, List<User> schools);
