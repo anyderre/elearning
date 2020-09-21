@@ -725,6 +725,8 @@ public class CourseController {
                 case "userId":
                     courses = courseService.fetchAllPrivateCoursesByPageAndUserId(Long.valueOf(filedValue), Integer.valueOf(page), Integer.valueOf(count), sortName, sortValue, principal.getName());
                     return new ResponseEntity<>(courses, HttpStatus.OK);
+                default:
+                    throw new IllegalArgumentException("filter is incorrect, check supported filters");
             }
 
         } else {
