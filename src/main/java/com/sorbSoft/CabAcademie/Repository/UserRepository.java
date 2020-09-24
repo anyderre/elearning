@@ -21,10 +21,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByEmail(String email);
 
-    User findAllByUsername(String username);
-
-    User findAllByEmail(String email);
-
     User findUserByUsernameAndIdIsNot(String username, Long id);
 
     User findById(Long id);
@@ -39,9 +35,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     List<User> findAllByRole(Rol role);
 
-    Boolean existsByUsernameAndIdNot(String username, Long id);
+    Boolean existsByUsernameAndIdIsNot(String username, Long id);
 
-    Boolean existsByEmailAndIdNot(String email, Long id);
+    Boolean existsByEmailAndIdIsNot(String email, Long id);
+
+    Boolean existsByUsernameAndIdIsNotAndDeletedIsTrue(String username, Long id);
+
+    Boolean existsByEmailAndIdIsNotAndDeletedIsTrue(String email, Long id);
 
     User findUserByEmailConfirmationUID(String emailConfirmationUid);
 

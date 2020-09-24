@@ -169,7 +169,9 @@ public class UserController {
         log.info("Save request");
         log.info(user.getUsername());
         log.info(user.getId());
-        if (userRepository.existsByUsernameAndIdNot(user.getUsername(), user.getId())) {
+        if (userRepository.existsByUsernameAndIdIsNot(user.getUsername(), user.getId()) ||
+            userRepository.existsByUsernameAndIdIsNotAndDeletedIsTrue(user.getUsername(), user.getId())
+                ) {
             log.info("1");
 
             return ResponseEntity
@@ -177,7 +179,8 @@ public class UserController {
                     .body(MessageResponse.of("Error: Username is already taken!"));
         }
 
-        if (userRepository.existsByEmailAndIdNot(user.getEmail(), user.getId())) {
+        if (userRepository.existsByEmailAndIdIsNot(user.getEmail(), user.getId()) ||
+            userRepository.existsByEmailAndIdIsNotAndDeletedIsTrue(user.getEmail(), user.getId())) {
             log.info("2");
             return ResponseEntity
                     .badRequest()
@@ -209,31 +212,7 @@ public class UserController {
     @PostMapping("/saveSchool")
     public  ResponseEntity<MessageResponse> saveSchool(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
         user.setIsDefaultPasswordChanged(true);
-
-        log.info("Save request");
-        log.info(user.getUsername());
-        log.info(user.getId());
-        log.info(userRepository.findAllByUsername(user.getUsername()));
-        if (userRepository.findAllByUsername(user.getUsername()) != null) {
-            log.info("1");
-
-            return ResponseEntity
-                    .badRequest()
-                    .body(MessageResponse.of("Error: Username is already taken!"));
-        }
-
-        if (userRepository.findAllByEmail(user.getEmail()) != null) {
-            log.info("2");
-            return ResponseEntity
-                    .badRequest()
-                    .body(MessageResponse.of("Error: Email is already in use!"));
-        }
-
-        Result result = userService.saveUser(user);
-        log.info("4");
-        if(!result.isValid())
-            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
-        return  new ResponseEntity<>(MessageResponse.of("User successfully created"), HttpStatus.CREATED);
+        return saveUser(user);
     }
 
     @PostMapping("/saveTeacher")
