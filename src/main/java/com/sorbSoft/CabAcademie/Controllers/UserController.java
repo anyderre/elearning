@@ -170,7 +170,7 @@ public class UserController {
         log.info(user.getUsername());
         log.info(user.getId());
         if (userRepository.existsByUsernameAndIdIsNot(user.getUsername(), user.getId()) ||
-            userRepository.existsByUsername(user.getUsername())
+            userRepository.existsByUsername(user.getUsername()) > 0
                 ) {
             log.info("1");
 
@@ -180,7 +180,7 @@ public class UserController {
         }
 
         if (userRepository.existsByEmailAndIdIsNot(user.getEmail(), user.getId()) ||
-            userRepository.existsByEmail(user.getEmail())) {
+            userRepository.existsByEmail(user.getEmail()) > 0) {
             log.info("2");
             return ResponseEntity
                     .badRequest()

@@ -6,6 +6,7 @@ import com.sorbSoft.CabAcademie.Entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -39,9 +40,11 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByEmailAndIdIsNot(String email, Long id);
 
-    Boolean existsByUsername(String username);
+    @Query(value="SELECT count(*) FROM \"USER\" where username = ?1", nativeQuery=true)
+    int existsByUsername(String username);
 
-    Boolean existsByEmail(String email);
+    @Query(value="SELECT count(*) FROM \"USER\" where email = ?1", nativeQuery=true)
+    int existsByEmail(String email);
 
     User findUserByEmailConfirmationUID(String emailConfirmationUid);
 
