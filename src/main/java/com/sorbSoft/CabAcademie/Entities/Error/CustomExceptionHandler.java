@@ -31,22 +31,6 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler{
         return buildResponseEntity(error);
     }
 
-    @ExceptionHandler({Exception.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public final ResponseEntity<Object> handleAllExceptions(String ex, String message) {
-        log.error("error string exception: " +ex);
-        ErrorMessage error = new ErrorMessage(BAD_REQUEST, message, new IllegalArgumentException(ex));
-        return buildResponseEntity(error);
-    }
-
-    @ExceptionHandler({Exception.class})
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public final ResponseEntity<Object> handleAllExceptions(String message) {
-        log.error("error message: " + message);
-        ErrorMessage error = new ErrorMessage(BAD_REQUEST, message, null);
-        return buildResponseEntity(error);
-    }
-
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler({NullPointerException.class})
     public final ResponseEntity<Object> handleNullException(NullPointerException ex, String message) {
