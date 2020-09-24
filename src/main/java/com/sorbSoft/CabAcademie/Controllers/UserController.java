@@ -209,7 +209,30 @@ public class UserController {
     @PostMapping("/saveSchool")
     public  ResponseEntity<MessageResponse> saveSchool(@Valid @RequestBody UserViewModel user) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
         user.setIsDefaultPasswordChanged(true);
-        return saveUser(user);
+
+        log.info("Save request");
+        log.info(user.getUsername());
+        log.info(user.getId());
+        if (userRepository.findByUsername(user.getUsername()) != null) {
+            log.info("1");
+
+            return ResponseEntity
+                    .badRequest()
+                    .body(MessageResponse.of("Error: Username is already taken!"));
+        }
+
+        if (userRepository.findByEmail(user.getEmail()) != null) {
+            log.info("2");
+            return ResponseEntity
+                    .badRequest()
+                    .body(MessageResponse.of("Error: Email is already in use!"));
+        }
+
+        Result result = userService.saveUser(user);
+        log.info("4");
+        if(!result.isValid())
+            return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
+        return  new ResponseEntity<>(MessageResponse.of("User successfully created"), HttpStatus.CREATED);
     }
 
     @PostMapping("/saveTeacher")
