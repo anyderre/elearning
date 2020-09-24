@@ -213,7 +213,8 @@ public class UserController {
         log.info("Save request");
         log.info(user.getUsername());
         log.info(user.getId());
-        if (userRepository.findByUsername(user.getUsername()) != null) {
+        log.info(userRepository.findAllByUsername(user.getUsername()));
+        if (userRepository.findAllByUsername(user.getUsername()) != null) {
             log.info("1");
 
             return ResponseEntity
@@ -221,7 +222,7 @@ public class UserController {
                     .body(MessageResponse.of("Error: Username is already taken!"));
         }
 
-        if (userRepository.findByEmail(user.getEmail()) != null) {
+        if (userRepository.findAllByEmail(user.getEmail()) != null) {
             log.info("2");
             return ResponseEntity
                     .badRequest()
