@@ -166,19 +166,27 @@ public class UserController {
     }
 
     private ResponseEntity<MessageResponse> saveUser(UserViewModel user) throws WorkspaceNameIsAlreadyTaken, SubscriptionPlanNotSpecified {
+        log.info("Save request");
+        log.info(user.getUsername());
+        log.info(user.getId());
         if (userRepository.existsByUsernameAndIdIsNot(user.getUsername(), user.getId())) {
+            log.info("1");
+
             return ResponseEntity
                     .badRequest()
                     .body(MessageResponse.of("Error: Username is already taken!"));
         }
 
         if (userRepository.existsByEmailAndIdIsNot(user.getEmail(), user.getId())) {
+            log.info("2");
             return ResponseEntity
                     .badRequest()
                     .body(MessageResponse.of("Error: Email is already in use!"));
         }
 
+        log.info("3");
         Result result = userService.saveUser(user);
+        log.info("4");
         if(!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(MessageResponse.of("User successfully created"), HttpStatus.CREATED);
