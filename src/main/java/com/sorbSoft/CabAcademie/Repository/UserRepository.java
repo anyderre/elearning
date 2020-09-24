@@ -40,10 +40,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Boolean existsByEmailAndIdIsNot(String email, Long id);
 
-    @Query(value="SELECT count(*) FROM \"USER\" where username = ?1", nativeQuery=true)
+    @Query(value="SELECT count(*) FROM \"user\" where username = ?1", nativeQuery=true)
     int existsByUsername(String username);
 
-    @Query(value="SELECT count(*) FROM \"USER\" where email = ?1", nativeQuery=true)
+    @Query(value="SELECT count(*) FROM \"user\" where email = ?1", nativeQuery=true)
     int existsByEmail(String email);
 
     User findUserByEmailConfirmationUID(String emailConfirmationUid);
