@@ -1,5 +1,6 @@
 package com.sorbSoft.CabAcademie.Entities.Error;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +20,30 @@ import java.util.ArrayList;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
+@Log4j2
 @ControllerAdvice
 public class CustomExceptionHandler extends ResponseEntityExceptionHandler{
     @ExceptionHandler({Exception.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public final ResponseEntity<Object> handleAllExceptions(Exception ex, String message) {
+        log.error(ex);
         ErrorMessage error = new ErrorMessage(BAD_REQUEST, message, ex);
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler({Exception.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public final ResponseEntity<Object> handleAllExceptions(String ex, String message) {
+        log.error("error string exception: " +ex);
+        ErrorMessage error = new ErrorMessage(BAD_REQUEST, message, new IllegalArgumentException(ex));
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler({Exception.class})
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public final ResponseEntity<Object> handleAllExceptions(String message) {
+        log.error("error message: " + message);
+        ErrorMessage error = new ErrorMessage(BAD_REQUEST, message, null);
         return buildResponseEntity(error);
     }
 
