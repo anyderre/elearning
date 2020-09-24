@@ -169,7 +169,7 @@ public class UserController {
         log.info("Save request");
         log.info(user.getUsername());
         log.info(user.getId());
-        if (userRepository.existsByUsernameAndIdIsNot(user.getUsername(), user.getId())) {
+        if (userRepository.existsByUsernameAndIdNot(user.getUsername(), user.getId())) {
             log.info("1");
 
             return ResponseEntity
@@ -177,7 +177,7 @@ public class UserController {
                     .body(MessageResponse.of("Error: Username is already taken!"));
         }
 
-        if (userRepository.existsByEmailAndIdIsNot(user.getEmail(), user.getId())) {
+        if (userRepository.existsByEmailAndIdNot(user.getEmail(), user.getId())) {
             log.info("2");
             return ResponseEntity
                     .badRequest()
