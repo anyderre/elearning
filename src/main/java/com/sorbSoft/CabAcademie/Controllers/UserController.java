@@ -169,27 +169,19 @@ public class UserController {
         log.info("Save request");
         log.info(user.getUsername());
         log.info(user.getId());
-        if (userRepository.existsByUsernameAndIdIsNot(user.getUsername(), user.getId()) ||
-            userRepository.existsByUsername(user.getUsername()) > 0
-                ) {
-            log.info("1");
-
+        if (userRepository.existsByUsernameAndIdIsNot(user.getUsername(), user.getId())) {
             return ResponseEntity
                     .badRequest()
                     .body(MessageResponse.of("Error: Username is already taken!"));
         }
 
-        if (userRepository.existsByEmailAndIdIsNot(user.getEmail(), user.getId()) ||
-            userRepository.existsByEmail(user.getEmail()) > 0) {
-            log.info("2");
+        if (userRepository.existsByEmailAndIdIsNot(user.getEmail(), user.getId())) {
             return ResponseEntity
                     .badRequest()
                     .body(MessageResponse.of("Error: Email is already in use!"));
         }
 
-        log.info("3");
         Result result = userService.saveUser(user);
-        log.info("4");
         if(!result.isValid())
             return new ResponseEntity<>(MessageResponse.of(result.lista.get(0).getMessage()), HttpStatus.CONFLICT);
         return  new ResponseEntity<>(MessageResponse.of("User successfully created"), HttpStatus.CREATED);
